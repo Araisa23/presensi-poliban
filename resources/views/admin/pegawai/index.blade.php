@@ -1,0 +1,78 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+                <p class="text-white/70 text-xs font-black uppercase tracking-[0.25em]">Admin</p>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+                {{ __('Daftar Tenaga Kependidikan') }}
+                </h2>
+                <p class="mt-1 text-white/70 text-sm font-medium">Kelola data pegawai, unit kerja, dan akun terkait.</p>
+            </div>
+            <a href="{{ route('admin.pegawai.create') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition text-center min-w-[180px]">
+                + Tambah Pegawai
+            </a>
+        </div>
+    </x-slot>
+
+    <div class="max-w-7xl mx-auto">
+            @if(session('success'))
+                <div class="mb-6 p-4 rounded-2xl bg-emerald-50/70 dark:bg-emerald-500/10 border border-emerald-200/70 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-200 shadow-soft">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50/70 dark:bg-white/5">
+                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">NIP</th>
+                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">Nama Lengkap</th>
+                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">Unit Kerja</th>
+                                <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
+                            @forelse($pegawai as $p)
+                                <tr class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition">
+                                    <td class="px-6 py-5 text-sm font-mono text-slate-600 dark:text-slate-300">
+                                        {{ $p->nip }}
+                                    </td>
+                                    <td class="px-6 py-5">
+                                        <div class="text-sm font-black text-slate-800 dark:text-slate-100">{{ $p->nama }}</div>
+                                        <div class="text-xs font-medium text-slate-400">{{ $p->user->email ?? '-' }}</div>
+                                    </td>
+                                    <td class="px-6 py-5">
+                                        <span class="px-3 py-1.5 bg-indigo-50/80 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-200 rounded-full text-xs font-black ring-1 ring-indigo-600/10">
+                                            {{ $p->unitKerja->nama_unit ?? '-' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-5 text-right">
+                                        <div class="inline-flex items-center gap-2">
+                                            <a href="{{ route('admin.pegawai.edit', $p->id) }}" class="inline-flex items-center justify-center px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-[0.18em] bg-white/80 dark:bg-white/10 text-slate-700 dark:text-slate-100 hover:bg-white dark:hover:bg-white/15 ring-1 ring-slate-900/10 dark:ring-white/10 shadow-soft transition">
+                                                Edit
+                                            </a>
+                                        <form action="{{ route('admin.pegawai.destroy', $p->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus data pegawai ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-[0.18em] bg-rose-50/80 dark:bg-rose-500/10 text-rose-700 dark:text-rose-200 hover:bg-rose-100/70 dark:hover:bg-rose-500/15 ring-1 ring-rose-600/10 dark:ring-rose-500/20 transition">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-6 py-12 text-center text-slate-400 font-medium italic">Belum ada data tenaga kependidikan.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-6 border-t border-slate-100/70 dark:border-white/10 bg-slate-50/60 dark:bg-white/5">
+                    {{ $pegawai->links() }}
+                </div>
+            </div>
+    </div>
+</x-app-layout>
