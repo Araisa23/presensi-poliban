@@ -19,47 +19,95 @@
                 <form action="{{ route('admin.pegawai.store') }}" method="POST" class="space-y-6">
                     @csrf
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- User ID Selection -->
-                        <div class="md:col-span-2">
-                            <x-input-label for="user_id" :value="__('Pilih Akun User')" />
-                            <select id="user_id" name="user_id" class="block mt-2 w-full border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/5 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-2xl shadow-soft ring-1 ring-slate-900/5 dark:ring-white/10 transition" required>
-                                <option value="">-- Pilih Akun --</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }} ({{ $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('user_id')" class="mt-2" />
-                            <p class="text-xs text-gray-400 mt-1 italic italic">Hanya menampilkan user dengan role 'pegawai' yang belum memiliki profil tenaga kependidikan.</p>
-                        </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                        <div>
-                            <x-input-label for="nip" :value="__('NIP')" />
-                            <x-text-input id="nip" class="block mt-1 w-full" type="text" name="nip" :value="old('nip')" required />
-                            <x-input-error :messages="$errors->get('nip')" class="mt-2" />
-                        </div>
+        <!-- NIP -->
+        <div>
+            <x-input-label for="nip" :value="__('NIP')" />
+            <x-text-input 
+                id="nip" 
+                class="block mt-1 w-full" 
+                type="text" 
+                name="nip" 
+                :value="old('nip')" 
+                required 
+            />
+            <x-input-error :messages="$errors->get('nip')" class="mt-2" />
+        </div>
 
-                        <div>
-                            <x-input-label for="nama" :value="__('Nama Lengkap')" />
-                            <x-text-input id="nama" class="block mt-1 w-full" type="text" name="nama" :value="old('nama')" required />
-                            <x-input-error :messages="$errors->get('nama')" class="mt-2" />
-                        </div>
+        <!-- Nama -->
+        <div>
+            <x-input-label for="nama" :value="__('Nama Lengkap')" />
+            <x-text-input 
+                id="nama" 
+                class="block mt-1 w-full" 
+                type="text" 
+                name="nama" 
+                :value="old('nama')" 
+                required 
+            />
+            <x-input-error :messages="$errors->get('nama')" class="mt-2" />
+        </div>
 
-                        <div class="md:col-span-2">
-                            <x-input-label for="unit_kerja_id" :value="__('Unit Kerja')" />
-                            <select id="unit_kerja_id" name="unit_kerja_id" class="block mt-2 w-full border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/5 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-2xl shadow-soft ring-1 ring-slate-900/5 dark:ring-white/10 transition" required>
-                                <option value="">-- Pilih Unit --</option>
-                                @foreach($unitKerja as $unit)
-                                    <option value="{{ $unit->id }}" {{ old('unit_kerja_id') == $unit->id ? 'selected' : '' }}>
-                                        {{ $unit->nama_unit }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('unit_kerja_id')" class="mt-2" />
-                        </div>
-                    </div>
+        <!-- Jenis Kelamin -->
+        <div>
+            <x-input-label for="jenis_kelamin" :value="__('Jenis Kelamin')" />
+
+            <select 
+                id="jenis_kelamin" 
+                name="jenis_kelamin"
+                class="block mt-2 w-full border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/5 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-2xl shadow-soft ring-1 ring-slate-900/5 dark:ring-white/10 transition"
+                required
+            >
+                <option value="">-- Pilih Jenis Kelamin --</option>
+                <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>
+                    Laki-laki
+                </option>
+                <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>
+                    Perempuan
+                </option>
+            </select>
+
+            <x-input-error :messages="$errors->get('jenis_kelamin')" class="mt-2" />
+        </div>
+
+        <!-- Pangkat -->
+        <div>
+            <x-input-label for="pangkat" :value="__('Pangkat')" />
+            <x-text-input 
+                id="pangkat" 
+                class="block mt-1 w-full" 
+                type="text" 
+                name="pangkat" 
+                :value="old('pangkat')" 
+                placeholder="Opsional"
+            />
+            <x-input-error :messages="$errors->get('pangkat')" class="mt-2" />
+        </div>
+
+        <!-- Unit Kerja -->
+        <div class="md:col-span-2">
+            <x-input-label for="unit_kerja_id" :value="__('Unit Kerja')" />
+
+            <select 
+                id="unit_kerja_id" 
+                name="unit_kerja_id"
+                class="block mt-2 w-full border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/5 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-2xl shadow-soft ring-1 ring-slate-900/5 dark:ring-white/10 transition"
+                required
+            >
+                <option value="">-- Pilih Unit Kerja --</option>
+
+                @foreach($unitKerja as $unit)
+                    <option value="{{ $unit->id }}" {{ old('unit_kerja_id') == $unit->id ? 'selected' : '' }}>
+                        {{ $unit->nama_unit }}
+                    </option>
+                @endforeach
+            </select>
+
+            <x-input-error :messages="$errors->get('unit_kerja_id')" class="mt-2" />
+        </div>
+
+    </div>
 
                     <div class="flex items-center justify-end mt-6">
                         <x-primary-button>

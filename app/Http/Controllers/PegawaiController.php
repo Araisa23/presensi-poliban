@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\PegawaiImport;
+use App\Exports\PegawaiTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\Request;
 use App\Http\Requests\PegawaiRequest;
 use App\Models\TenagaKependidikan;
 use App\Models\User;
@@ -96,5 +100,26 @@ class PegawaiController extends Controller
         return redirect()
             ->route('admin.pegawai.index')
             ->with('success', 'Pegawai berhasil dihapus.');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        Excel::import(new PegawaiImport, $request->file('file'));
+
+        return redirect()
+            ->route('admin.pegawai.index')
+            ->with('success', 'Data pegawai berhasil diimport.');
+    }
+
+    public function downloadTemplate()
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new PegawaiTemplateExport,
+            'template_pegawai.xlsx'
+        );
     }
 }

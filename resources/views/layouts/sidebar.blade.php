@@ -4,7 +4,7 @@
             P
         </div>
         <div class="leading-tight">
-            <div class="text-sm font-black tracking-tight">PresenceHub</div>
+            <div class="text-sm font-black tracking-tight">Presensi Tenaga Kependidikan</div>
             <div class="text-[10px] font-black uppercase tracking-[0.25em] text-white/70">Presensi</div>
         </div>
     </div>
@@ -47,12 +47,25 @@
                 Jadwal
             </a>
 
-            <a href="{{ route('admin.hari-libur.index') }}"
-               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {{ request()->routeIs('admin.hari-libur.*') ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/10' : 'text-slate-700 hover:bg-slate-50' }}">
+            <a href="{{ route('admin.pengumuman.index') }}"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {{ request()->routeIs('admin.pengumuman.*') ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/10' : 'text-slate-700 hover:bg-slate-50' }}">
+
                 <span class="w-8 h-8 rounded-xl bg-white ring-1 ring-slate-900/10 flex items-center justify-center">
-                    <svg class="w-4 h-4 {{ request()->routeIs('admin.hari-libur.*') ? 'text-indigo-700' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10"/></svg>
+
+                    <svg class="w-4 h-4 {{ request()->routeIs('admin.pengumuman.*') ? 'text-indigo-700' : 'text-slate-500' }}"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/>
+                    </svg>
+
                 </span>
-                Hari Libur
+
+                Pengumuman
             </a>
 
             <a href="{{ route('admin.lokasi-kantor.index') }}"
@@ -125,4 +138,3 @@
         @endif
     </nav>
 </aside>
-

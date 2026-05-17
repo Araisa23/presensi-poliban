@@ -11,7 +11,6 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 use App\Models\PresensiFoto;
-use Illuminate\Support\Facades\Http;
 
 class PresensiController extends Controller
 {
@@ -29,111 +28,131 @@ class PresensiController extends Controller
 
     public function index()
     {
-        $presensi = Presensi::with('user.tenagaKependidikan')->latest()->paginate(10);
+        $presensi = Presensi::with('user.tenagaKependidikan')
+            ->latest()
+            ->paginate(10);
+
         return view('admin.presensi.index', compact('presensi'));
     }
 
     public function history()
     {
         $user = auth()->user();
-        $presensi = Presensi::where('user_id', $user->id)->latest()->paginate(10);
+
+        $presensi = Presensi::where('user_id', $user->id)
+            ->latest()
+            ->paginate(10);
+
         return view('presensi.history', compact('presensi'));
     }
 
     public function store(StorePresensiRequest $request)
     {
         try {
+
             $user = auth()->user();
+
             if (!$user) {
-                return response()->json(['message' => 'Unauthenticated.'], 401);
+                return response()->json([
+                    'message' => 'Unauthenticated.'
+                ], 401);
             }
 
             $pegawai = $user->tenagaKependidikan;
 
             if (!$pegawai) {
-                return response()->json(['message' => 'User belum punya data pegawai'], 400);
+                return response()->json([
+                    'message' => 'User belum punya data pegawai.'
+                ], 400);
             }
 
             $tanggalHariIni = Carbon::today()->toDateString();
-            $waktuSekarang = Carbon::now()->toTimeString();
+            $waktuSekarang  = Carbon::now()->toTimeString();
 
-            // 1. Cek apakah hari ini libur
+            /*
+            |--------------------------------------------------------------------------
+            | CEK HARI LIBUR / PENGUMUMAN
+            |--------------------------------------------------------------------------
+            */
+
             $checkLibur = $this->presensiService->isHoliday($tanggalHariIni);
+
             if ($checkLibur['status']) {
-                return response()->json(['message' => 'Hari ini libur: ' . $checkLibur['keterangan']], 400);
+                return response()->json([
+                    'message' => 'Hari ini libur: ' . $checkLibur['keterangan']
+                ], 400);
             }
 
-            // 2. Ambil Jadwal berdasarkan nama Hari
-            $namaHari = $this->presensiService->getIndonesianDayName(Carbon::today()->dayOfWeek);
-            $jadwal = JadwalKerja::where('hari', $namaHari)->first();
+            /*
+            |--------------------------------------------------------------------------
+            | AMBIL JADWAL
+            |--------------------------------------------------------------------------
+            */
+
+            $namaHari = $this->presensiService
+                ->getIndonesianDayName(Carbon::today()->dayOfWeek);
+
+            $jadwal = JadwalKerja::get()->first(function ($item) use ($namaHari) {
+
+                $hariArray = explode(',', $item->hari);
+
+                return in_array($namaHari, $hariArray);
+            });
+
             $lokasi = LokasiKantor::first();
 
             if (!$jadwal || !$lokasi) {
-                return response()->json(['message' => 'Jadwal kerja untuk hari ' . $namaHari . ' atau lokasi kantor belum diatur oleh admin.'], 400);
-            }
-
-            // 3. Validasi Jarak (Radius Haversine)
-            $jarak = $this->presensiService->calculateDistance(
-                (float) $lokasi->latitude,
-                (float) $lokasi->longitude,
-                (float) $request->latitude,
-                (float) $request->longitude
-            );
-
-            $batasRadius = $lokasi->radius ?? 200;
-
-            if ($jarak > $batasRadius) {
                 return response()->json([
-                    'message' => 'Anda berada di luar jangkauan area presensi.',
-                    'jarak_meter' => round($jarak)
+                    'message' => 'Jadwal kerja atau lokasi kantor belum diatur admin.'
                 ], 400);
             }
 
-            // ================= FACE RECOGNITION =================
-            if (!$pegawai->face_registered) {
+            /*
+            |--------------------------------------------------------------------------
+            | VALIDASI LOKASI (selain Jumat)
+            |--------------------------------------------------------------------------
+            */
 
-                $response = Http::post('http://127.0.0.1:5000/register', [
-                    'user_id' => $user->id,
-                    'image'   => $request->foto
-                ]);
+            if ($jadwal->use_location) {
 
-                $result = $response->json();
+                $jarak = $this->presensiService->calculateDistance(
+                    (float) $lokasi->latitude,
+                    (float) $lokasi->longitude,
+                    (float) $request->latitude,
+                    (float) $request->longitude
+                );
 
-                if (!$response->ok() || $result['status'] !== 'success') {
+                $batasRadius = $lokasi->radius ?? 200;
+
+                if ($jarak > $batasRadius) {
                     return response()->json([
-                        'message' => 'Gagal registrasi wajah: ' . $response->body()
+                        'message' => 'Anda berada di luar jangkauan area presensi.',
+                        'jarak_meter' => round($jarak)
                     ], 400);
                 }
-
-                $pegawai->update(['face_registered' => true]);
-
-                return response()->json([
-                    'message' => 'Wajah berhasil didaftarkan, silakan ulangi presensi'
-                ]);
             }
 
-            // ================= VERIFIKASI WAJAH =================
-            $response = Http::post('http://127.0.0.1:5000/verify', [
-                'user_id' => $user->id,
-                'image'   => $request->foto
-            ]);
+            /*
+            |--------------------------------------------------------------------------
+            | CEK PRESENSI HARI INI
+            |--------------------------------------------------------------------------
+            */
 
-            $result = $response->json();
-
-            if (!$response->ok() || $result['status'] !== 'match') {
-                return response()->json([
-                    'message' => 'Wajah tidak sesuai!'
-                ], 400);
-            }
-            // =====================================================
-
-            // 4. Cek status presensi hari ini
-            $presensiHariIni = Presensi::where('tenaga_kependidikan_id', $pegawai->id)
+            $presensiHariIni = Presensi::where(
+                    'tenaga_kependidikan_id',
+                    $pegawai->id
+                )
                 ->where('tanggal', $tanggalHariIni)
                 ->first();
 
+            /*
+            |--------------------------------------------------------------------------
+            | PRESENSI MASUK
+            |--------------------------------------------------------------------------
+            */
+
             if (!$presensiHariIni) {
-                // PRESENSI MASUK
+
                 $this->presensiService->validateTime(
                     'masuk',
                     $waktuSekarang,
@@ -144,7 +163,7 @@ class PresensiController extends Controller
                 );
 
                 $presensi = Presensi::create([
-                    'user_id'                => $user->id,
+                    'user_id'                 => $user->id,
                     'tenaga_kependidikan_id' => $pegawai->id,
                     'tanggal'                => $tanggalHariIni,
                     'jam_masuk'              => $waktuSekarang,
@@ -152,70 +171,128 @@ class PresensiController extends Controller
                     'lng'                    => $request->longitude,
                 ]);
 
-                $this->saveFoto($presensi->id, $request->foto);
+                /*
+                |--------------------------------------------------------------------------
+                | SAVE FOTO (selain Jumat)
+                |--------------------------------------------------------------------------
+                */
 
-                return response()->json(['message' => 'Berhasil presensi masuk.']);
-
-            } else {
-                // JIKA SUDAH ABSEN PULANG
-                if ($presensiHariIni->jam_pulang) {
-                    return response()->json(['message' => 'Anda sudah melakukan presensi pulang hari ini.'], 400);
+                if ($jadwal->use_camera && $request->foto) {
+                    $this->saveFoto($presensi->id, $request->foto);
                 }
 
-                // PRESENSI PULANG
-                $this->presensiService->validateTime(
-                    'pulang',
-                    $waktuSekarang,
-                    $jadwal->jam_masuk,
-                    $jadwal->jam_pulang,
-                    $jadwal->batas_awal_pulang,
-                    $jadwal->batas_akhir_pulang
-                );
-
-                $presensiHariIni->update([
-                    'jam_pulang' => $waktuSekarang,
-                    'lat'        => $request->latitude,
-                    'lng'        => $request->longitude,
+                return response()->json([
+                    'message' => $jadwal->is_wfh
+                        ? 'Berhasil presensi masuk WFH.'
+                        : 'Berhasil presensi masuk.'
                 ]);
-
-                $this->saveFoto($presensiHariIni->id, $request->foto);
-
-                return response()->json(['message' => 'Berhasil presensi pulang.']);
             }
 
+            /*
+            |--------------------------------------------------------------------------
+            | SUDAH PRESENSI PULANG
+            |--------------------------------------------------------------------------
+            */
+
+            if ($presensiHariIni->jam_pulang) {
+                return response()->json([
+                    'message' => 'Anda sudah melakukan presensi pulang hari ini.'
+                ], 400);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | PRESENSI PULANG
+            |--------------------------------------------------------------------------
+            */
+
+            $this->presensiService->validateTime(
+                'pulang',
+                $waktuSekarang,
+                $jadwal->jam_masuk,
+                $jadwal->jam_pulang,
+                $jadwal->batas_awal_pulang,
+                $jadwal->batas_akhir_pulang
+            );
+
+            $presensiHariIni->update([
+                'jam_pulang' => $waktuSekarang,
+                'lat'        => $request->latitude,
+                'lng'        => $request->longitude,
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | SAVE FOTO PULANG
+            |--------------------------------------------------------------------------
+            */
+
+            if ($jadwal->use_camera && $request->foto) {
+                $this->saveFoto($presensiHariIni->id, $request->foto);
+            }
+
+            return response()->json([
+                'message' => $jadwal->is_wfh
+                    ? 'Berhasil presensi pulang WFH.'
+                    : 'Berhasil presensi pulang.'
+            ]);
+
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
+
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
 
     public function destroy(Presensi $presensi)
     {
         try {
+
             foreach ($presensi->foto as $pFoto) {
+
                 if (Storage::disk('public')->exists('presensi/' . $pFoto->foto)) {
-                    Storage::disk('public')->delete('presensi/' . $pFoto->foto);
+
+                    Storage::disk('public')->delete(
+                        'presensi/' . $pFoto->foto
+                    );
                 }
             }
 
             $presensi->delete();
 
-            return redirect()->back()->with('success', 'Data presensi berhasil dihapus.');
+            return redirect()
+                ->back()
+                ->with('success', 'Data presensi berhasil dihapus.');
+
         } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus data: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal menghapus data: ' . $e->getMessage());
         }
     }
 
     private function saveFoto($presensiId, $base64Image)
     {
-        $image     = str_replace(['data:image/png;base64,', 'data:image/jpeg;base64,'], '', $base64Image);
-        $image     = str_replace(' ', '+', $image);
+        $image = str_replace(
+            ['data:image/png;base64,', 'data:image/jpeg;base64,'],
+            '',
+            $base64Image
+        );
+
+        $image = str_replace(' ', '+', $image);
+
         $imageName = 'presensi_' . $presensiId . '_' . time() . '.png';
 
-        Storage::disk('public')->put('presensi/' . $imageName, base64_decode($image));
+        Storage::disk('public')->put(
+            'presensi/' . $imageName,
+            base64_decode($image)
+        );
 
         PresensiFoto::create([
             'presensi_id' => $presensiId,
             'foto'        => $imageName,
         ]);
     }
-} 
+}

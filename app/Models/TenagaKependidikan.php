@@ -10,7 +10,14 @@ class TenagaKependidikan extends Model
     use HasFactory;
 
     protected $table = 'tenaga_kependidikans';
-    protected $fillable = ['user_id', 'nip', 'nama', 'unit_kerja_id', 'face_registered'];
+    protected $fillable = [ 
+        'user_id', 
+        'nip', 
+        'nama', 
+        'jenis_kelamin', 
+        'pangkat', 
+        'unit_kerja_id', 
+        ];
 
     public function user()
     {
@@ -19,7 +26,7 @@ class TenagaKependidikan extends Model
 
     public function unitKerja()
     {
-        return $this->belongsTo(UnitKerja::class);
+        return $this->belongsTo(UnitKerja::class, 'unit_kerja_id');
     }
 
     public function presensi()

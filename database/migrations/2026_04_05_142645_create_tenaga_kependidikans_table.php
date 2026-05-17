@@ -24,8 +24,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('tenaga_kependidikans');
-        Schema::table('tenaga_kependidikans', function (Blueprint $table) {
-        $table->dropColumn('face_registered');
-    });
     }
 };

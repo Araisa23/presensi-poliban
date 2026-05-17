@@ -5,15 +5,28 @@
 /public/storage
 /storage/*.key
 /vendor
+
+# Environment
 .env
 .env.backup
 .env.production
+
+# Cache
 .phpunit.result.cache
+
+# Config
 Homestead.json
 Homestead.yaml
 auth.json
+
+# Logs
 npm-debug.log
 yarn-error.log
+
+# IDE
 /.fleet
 /.idea
 /.vscode
+
+# Python Virtual Environment
+venv/

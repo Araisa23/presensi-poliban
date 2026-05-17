@@ -7,12 +7,17 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable {
     use HasApiTokens, HasFactory, Notifiable;
-    protected $fillable = ['name', 'email', 'password', 'role_id'];
-    protected $hidden = ['password', 'remember_token'];
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+    protected $fillable = [
+        'name',
+        'nip',
+        'jenis_kelamin',
+        'pangkat',
+        'unit_kerja_id',
+        'email',
+        'password',
+        'role_id',
     ];
+    
     public function role() { return $this->belongsTo(Role::class); }
     public function tenagaKependidikan() { return $this->hasOne(TenagaKependidikan::class); }
     public function rekapPresensi() { return $this->hasMany(RekapPresensi::class); }

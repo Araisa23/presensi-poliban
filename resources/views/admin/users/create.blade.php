@@ -17,44 +17,90 @@
     <div class="max-w-4xl mx-auto">
             <div class="bg-white dark:bg-slate-900 shadow-soft rounded-3xl p-6 sm:p-8 border border-slate-100/70 dark:border-white/10">
                 
-                <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-6">
-                    @csrf
+            <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-5">
+                @csrf
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- NIP -->
+                <div>
+                    <label class="block mb-2 font-bold text-slate-700">
+                        NIP
+                    </label>
 
-                        <div>
-                            <x-input-label for="name" :value="__('Nama')" />
-                            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" required />
-                        </div>
+                    <input 
+                        type="text"
+                        name="nip"
+                        required
+                        class="w-full rounded-2xl border border-slate-300 px-4 py-3"
+                    >
+                </div>
 
-                        <div>
-                            <x-input-label for="email" :value="__('Email')" />
-                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" required />
-                        </div>
+                <!-- Nama -->
+                <div>
+                    <label class="block mb-2 font-bold text-slate-700">
+                        Nama Lengkap
+                    </label>
 
-                        <div>
-                            <x-input-label for="password" :value="__('Password')" />
-                            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required />
-                        </div>
+                    <input 
+                        type="text"
+                        name="name"
+                        required
+                        class="w-full rounded-2xl border border-slate-300 px-4 py-3"
+                    >
+                </div>
 
-                        <div>
-                            <x-input-label for="role_id" :value="__('Role')" />
-                            <select name="role_id" class="block mt-2 w-full border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/5 text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-2xl shadow-soft ring-1 ring-slate-900/5 dark:ring-white/10 transition">
-                                <option value="2">Pegawai</option>
-                                <option value="1">Admin</option>
-                                <option value="3">Kepala</option>
-                            </select>
-                        </div>
+                <!-- Jenis Kelamin -->
+                <div>
+                    <label class="block mb-2 font-bold text-slate-700">
+                        Jenis Kelamin
+                    </label>
 
-                    </div>
+                    <select 
+                        name="jenis_kelamin"
+                        class="w-full rounded-2xl border border-slate-300 px-4 py-3"
+                    >
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
+                </div>
 
-                    <div class="flex items-center justify-end mt-6">
-                        <x-primary-button>
-                            {{ __('Simpan User') }}
-                        </x-primary-button>
-                    </div>
+                <!-- Pangkat -->
+                <div>
+                    <label class="block mb-2 font-bold text-slate-700">
+                        Pangkat
+                    </label>
 
-                </form>
+                    <input 
+                        type="text"
+                        name="pangkat"
+                        placeholder="Opsional"
+                        class="w-full rounded-2xl border border-slate-300 px-4 py-3"
+                    >
+                </div>
+
+                <!-- Role -->
+                <div>
+                    <label class="block mb-2 font-bold text-slate-700">
+                        Role
+                    </label>
+
+                    <select 
+                        name="role_id"
+                        class="w-full rounded-2xl border border-slate-300 px-4 py-3"
+                    >
+                        <option value="2">Pegawai</option>
+                        <option value="1">Admin</option>
+                        <option value="3">Pimpinan</option>
+                    </select>
+                </div>
+
+                <!-- BUTTON -->
+                <button 
+                    type="submit"
+                    class="w-full bg-[#0b3c70] text-white font-bold py-3 rounded-2xl"
+                >
+                    Simpan User
+                </button>
+            </form>
 
             </div>
     </div>

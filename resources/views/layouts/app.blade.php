@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>Presensi Tendik Poliban</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -47,6 +47,9 @@
             *::-webkit-scrollbar-thumb { background: rgba(100,116,139,.35); border-radius: 999px; border: 3px solid transparent; background-clip: content-box; }
             *::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,.55); border: 3px solid transparent; background-clip: content-box; }
         </style>
+        
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    
     </head>
     <body class="font-sans antialiased text-slate-900 bg-slate-100">
         <div class="min-h-screen flex">
@@ -58,11 +61,11 @@
                         <a href="{{ route('dashboard') }}" class="w-9 h-9 rounded-2xl bg-white/10 ring-1 ring-white/15 flex items-center justify-center font-black">
                             P
                         </a>
-                        <div class="text-sm font-black tracking-tight">PresenceHub</div>
+                        <div class="text-sm font-black tracking-tight">Presensi Tendik Poliban</div>
                     </div>
 
                     <div class="hidden lg:block text-sm font-black tracking-tight opacity-90">
-                        {{ config('app.name', 'PresenceHub') }}
+                        {{ config('app.name', 'Presensi Tendik Poliban') }}
                     </div>
 
                     <div class="flex items-center gap-3">

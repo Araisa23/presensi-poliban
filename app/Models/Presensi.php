@@ -10,7 +10,15 @@ class Presensi extends Model
     use HasFactory;
 
     protected $table = 'presensis';
-    protected $fillable = ['user_id', 'tenaga_kependidikan_id', 'tanggal', 'jam_masuk', 'jam_pulang', 'lat', 'lng'];
+    protected $fillable = [
+        'user_id', 
+        'tenaga_kependidikan_id', 
+        'tanggal', 
+        'jam_masuk', 
+        'jam_pulang', 
+        'lat', 
+        'lng'
+    ];
 
     public function user()
     {
@@ -19,7 +27,7 @@ class Presensi extends Model
 
     public function tenagaKependidikan()
     {
-        return $this->belongsTo(TenagaKependidikan::class);
+        return $this->belongsTo(TenagaKependidikan::class, 'tenaga_kependidikan_id');
     }
 
     public function foto()

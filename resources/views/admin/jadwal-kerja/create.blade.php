@@ -102,5 +102,74 @@
                     </div>
                 </form>
             </div>
+
+        {{-- WFH --}}
+        <div class="flex items-start gap-3 p-5 rounded-3xl bg-slate-50 border border-slate-200">
+
+            <input
+                id="is_wfh"
+                type="checkbox"
+                name="is_wfh"
+                value="1"
+                class="mt-1 w-5 h-5 rounded-lg">
+
+            <div>
+                <label for="is_wfh"
+                    class="text-sm font-black text-slate-800">
+                    Mode WFH
+                </label>
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Jika aktif maka pegawai bisa presensi dari luar kantor.
+                </p>
+            </div>
+        </div>
+
+        {{-- USE LOCATION --}}
+        <div class="flex items-start gap-3 p-5 rounded-3xl bg-slate-50 border border-slate-200">
+
+            <input
+                id="use_location"
+                type="checkbox"
+                name="use_location"
+                value="1"
+                checked
+                class="mt-1 w-5 h-5 rounded-lg">
+
+            <div>
+                <label for="use_location"
+                    class="text-sm font-black text-slate-800">
+                    Gunakan Validasi Lokasi
+                </label>
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Sistem akan mengecek radius kantor.
+                </p>
+            </div>
+        </div>
+
+        {{-- USE CAMERA --}}
+        <div class="flex items-start gap-3 p-5 rounded-3xl bg-slate-50 border border-slate-200">
+
+            <input
+                id="use_camera"
+                type="checkbox"
+                name="use_camera"
+                value="1"
+                checked
+                class="mt-1 w-5 h-5 rounded-lg">
+
+            <div>
+                <label for="use_camera"
+                    class="text-sm font-black text-slate-800">
+                    Wajib Selfie Kamera
+                </label>
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Pegawai wajib mengambil foto selfie saat presensi.
+                </p>
+            </div>
+        </div>
+
     </div>
 </x-app-layout>

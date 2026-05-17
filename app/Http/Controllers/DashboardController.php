@@ -17,24 +17,67 @@ class DashboardController extends Controller
         $role = $user->role->name ?? '';
         $hariIni = Carbon::today()->toDateString();
 
+        // =========================
+        // ADMIN
+        // =========================
         if ($role === 'admin') {
+
             $totalPegawai = TenagaKependidikan::count();
+
             $totalUnit = UnitKerja::count();
-            $hadirHariIni = Presensi::where('tanggal', $hariIni)->count();
-            
-            return view('dashboard.admin', compact('totalPegawai', 'totalUnit', 'hadirHariIni'));
-        } elseif ($role === 'pegawai') {
+
+            $hadirHariIni = Presensi::whereDate('tanggal', $hariIni)
+                ->count();
+
+            $totalAlfa = $totalPegawai - $hadirHariIni;
+
+            $presensiHariIni = Presensi::with([
+                    'tenagaKependidikan.unitKerja'
+                ])
+                ->whereDate('tanggal', $hariIni)
+                ->latest()
+                ->get();
+
+            return view('dashboard.admin', compact(
+                'totalPegawai',
+                'totalUnit',
+                'hadirHariIni',
+                'totalAlfa',
+                'presensiHariIni'
+            ));
+        }
+
+        // =========================
+        // PEGAWAI
+        // =========================
+        elseif ($role === 'pegawai') {
+
             $presensiHariIni = Presensi::where('user_id', $user->id)
                 ->where('tanggal', $hariIni)
                 ->first();
 
-            return view('dashboard.pegawai', compact('presensiHariIni'));
-        } elseif ($role === 'pimpinan') {
+            return view('dashboard.pegawai', compact(
+                'presensiHariIni'
+            ));
+        }
+
+        // =========================
+        // PIMPINAN
+        // =========================
+        elseif ($role === 'pimpinan') {
+
             $totalPegawai = TenagaKependidikan::count();
-            $hadirHariIni = Presensi::where('tanggal', $hariIni)->count();
+
+            $hadirHariIni = Presensi::where('tanggal', $hariIni)
+                ->count();
+
             $tidakHadir = $totalPegawai - $hadirHariIni;
 
-            return view('dashboard.pimpinan', compact('totalPegawai', 'hadirHariIni', 'tidakHadir'));
+            return view('dashboard.pimpinan', compact(
+                'totalPegawai',
+                'hadirHariIni',
+                'tidakHadir'
+            ));
         }
 
         return abort(403);
