@@ -5,18 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HariLibur extends Model
+class KalenderAkademik extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'tanggal',
-        'keterangan',
-        'is_nasional',
-    ];
 
-    protected $casts = [
-        'tanggal' => 'date',
-        'is_nasional' => 'boolean',
+        'judul',
+
+        'tanggal_mulai',
+
+        'tanggal_selesai',
+
+        'jenis',
+
+        'is_libur',
+
+        'keterangan',
     ];
 }

@@ -2,15 +2,13 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-            <p class="text-white/70 text-xs font-black uppercase tracking-[0.25em]">Admin</p>
             <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                 {{ __('Konfigurasi Jadwal Kerja') }}
             </h2>
-            <p class="mt-1 text-white/70 text-sm font-medium">Atur jam masuk/pulang, status libur, dan jadwal operasional.</p>
+            <p class="mt-1 text-black-70 text-sm font-medium">Atur jam masuk/pulang, status libur, dan jadwal operasional.</p>
             </div>
-            <a href="{{ route('admin.jadwal-kerja.create') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition min-w-[200px]">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                Tambah Jadwal
+            <a href="{{ route('admin.jadwal-kerja.create') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition min-w-[180px]">
+                + Tambah Jadwal
             </a>
         </div>
     </x-slot>
@@ -31,7 +29,7 @@
                                 <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">Hari</th>
                                 <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Jam Operasional</th>
                                 <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Status Kerja</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-right">Manajemen</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
@@ -70,18 +68,113 @@
                                         @endif
                                     </td>
                                     <td class="px-8 py-5 text-right">
-                                        <div class="flex items-center justify-end space-x-3">
-                                            <a href="{{ route('admin.jadwal-kerja.edit', $jadwal->id) }}" class="p-2 text-indigo-700 dark:text-indigo-200 hover:bg-indigo-50/80 dark:hover:bg-indigo-500/10 rounded-2xl transition-colors ring-1 ring-transparent hover:ring-indigo-600/10" title="Edit Jadwal">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5M16.5 3.5a2.121 2.121 0 113 3L13 13l-4 1 1-4 7.5-7.5z"/></svg>
+
+                                        <div class="flex items-center justify-end gap-3"
+                                            x-data="{ openDeleteModal: false }">
+
+                                            {{-- EDIT --}}
+                                            <a href="{{ route('admin.jadwal-kerja.edit', $jadwal->id) }}"
+                                            class="inline-flex items-center px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-200 bg-indigo-50/80 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition ring-1 ring-indigo-600/10">
+
+                                                Edit
                                             </a>
-                                            <form action="{{ route('admin.jadwal-kerja.destroy', $jadwal->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus jadwal hari {{ $jadwal->hari }}?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="p-2 text-rose-700 dark:text-rose-200 hover:bg-rose-50/80 dark:hover:bg-rose-500/10 rounded-2xl transition-colors ring-1 ring-transparent hover:ring-rose-600/10" title="Hapus">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                </button>
-                                            </form>
+
+                                            {{-- DELETE --}}
+                                            <button
+                                                type="button"
+                                                @click="openDeleteModal = true"
+                                                class="inline-flex items-center px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-[0.15em] text-rose-700 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 transition ring-1 ring-rose-600/10">
+
+                                                Hapus
+                                            </button>
+
+                                            {{-- MODAL --}}
+                                            <div
+                                                x-show="openDeleteModal"
+                                                x-transition
+                                                class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                                                style="display: none;"
+                                            >
+
+                                                {{-- OVERLAY --}}
+                                                <div
+                                                    class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+                                                    @click="openDeleteModal = false"
+                                                ></div>
+
+                                                {{-- MODAL --}}
+                                                <div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+
+                                                    <div class="p-8">
+
+                                                        <div class="w-16 h-16 mx-auto rounded-3xl bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-300 flex items-center justify-center">
+
+                                                            <svg class="w-8 h-8"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+
+                                                                <path stroke-linecap="round"
+                                                                    stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7"/>
+                                                            </svg>
+
+                                                        </div>
+
+                                                        <div class="mt-6 text-center">
+
+                                                            <h3 class="text-xl font-black text-slate-900 dark:text-white">
+                                                                Hapus Jadwal?
+                                                            </h3>
+
+                                                            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                                                                Jadwal kerja hari
+                                                                <span class="font-bold text-rose-600">
+                                                                    {{ $jadwal->hari }}
+                                                                </span>
+                                                                akan dihapus permanen.
+                                                            </p>
+
+                                                        </div>
+
+                                                        <div class="mt-8 flex items-center justify-center gap-3">
+
+                                                            {{-- CANCEL --}}
+                                                            <button
+                                                                type="button"
+                                                                @click="openDeleteModal = false"
+                                                                class="px-5 py-2.5 rounded-2xl border border-slate-300 dark:border-white/10 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+
+                                                                Batal
+                                                            </button>
+
+                                                            {{-- DELETE --}}
+                                                            <form action="{{ route('admin.jadwal-kerja.destroy', $jadwal->id) }}"
+                                                                method="POST">
+
+                                                                @csrf
+                                                                @method('DELETE')
+
+                                                                <button
+                                                                    type="submit"
+                                                                    class="px-5 py-2.5 rounded-2xl bg-rose-600 text-white font-semibold hover:bg-rose-700 transition">
+
+                                                                    Ya, Hapus
+                                                                </button>
+
+                                                            </form>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
                                         </div>
+
                                     </td>
                                 </tr>
                             @empty

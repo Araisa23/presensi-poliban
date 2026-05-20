@@ -70,7 +70,7 @@
 
                     <div class="flex items-center gap-3">
                         <div class="hidden sm:flex items-center gap-2 rounded-2xl bg-white/10 px-3 py-2 ring-1 ring-white/15">
-                            <span class="text-xs font-black uppercase tracking-[0.25em] text-white/70">{{ Auth::user()->role->name ?? 'user' }}</span>
+                            <span class="text-xs font-black uppercase tracking-[0.25em] text-black-70">{{ Auth::user()->role->name ?? 'user' }}</span>
                         </div>
 
                         <x-dropdown align="right" width="48">

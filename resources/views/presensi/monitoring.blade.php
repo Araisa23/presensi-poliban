@@ -14,7 +14,7 @@
             <div class="mb-6 bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-100/70 dark:border-white/10 overflow-hidden">
                 <div class="px-6 py-4 bg-gradient-to-r from-[#0b2c52] to-indigo-700 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <p class="text-white/70 text-[10px] font-black uppercase tracking-[0.25em]">Pantau Tanggal</p>
+                    <p class="text-black-70 text-[10px] font-black uppercase tracking-[0.25em]">Pantau Tanggal</p>
                     <h3 class="text-xl font-black mt-1">{{ \Carbon\Carbon::parse($tanggal)->format('d F Y') }}</h3>
                 </div>
                 <form action="{{ route('pimpinan.monitoring') }}" method="GET" class="flex items-center space-x-2">

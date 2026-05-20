@@ -4,15 +4,10 @@
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
 
             <div>
-                <p class="text-white/70 text-xs font-black uppercase tracking-[0.25em]">
-                    Admin
-                </p>
-
                 <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                     {{ __('Daftar Tenaga Kependidikan') }}
                 </h2>
-
-                <p class="mt-1 text-white/70 text-sm font-medium">
+                <p class="mt-1 text-black-70 text-sm font-medium">
                     Kelola data pegawai, unit kerja, dan akun terkait.
                 </p>
             </div>
@@ -42,10 +37,9 @@
 
                 <!-- TAMBAH -->
                 <a href="{{ route('admin.pegawai.create') }}"
-                    class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#facc15] text-[#0b3c70] font-black shadow-lg hover:bg-yellow-300 transition">
-
-                    + Tambah Pegawai
-                </a>
+                class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition min-w-[180px]">
+                + Tambah Unit
+            </a>
 
             </div>
 
@@ -68,6 +62,62 @@
             </div>
         @endif
 
+    <form method="GET" class="mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            {{-- SEARCH --}}
+            <div>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Cari nama / NIP..."
+                    class="w-full rounded-2xl border-slate-200"
+                >
+            </div>
+
+            {{-- UNIT KERJA --}}
+            <div>
+                <select
+                    name="unit_kerja"
+                    class="w-full rounded-2xl border-slate-200"
+                >
+                    <option value="">Semua Unit Kerja</option>
+
+                    @foreach($unitKerja as $unit)
+
+                        <option
+                            value="{{ $unit->id }}"
+                            {{ request('unit_kerja') == $unit->id ? 'selected' : '' }}
+                        >
+                            {{ $unit->nama }}
+                        </option>
+
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- BUTTON --}}
+            <div class="flex gap-2">
+
+                <button
+                    type="submit"
+                    class="px-5 py-2 rounded-2xl bg-indigo-600 text-white font-bold"
+                >
+                    Filter
+                </button>
+
+                <a
+                    href="{{ route('admin.pegawai.index') }}"
+                    class="px-5 py-2 rounded-2xl bg-slate-200 font-bold"
+                >
+                    Reset
+                </a>
+
+            </div>
+
+        </div>
+    </form>
         <!-- TABLE -->
         <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">
 
@@ -112,7 +162,7 @@
                             <tr class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition">
 
                                 <!-- NIP -->
-                                <td class="px-6 py-5 text-sm font-mono text-slate-600 dark:text-slate-300">
+                                <td class="px-6 py-5 text-sm font-black text-slate-800 dark:text-slate-300">
                                     {{ $p->nip }}
                                 </td>
 
@@ -162,22 +212,107 @@
                                             Edit
                                         </a>
 
-                                        <!-- DELETE -->
+                    <div x-data="{ openDeleteModal: false }">
+
+                        {{-- DELETE BUTTON --}}
+                        <button
+                            type="button"
+                            @click="openDeleteModal = true"
+                            class="inline-flex items-center justify-center px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-[0.18em] bg-rose-50 text-rose-700 hover:bg-rose-100 ring-1 ring-rose-600/10 transition"
+                        >
+                            Hapus
+                        </button>
+
+                        {{-- MODAL --}}
+                        <div
+                            x-show="openDeleteModal"
+                            x-transition
+                            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                            style="display: none;"
+                        >
+
+                            {{-- OVERLAY --}}
+                            <div
+                                class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+                                @click="openDeleteModal = false"
+                            ></div>
+
+                            {{-- CARD --}}
+                            <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+
+                                <div class="p-8">
+
+                                    {{-- ICON --}}
+                                    <div class="w-16 h-16 mx-auto rounded-3xl bg-rose-100 text-rose-600 flex items-center justify-center">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="w-8 h-8"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor">
+
+                                            <path stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7"/>
+                                        </svg>
+
+                                    </div>
+
+                                    {{-- TEXT --}}
+                                    <div class="mt-6 text-center">
+
+                                        <h3 class="text-xl font-black text-slate-900">
+                                            Hapus Pegawai?
+                                        </h3>
+
+                                        <p class="mt-2 text-sm text-slate-500 leading-relaxed">
+                                            Data pegawai
+                                            <span class="font-bold text-rose-600">
+                                                {{ $p->nama }}
+                                            </span>
+                                            akan dihapus permanen.
+                                        </p>
+
+                                    </div>
+
+                                    {{-- ACTION --}}
+                                    <div class="mt-8 flex items-center justify-center gap-3">
+
+                                        {{-- CANCEL --}}
+                                        <button
+                                            type="button"
+                                            @click="openDeleteModal = false"
+                                            class="px-5 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition"
+                                        >
+                                            Batal
+                                        </button>
+
+                                        {{-- DELETE --}}
                                         <form action="{{ route('admin.pegawai.destroy', $p->id) }}"
-                                            method="POST"
-                                            class="inline-block"
-                                            onsubmit="return confirm('Hapus data pegawai ini?')">
+                                            method="POST">
 
                                             @csrf
                                             @method('DELETE')
 
-                                            <button type="submit"
-                                                class="inline-flex items-center justify-center px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-[0.18em] bg-rose-50 text-rose-700 hover:bg-rose-100 ring-1 ring-rose-600/10 transition">
-
-                                                Hapus
+                                            <button
+                                                type="submit"
+                                                class="px-5 py-2.5 rounded-2xl bg-rose-600 text-white font-semibold hover:bg-rose-700 transition"
+                                            >
+                                                Ya, Hapus
                                             </button>
 
                                         </form>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                                     </div>
 
@@ -303,7 +438,7 @@
                                     d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"/>
                             </svg>
 
-                            Download Template Excel Import Pegawai
+                            Unduh Template
                         </a>
                         <div class="rounded-2xl bg-slate-50 p-4">
 

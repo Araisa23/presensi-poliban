@@ -2,11 +2,10 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-                <p class="text-white/70 text-xs font-black uppercase tracking-[0.25em]">Admin</p>
                 <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                 {{ __('Daftar Unit Kerja') }}
                 </h2>
-                <p class="mt-1 text-white/70 text-sm font-medium">Atur struktur organisasi untuk pengelompokan pegawai.</p>
+                <p class="mt-1 text-black-70 text-sm font-medium">Atur struktur organisasi untuk pengelompokan pegawai.</p>
             </div>
             <a href="{{ route('admin.unit-kerja.create') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition min-w-[180px]">
                 + Tambah Unit
@@ -31,19 +30,125 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
                         @forelse($unitKerja as $unit)
-                            <tr class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition">
-                                <td class="px-6 py-5 text-sm font-black text-slate-800 dark:text-slate-100">{{ $unit->nama_unit }}</td>
-                                <td class="px-6 py-5 text-right">
-                                    <div class="inline-flex items-center gap-2">
-                                    <a href="{{ route('admin.unit-kerja.edit', $unit->id) }}" class="inline-flex items-center justify-center px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-[0.18em] bg-white/80 dark:bg-white/10 text-slate-700 dark:text-slate-100 hover:bg-white dark:hover:bg-white/15 ring-1 ring-slate-900/10 dark:ring-white/10 shadow-soft transition">Edit</a>
-                                    <form action="{{ route('admin.unit-kerja.destroy', $unit->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus unit ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 rounded-2xl text-[11px] font-black uppercase tracking-[0.18em] bg-rose-50/80 dark:bg-rose-500/10 text-rose-700 dark:text-rose-200 hover:bg-rose-100/70 dark:hover:bg-rose-500/15 ring-1 ring-rose-600/10 dark:ring-rose-500/20 transition">Hapus</button>
-                                    </form>
+                        <tr class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition">
+
+                            {{-- NAMA UNIT --}}
+                            <td class="px-6 py-5 text-sm font-black text-slate-800 dark:text-slate-100">
+                                {{ $unit->nama_unit }}
+                            </td>
+
+                            {{-- AKSI --}}
+                            <td class="px-6 py-5 text-right">
+
+                                <div class="flex items-center justify-end gap-2"
+                                    x-data="{ openDeleteModal: false }">
+
+                                    {{-- EDIT --}}
+                                    <a href="{{ route('admin.unit-kerja.edit', $unit->id) }}"
+                                    class="inline-flex items-center justify-center px-4 py-2 rounded-2xl border border-slate-200 text-slate-700 text-xs font-black uppercase tracking-[0.15em] hover:bg-slate-100 transition">
+
+                                        Edit
+                                    </a>
+
+                                    {{-- DELETE BUTTON --}}
+                                    <button
+                                        type="button"
+                                        @click="openDeleteModal = true"
+                                        class="inline-flex items-center justify-center px-4 py-2 rounded-2xl border border-red-200 text-red-600 text-xs font-black uppercase tracking-[0.15em] hover:bg-red-50 transition"
+                                    >
+                                        Hapus
+                                    </button>
+
+                                    {{-- MODAL --}}
+                                    <div
+                                        x-show="openDeleteModal"
+                                        x-transition
+                                        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                                        style="display: none;"
+                                    >
+
+                                        {{-- OVERLAY --}}
+                                        <div
+                                            class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+                                            @click="openDeleteModal = false"
+                                        ></div>
+
+                                        {{-- MODAL CARD --}}
+                                        <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+
+                                            <div class="p-8">
+
+                                                {{-- ICON --}}
+                                                <div class="w-16 h-16 mx-auto rounded-3xl bg-red-100 text-red-600 flex items-center justify-center">
+
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="w-8 h-8"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor">
+
+                                                        <path stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-1-3H10a1 1 0 00-1 1v2h6V5a1 1 0 00-1-1z" />
+                                                    </svg>
+
+                                                </div>
+
+                                                {{-- TEXT --}}
+                                                <div class="mt-6 text-center">
+
+                                                    <h3 class="text-xl font-black text-slate-900">
+                                                        Hapus Data?
+                                                    </h3>
+
+                                                    <p class="mt-2 text-slate-500 text-sm leading-relaxed">
+                                                        Data yang dihapus tidak dapat dikembalikan lagi.
+                                                    </p>
+
+                                                </div>
+
+                                                {{-- ACTION --}}
+                                                <div class="mt-8 flex items-center justify-center gap-3">
+
+                                                    {{-- CANCEL --}}
+                                                    <button
+                                                        type="button"
+                                                        @click="openDeleteModal = false"
+                                                        class="px-5 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition"
+                                                    >
+                                                        Batal
+                                                    </button>
+
+                                                    {{-- DELETE --}}
+                                                    <form action="{{ route('admin.unit-kerja.destroy', $unit->id) }}"
+                                                        method="POST">
+
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <button
+                                                            type="submit"
+                                                            class="px-5 py-2.5 rounded-2xl bg-red-600 text-white font-semibold hover:bg-red-700 transition"
+                                                        >
+                                                            Ya, Hapus
+                                                        </button>
+
+                                                    </form>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
                                     </div>
-                                </td>
-                            </tr>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
                         @empty
                             <tr>
                                 <td colspan="2" class="px-6 py-12 text-center text-slate-400 font-medium italic">Belum ada data unit kerja.</td>

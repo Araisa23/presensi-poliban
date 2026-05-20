@@ -5,11 +5,11 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
             <div>
-                <p class="text-white/70 text-xs font-black uppercase tracking-[0.25em]">Admin</p>
+                <p class="text-black-70 text-xs font-black uppercase tracking-[0.25em]">Admin</p>
                 <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                     {{ __('Tambah User') }}
                 </h2>
-                <p class="mt-1 text-white/70 text-sm font-medium">Buat akun baru dan tentukan role.</p>
+                <p class="mt-1 text-black-70 text-sm font-medium">Buat akun baru dan tentukan role.</p>
             </div>
         </div>
     </x-slot>

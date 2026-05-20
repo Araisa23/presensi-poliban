@@ -2,11 +2,11 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-                <p class="text-white/70 text-xs font-black uppercase tracking-[0.25em]">Laporan</p>
+                <p class="text-black-70 text-xs font-black uppercase tracking-[0.25em]">Laporan</p>
                 <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                     {{ __('Laporan Presensi') }}
                 </h2>
-                <p class="mt-1 text-white/70 text-sm font-medium">Ringkasan laporan presensi untuk pimpinan.</p>
+                <p class="mt-1 text-black-70 text-sm font-medium">Ringkasan laporan presensi untuk pimpinan.</p>
             </div>
             <a href="{{ route('pimpinan.laporan.export') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-rose-600 to-rose-700 text-white shadow-[0_14px_30px_rgba(225,_29,_72,_0.25)] ring-1 ring-rose-600/20 transition">
                 Export PDF

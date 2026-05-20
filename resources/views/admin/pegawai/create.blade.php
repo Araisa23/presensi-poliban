@@ -1,15 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.pegawai.index') }}" class="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-white/10 text-white hover:bg-white/15 ring-1 ring-white/15 shadow-soft transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            </a>
             <div>
-                <p class="text-white/70 text-xs font-black uppercase tracking-[0.25em]">Admin</p>
                 <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                     {{ __('Tambah Tenaga Kependidikan') }}
                 </h2>
-                <p class="mt-1 text-white/70 text-sm font-medium">Hubungkan akun user pegawai dan isi profil kepegawaian.</p>
+                <p class="mt-1 text-black-70 text-sm font-medium">Tambahkan data tenaga kependidikan baru.</p>
             </div>
         </div>
     </x-slot>
@@ -109,10 +105,45 @@
 
     </div>
 
-                    <div class="flex items-center justify-end mt-6">
-                        <x-primary-button>
-                            {{ __('Simpan Data Pegawai') }}
-                        </x-primary-button>
+                <!-- FOOTER -->
+                <div class="flex items-center justify-end mt-6 gap-3">
+
+                    {{-- BACK BUTTON --}}
+                    <a href="{{ route('admin.pegawai.index') }}"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15 19l-7-7 7-7" />
+                        </svg>
+
+                        Kembali
+                    </a>
+
+                    {{-- SAVE BUTTON --}}
+                    <x-primary-button class="gap-2">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M5 13l4 4L19 7" />
+                        </svg>
+                        Simpan Pengumuman
+                    </x-primary-button>
+
                     </div>
                 </form>
             </div>

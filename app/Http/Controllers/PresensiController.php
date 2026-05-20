@@ -46,6 +46,16 @@ class PresensiController extends Controller
         return view('presensi.history', compact('presensi'));
     }
 
+    public function show($id)
+    {
+        $presensi = Presensi::with([
+            'user.tenagaKependidikan',
+            'foto'
+        ])->findOrFail($id);
+
+        return view('admin.presensi.show', compact('presensi'));
+    }
+
     public function store(StorePresensiRequest $request)
     {
         try {

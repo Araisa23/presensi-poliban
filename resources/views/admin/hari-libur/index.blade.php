@@ -2,11 +2,11 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-            <p class="text-white/70 text-xs font-black uppercase tracking-[0.25em]">Admin</p>
+            <p class="text-black-70 text-xs font-black uppercase tracking-[0.25em]">Admin</p>
             <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                 {{ __('Manajemen Hari Libur Khusus') }}
             </h2>
-            <p class="mt-1 text-white/70 text-sm font-medium">Tambahkan libur khusus (nasional/cuti bersama) untuk laporan presensi.</p>
+            <p class="mt-1 text-black-70 text-sm font-medium">Tambahkan libur khusus (nasional/cuti bersama) untuk laporan presensi.</p>
             </div>
             <a href="{{ route('admin.hari-libur.create') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-rose-600 to-rose-700 text-white shadow-[0_14px_30px_rgba(225,_29,_72,_0.25)] ring-1 ring-rose-600/20 transition min-w-[200px]">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>

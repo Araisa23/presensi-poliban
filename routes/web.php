@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KalenderAkademikController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\LaporanController;
@@ -53,8 +54,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('pegawai.import');
 
         Route::get(
-            'pegawai/template/download',
-            [PegawaiController::class, 'downloadTemplate']
+            'pegawai/template/download', [PegawaiController::class, 'downloadTemplate']
         )->name('pegawai.template.download');
 
         Route::resource('pegawai', PegawaiController::class);
@@ -62,12 +62,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('jadwal-kerja', JadwalKerjaController::class);
         Route::resource('lokasi-kantor', LokasiKantorController::class);
         Route::resource('pengumuman', PengumumanController::class);
+        Route::resource('kalender-akademik', KalenderAkademikController::class);
 
         Route::get('presensi', [PresensiController::class, 'index'])
             ->name('presensi.index');
 
-        Route::delete('presensi/{presensi}', [PresensiController::class, 'destroy'])
-            ->name('presensi.destroy');
+        Route::get('/presensi/{id}', [PresensiController::class, 'show'])
+            ->name('presensi.show');
     });
 
     /*

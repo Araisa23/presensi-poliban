@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-white/70 text-xs font-black uppercase tracking-[0.25em]">Akun</p>
+            <p class="text-black-70 text-xs font-black uppercase tracking-[0.25em]">Akun</p>
             <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                 {{ __('Profile') }}
             </h2>
-            <p class="text-white/70 text-sm font-medium mt-1">
+            <p class="text-black-70 text-sm font-medium mt-1">
                 Perbarui informasi akun, kata sandi, atau hapus akun Anda.
             </p>
         </div>

@@ -14,7 +14,7 @@
             <div class="mb-6 bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-100/70 dark:border-white/10 overflow-hidden print:hidden">
                 <div class="px-6 py-4 bg-gradient-to-r from-[#0b2c52] to-indigo-700 text-white flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
-                        <p class="text-white/70 text-[10px] font-black uppercase tracking-[0.25em] leading-loose">Detail Kehadiran</p>
+                        <p class="text-black-70 text-[10px] font-black uppercase tracking-[0.25em] leading-loose">Detail Kehadiran</p>
                         <h3 class="text-xl font-black">{{ \Carbon\Carbon::parse($tanggal)->isoFormat('dddd, D MMMM YYYY') }}</h3>
                     </div>
                     <form action="{{ route('pimpinan.laporan.index') }}" method="GET" class="flex items-center space-x-2">

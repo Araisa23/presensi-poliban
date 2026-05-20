@@ -5,19 +5,12 @@
 
             <!-- LEFT -->
             <div>
-
-                <p class="text-white/70 text-xs font-black uppercase tracking-[0.25em]">
-                    Admin
-                </p>
-
                 <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                     {{ __('Daftar Pengumuman') }}
                 </h2>
-
-                <p class="mt-1 text-white/70 text-sm font-medium">
+                <p class="mt-1 text-black-70 text-sm font-medium">
                     Kelola pengumuman dan informasi penting untuk pegawai.
                 </p>
-
             </div>
 
             <!-- BUTTON -->

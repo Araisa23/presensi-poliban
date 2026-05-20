@@ -32,31 +32,25 @@ class PresensiService
     /**
      * Cek apakah tanggal tersebut adalah hari libur
      */
-    public function isHoliday($date)
+    public function isHoliday($tanggal)
     {
-        $carbonDate = Carbon::parse($date);
-        
-        // 1. Cek Libur Rutin (berdasarkan hari di Tabel Jadwal Kerja)
-        $namaHari = $this->getIndonesianDayName($carbonDate->dayOfWeek);
-        $jadwal = JadwalKerja::where('hari', $namaHari)->first();
-        
-        if ($jadwal && $jadwal->is_libur) {
+        $libur = HariLibur::whereDate(
+            'tanggal',
+            $tanggal
+        )->first();
+
+        if ($libur) {
+
             return [
                 'status' => true,
-                'keterangan' => "Hari " . $namaHari . " adalah libur rutin."
+                'keterangan' => $libur->keterangan
             ];
         }
 
-        // 2. Cek Tanggal Merah (Tabel Hari Libur)
-        $liburKhusus = HariLibur::where('tanggal', $carbonDate->toDateString())->first();
-        if ($liburKhusus) {
-            return [
-                'status' => true,
-                'keterangan' => $liburKhusus->keterangan ?? "Tanggal merah."
-            ];
-        }
-
-        return ['status' => false];
+        return [
+            'status' => false,
+            'keterangan' => null
+        ];
     }
 
     public function getIndonesianDayName($dayOfWeek)

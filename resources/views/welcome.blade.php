@@ -63,7 +63,7 @@
             <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
                     <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-white/70">Sistem Presensi Berbasis Lokasi</p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-black-70">Sistem Presensi Berbasis Lokasi</p>
                         <h1 class="mt-3 text-4xl sm:text-5xl font-black tracking-tight text-white leading-tight">
                             Presensi jadi cepat, akurat, dan rapi.
                         </h1>
@@ -86,7 +86,7 @@
                         <div class="absolute -bottom-10 -left-10 w-56 h-56 bg-sky-500/10 rounded-full blur-3xl"></div>
                         <div class="bg-white border border-slate-100/70 shadow-soft rounded-3xl overflow-hidden">
                             <div class="px-6 py-4 bg-gradient-to-r from-[#0b2c52] to-indigo-700 text-white">
-                                <p class="text-white/70 text-[10px] font-black uppercase tracking-[0.25em]">Preview</p>
+                                <p class="text-black-70 text-[10px] font-black uppercase tracking-[0.25em]">Preview</p>
                                 <p class="mt-1 font-black">Dashboard Presensi</p>
                             </div>
                             <div class="p-6">
@@ -117,7 +117,7 @@
                     </div>
                 </div>
 
-                <footer class="mt-14 pt-8 border-t border-white/15 text-center text-xs font-medium text-white/70">
+                <footer class="mt-14 pt-8 border-t border-white/15 text-center text-xs font-medium text-black-70">
                     © {{ date('Y') }} Presensi Tendik Poliban. All rights reserved.
                 </footer>
             </main>

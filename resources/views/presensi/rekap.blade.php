@@ -13,7 +13,7 @@
             <!-- Filter Rekap -->
             <div class="mb-6 bg-white dark:bg-slate-900 rounded-3xl shadow-soft border border-slate-100/70 dark:border-white/10 overflow-hidden">
                 <div class="px-6 py-4 bg-gradient-to-r from-[#0b2c52] to-indigo-700 text-white">
-                    <p class="text-white/70 text-[10px] font-black uppercase tracking-[0.25em]">Filter Periode</p>
+                    <p class="text-black-70 text-[10px] font-black uppercase tracking-[0.25em]">Filter Periode</p>
                     <h3 class="text-xl font-black mt-1">{{ \Carbon\Carbon::create()->month($bulan)->monthName }} {{ $tahun }}</h3>
                 </div>
                 <div class="p-6">

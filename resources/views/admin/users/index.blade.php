@@ -1,194 +1,283 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-            
-            <!-- LEFT -->
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-                <p class="text-[#facc15] text-xs font-black uppercase tracking-[0.3em]">
-                    Admin Panel
-                </p>
-
-                <h2 class="text-3xl font-black text-white leading-tight mt-1">
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                     {{ __('Manajemen User') }}
                 </h2>
 
-                <p class="mt-2 text-white/70 text-sm">
-                    Kelola akun pegawai, admin, dan pimpinan.
+                <p class="mt-1 text-black-70 text-sm font-medium">
+                    Kelola akun admin, pegawai, dan pimpinan sistem presensi.
                 </p>
             </div>
 
-            <!-- RIGHT -->
-            <div class="flex flex-wrap gap-3">
+            <a href="{{ route('admin.users.create') }}"
+                class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition min-w-[180px]">
 
-                <!-- TAMBAH USER -->
-                <a href="{{ route('admin.users.create') }}"
-                    class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl 
-                    bg-[#facc15] text-[#0b3c70] font-black shadow-lg 
-                    hover:bg-yellow-300 transition">
-
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 4v16m8-8H4"/>
-                    </svg>
-
-                    Tambah User
-                </a>
-            </div>
+                + Tambah User
+            </a>
         </div>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto py-6">
+    <div class="max-w-7xl mx-auto">
 
-        <!-- CARD -->
-        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+        {{-- SUCCESS --}}
+        @if(session('success'))
+            <div class="mb-6 p-4 rounded-2xl bg-emerald-50/70 dark:bg-emerald-500/10 border border-emerald-200/70 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-200 shadow-soft flex items-center">
 
-            <!-- TOP -->
-            <div class="p-6 border-b border-slate-100">
+                <svg class="w-5 h-5 mr-3"
+                    fill="currentColor"
+                    viewBox="0 0 20 20">
 
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"/>
+                </svg>
 
-                    <!-- TITLE -->
-                    <div>
-                        <h3 class="text-xl font-black text-[#0b3c70]">
-                            Daftar Pengguna Sistem
-                        </h3>
-
-                        <p class="text-slate-500 text-sm mt-1">
-                            Total User: {{ $users->count() }}
-                        </p>
-                    </div>
-
-                    <!-- SEARCH -->
-                    <div class="w-full lg:w-80">
-                        <input 
-                            type="text"
-                            placeholder="Cari user..."
-                            class="w-full rounded-2xl border border-slate-200 
-                            px-5 py-3 text-sm focus:ring-2 focus:ring-[#0b3c70] 
-                            focus:border-[#0b3c70] outline-none"
-                        >
-                    </div>
-
-                </div>
+                {{ session('success') }}
             </div>
+        @endif
 
-            <!-- TABLE -->
+        {{-- CARD --}}
+        <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">
+
+            {{-- TABLE --}}
             <div class="overflow-x-auto">
 
-                <table class="w-full">
+                <table class="w-full text-left border-collapse">
 
-                    <!-- HEAD -->
-                    <thead class="bg-[#0b3c70] text-white">
+                    {{-- HEAD --}}
+                    <thead>
+                        <tr class="bg-slate-50/70 dark:bg-white/5">
 
-                        <tr>
-                            <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-widest">
-                                Nama
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">
+                                User
                             </th>
 
-                            <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-widest">
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">
                                 NIP
                             </th>
 
-                            <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-widest">
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">
                                 Email
                             </th>
 
-                            <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-widest">
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">
                                 Role
                             </th>
 
-                            <th class="px-6 py-4 text-center text-xs font-black uppercase tracking-widest">
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-right">
                                 Aksi
                             </th>
-                        </tr>
 
+                        </tr>
                     </thead>
 
-                    <!-- BODY -->
-                    <tbody class="divide-y divide-slate-100">
+                    {{-- BODY --}}
+                    <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
 
                         @forelse($users as $user)
 
-                            <tr class="hover:bg-slate-50 transition">
+                            <tr class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors duration-150 group">
 
-                                <!-- NAMA -->
-                                <td class="px-6 py-5">
+                                {{-- USER --}}
+                                <td class="px-8 py-5 whitespace-nowrap">
 
-                                    <div class="flex items-center gap-4">
+                                    <div class="flex items-center">
 
-                                        <!-- AVATAR -->
-                                        <div class="w-11 h-11 rounded-2xl bg-[#0b3c70] text-white flex items-center justify-center font-black">
+                                        {{-- AVATAR --}}
+                                        <div class="w-10 h-10 rounded-2xl bg-indigo-50/80 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-200 flex items-center justify-center font-black text-lg mr-3 group-hover:scale-110 transition-transform ring-1 ring-indigo-600/10 shadow-soft">
+
                                             {{ strtoupper(substr($user->name, 0, 1)) }}
+
                                         </div>
 
-                                        <!-- INFO -->
+                                        {{-- INFO --}}
                                         <div>
-                                            <div class="font-bold text-slate-800">
+
+                                            <div class="text-sm font-black text-slate-800 dark:text-slate-100">
                                                 {{ $user->name }}
                                             </div>
 
                                             <div class="text-xs text-slate-400">
                                                 Pengguna Sistem
                                             </div>
+
                                         </div>
 
                                     </div>
 
                                 </td>
 
-                                <!-- NIP -->
-                                <td class="px-6 py-5 text-sm font-semibold text-slate-700">
-                                    {{ $user->nip }}
+                                {{-- NIP --}}
+                                <td class="px-8 py-5">
+
+                                    <span class="text-xs bg-white/70 dark:bg-white/5 px-3 py-1.5 rounded-full text-slate-600 dark:text-slate-300 font-mono ring-1 ring-slate-900/5 dark:ring-white/10">
+
+                                        {{ $user->nip }}
+
+                                    </span>
+
                                 </td>
 
-                                <!-- EMAIL -->
-                                <td class="px-6 py-5 text-sm text-slate-600">
-                                    {{ $user->email ?? '-' }}
+                                {{-- EMAIL --}}
+                                <td class="px-8 py-5">
+
+                                    <span class="text-sm text-slate-600 dark:text-slate-300 font-medium">
+
+                                        {{ $user->email ?? '-' }}
+
+                                    </span>
+
                                 </td>
 
-                                <!-- ROLE -->
-                                <td class="px-6 py-5">
+                                {{-- ROLE --}}
+                                <td class="px-8 py-5 text-center">
 
                                     @if($user->role_id == 1)
 
-                                        <span class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-black bg-blue-100 text-blue-700">
+                                        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-indigo-50/80 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-200 ring-1 ring-indigo-600/10">
+
+                                            <span class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></span>
+
                                             Admin
+
                                         </span>
 
                                     @elseif($user->role_id == 2)
 
-                                        <span class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-black bg-emerald-100 text-emerald-700">
+                                        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-emerald-50/80 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200 ring-1 ring-emerald-600/10">
+
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+
                                             Pegawai
+
                                         </span>
 
                                     @else
 
-                                        <span class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-black bg-yellow-100 text-yellow-700">
+                                        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-amber-50/80 text-amber-700 dark:bg-amber-500/10 dark:text-amber-200 ring-1 ring-amber-600/10">
+
+                                            <span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span>
+
                                             Pimpinan
+
                                         </span>
 
                                     @endif
 
                                 </td>
 
-                                <!-- AKSI -->
-                                <td class="px-6 py-5">
+                                {{-- AKSI --}}
+                                <td class="px-8 py-5 text-right">
 
-                                    <div class="flex items-center justify-center gap-2">
+                                    <div class="flex items-center justify-end gap-3"
+                                        x-data="{ openDeleteModal: false }">
 
-                                        <!-- EDIT -->
-                                        <a href="#"
-                                            class="px-4 py-2 rounded-xl bg-[#0b3c70] text-white text-xs font-bold hover:bg-[#082b50] transition">
+                                        {{-- EDIT --}}
+                                        <a href="{{ route('admin.users.edit', $user->id) }}"
+                                            class="inline-flex items-center px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-200 bg-indigo-50/80 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition ring-1 ring-indigo-600/10">
+
                                             Edit
                                         </a>
 
-                                        <!-- DELETE -->
+                                        {{-- DELETE --}}
                                         <button
-                                            class="px-4 py-2 rounded-xl bg-red-500 text-white text-xs font-bold hover:bg-red-600 transition">
+                                            type="button"
+                                            @click="openDeleteModal = true"
+                                            class="inline-flex items-center px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-[0.15em] text-rose-700 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 transition ring-1 ring-rose-600/10">
+
                                             Hapus
                                         </button>
+
+                                        {{-- MODAL --}}
+                                        <div
+                                            x-show="openDeleteModal"
+                                            x-transition
+                                            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                                            style="display: none;">
+
+                                            {{-- OVERLAY --}}
+                                            <div
+                                                class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+                                                @click="openDeleteModal = false">
+                                            </div>
+
+                                            {{-- CONTENT --}}
+                                            <div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+
+                                                <div class="p-8">
+
+                                                    {{-- ICON --}}
+                                                    <div class="w-16 h-16 mx-auto rounded-3xl bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-300 flex items-center justify-center">
+
+                                                        <svg class="w-8 h-8"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+
+                                                            <path stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7"/>
+                                                        </svg>
+
+                                                    </div>
+
+                                                    {{-- TEXT --}}
+                                                    <div class="mt-6 text-center">
+
+                                                        <h3 class="text-xl font-black text-slate-900 dark:text-white">
+                                                            Hapus User?
+                                                        </h3>
+
+                                                        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+
+                                                            User
+                                                            <span class="font-bold text-rose-600">
+                                                                {{ $user->name }}
+                                                            </span>
+                                                            akan dihapus permanen.
+
+                                                        </p>
+
+                                                    </div>
+
+                                                    {{-- BUTTON --}}
+                                                    <div class="mt-8 flex items-center justify-center gap-3">
+
+                                                        {{-- CANCEL --}}
+                                                        <button
+                                                            type="button"
+                                                            @click="openDeleteModal = false"
+                                                            class="px-5 py-2.5 rounded-2xl border border-slate-300 dark:border-white/10 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+
+                                                            Batal
+                                                        </button>
+
+                                                        {{-- DELETE --}}
+                                                        <form action="{{ route('admin.users.destroy', $user->id) }}"
+                                                            method="POST">
+
+                                                            @csrf
+                                                            @method('DELETE')
+
+                                                            <button
+                                                                type="submit"
+                                                                class="px-5 py-2.5 rounded-2xl bg-rose-600 text-white font-semibold hover:bg-rose-700 transition">
+
+                                                                Ya, Hapus
+                                                            </button>
+
+                                                        </form>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
 
                                     </div>
 
@@ -200,32 +289,23 @@
 
                             <tr>
 
-                                <td colspan="5" class="py-16 text-center">
+                                <td colspan="5" class="px-8 py-20 text-center">
 
-                                    <div class="flex flex-col items-center justify-center">
+                                    <div class="flex flex-col items-center">
 
-                                        <div class="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                                        <svg class="w-16 h-16 text-gray-200 mb-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24">
 
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="w-10 h-10 text-slate-400"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor">
+                                            <path stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
 
-                                                <path stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            </svg>
-
-                                        </div>
-
-                                        <h3 class="text-lg font-black text-slate-700">
-                                            Belum Ada User
-                                        </h3>
-
-                                        <p class="text-slate-400 mt-1">
-                                            Tambahkan pengguna baru atau import dari Excel.
+                                        <p class="text-gray-400 font-medium">
+                                            Belum ada data user.
                                         </p>
 
                                     </div>
@@ -241,6 +321,14 @@
                 </table>
 
             </div>
+
+            {{-- PAGINATION --}}
+            <div class="p-6 border-t border-slate-100/70 dark:border-white/10 bg-slate-50/60 dark:bg-white/5">
+
+                {{ $users->links() }}
+
+            </div>
+
         </div>
     </div>
 </x-app-layout>

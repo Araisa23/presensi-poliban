@@ -1,4 +1,3 @@
-```blade
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
