@@ -118,7 +118,7 @@
                 </div>
 
                 <!-- FOOTER -->
-                <div class="px-8 py-5 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
+                <div class="px-8 py-5 flex justify-end gap-3">
 
                     {{-- BACK BUTTON --}}
                     <a href="{{ route('admin.pengumuman.index') }}"

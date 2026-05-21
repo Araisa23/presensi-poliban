@@ -38,7 +38,7 @@
                 <!-- TAMBAH -->
                 <a href="{{ route('admin.pegawai.create') }}"
                 class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition min-w-[180px]">
-                + Tambah Unit
+                + Tambah Pegawai
             </a>
 
             </div>
@@ -90,7 +90,7 @@
                             value="{{ $unit->id }}"
                             {{ request('unit_kerja') == $unit->id ? 'selected' : '' }}
                         >
-                            {{ $unit->nama }}
+                            {{ $unit->nama_unit }}
                         </option>
 
                     @endforeach

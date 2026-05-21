@@ -16,9 +16,10 @@ class PegawaiRequest extends FormRequest
         $pegawaiId = $this->route('pegawai');
 
         return [
-            'user_id' => 'required|exists:users,id',
             'nip' => 'required|string|unique:tenaga_kependidikans,nip,' . $pegawaiId,
             'nama' => 'required|string|max:255',
+            'jenis_kelamin' => 'required|string',
+            'pangkat' => 'nullable|string|max:255',
             'unit_kerja_id' => 'required|exists:unit_kerjas,id',
         ];
     }

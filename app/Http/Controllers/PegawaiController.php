@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Hash;
 use App\Imports\PegawaiImport;
 use App\Exports\PegawaiTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -45,44 +46,31 @@ class PegawaiController extends Controller
 
     public function create()
     {
-        $users = User::whereDoesntHave('tenagaKependidikan')
-            ->whereHas('role', function ($q) {
-
-                $q->where('name', 'pegawai');
-            })
-            ->get();
-
         $unitKerja = UnitKerja::all();
 
-        return view('admin.pegawai.create', compact(
-            'users',
-            'unitKerja'
-        ));
+        return view('admin.pegawai.create', compact('unitKerja'));
     }
 
     public function store(PegawaiRequest $request)
     {
         $data = $request->validated();
 
-        // CEK BIAR TIDAK DOUBLE
-        if (
-            TenagaKependidikan::where(
-                'user_id',
-                $data['user_id']
-            )->exists()
-        ) {
+        // BUAT USER OTOMATIS
+        $user = User::create([
+            'name' => $data['nama'],
+            'nip' => $data['nip'],
+            'password' => Hash::make('password123'),
+            'role_id' => 2, // pegawai
+        ]);
 
-            return back()
-                ->with('error', 'User sudah punya data pegawai')
-                ->withInput();
-        }
-
-        // SIMPAN DATA
+        // BUAT DATA PEGAWAI
         TenagaKependidikan::create([
-            'user_id'       => $data['user_id'],
-            'nama'          => $data['nama'],
-            'nip'           => $data['nip'],
-            'unit_kerja_id' => $data['unit_kerja_id'],
+            'user_id'         => $user->id,
+            'nip'             => $data['nip'],
+            'nama'            => $data['nama'],
+            'jenis_kelamin'   => $data['jenis_kelamin'],
+            'pangkat'         => $data['pangkat'],
+            'unit_kerja_id'   => $data['unit_kerja_id'],
         ]);
 
         return redirect()
@@ -108,33 +96,28 @@ class PegawaiController extends Controller
         ));
     }
 
-    public function update(PegawaiRequest $request, $id)
-    {
-        $pegawai = TenagaKependidikan::findOrFail($id);
+        public function update(PegawaiRequest $request, $id)
+        {
+            $pegawai = TenagaKependidikan::findOrFail($id);
 
-        $data = $request->validated();
+            $data = $request->validated();
 
-        // CEK DOUBLE (kecuali dirinya sendiri)
-        if (
-            TenagaKependidikan::where('user_id', $data['user_id'])
-                ->where('id', '!=', $id)
-                ->exists()
-        ) {
+            $pegawai->update([
+                'nip'             => $data['nip'],
+                'nama'            => $data['nama'],
+                'jenis_kelamin'   => $data['jenis_kelamin'],
+                'pangkat'         => $data['pangkat'],
+                'unit_kerja_id'   => $data['unit_kerja_id'],
+            ]);
 
-            return back()
-                ->with('error', 'User sudah dipakai oleh pegawai lain')
-                ->withInput();
+            return redirect()
+                ->route('admin.pegawai.index')
+                ->with('success', 'Pegawai berhasil diperbarui.');
         }
 
-        $pegawai->update($data);
+        public function destroy($id)
+        {
 
-        return redirect()
-            ->route('admin.pegawai.index')
-            ->with('success', 'Pegawai berhasil diperbarui.');
-    }
-
-    public function destroy($id)
-    {
         $pegawai = TenagaKependidikan::findOrFail($id);
 
         $pegawai->delete();

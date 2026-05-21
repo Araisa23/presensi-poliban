@@ -21,6 +21,64 @@
                 </div>
             @endif
 
+            {{-- FILTER --}}
+            <form method="GET" class="mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    {{-- SEARCH --}}
+                    <div>
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Cari hari / nama jadwal..."
+                            class="w-full rounded-2xl border-slate-200"
+                        >
+                    </div>
+
+                    {{-- STATUS --}}
+                    <div>
+                        <select
+                            name="status"
+                            class="w-full rounded-2xl border-slate-200"
+                        >
+                            <option value="">Semua Status</option>
+
+                            <option value="aktif"
+                                {{ request('status') == 'aktif' ? 'selected' : '' }}>
+                                Hari Kerja
+                            </option>
+
+                            <option value="libur"
+                                {{ request('status') == 'libur' ? 'selected' : '' }}>
+                                Hari Libur
+                            </option>
+                        </select>
+                    </div>
+
+                    {{-- BUTTON --}}
+                    <div class="flex gap-2">
+
+                        <button
+                            type="submit"
+                            class="px-5 py-2 rounded-2xl bg-indigo-600 text-white font-bold"
+                        >
+                            Filter
+                        </button>
+
+                        <a
+                            href="{{ route('admin.jadwal-kerja.index') }}"
+                            class="px-5 py-2 rounded-2xl bg-slate-200 font-bold"
+                        >
+                            Reset
+                        </a>
+
+                    </div>
+
+                </div>
+            </form>
+
+            <!-- TABLE -->
             <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">

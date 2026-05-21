@@ -7,9 +7,29 @@ use Illuminate\Http\Request;
 
 class JadwalKerjaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $jadwalKerja = JadwalKerja::latest()->get();
+        $jadwalKerja = JadwalKerja::query()
+
+            ->when($request->search, function ($query) use ($request) {
+
+                $query->where('hari', 'like', '%' . $request->search . '%')
+                    ->orWhere('nama_jadwal', 'like', '%' . $request->search . '%');
+            })
+
+            ->when($request->status, function ($query) use ($request) {
+
+                if ($request->status == 'aktif') {
+                    $query->where('is_libur', 0);
+                }
+
+                if ($request->status == 'libur') {
+                    $query->where('is_libur', 1);
+                }
+            })
+
+            ->latest()
+            ->get();
 
         return view('admin.jadwal-kerja.index', compact('jadwalKerja'));
     }
@@ -41,7 +61,7 @@ class JadwalKerjaController extends Controller
             'nama_jadwal' => $request->nama_jadwal,
 
             // convert array hari -> string
-            'hari' => implode(',', $request->hari),
+            'hari' => implode(', ', $request->hari),
 
             'jam_masuk' => $request->jam_masuk,
             'jam_pulang' => $request->jam_pulang,
@@ -52,7 +72,7 @@ class JadwalKerjaController extends Controller
             'batas_awal_pulang' => $request->batas_awal_pulang,
             'batas_akhir_pulang' => $request->batas_akhir_pulang,
 
-            // fitur baru
+            // fitur
             'is_libur' => $request->has('is_libur'),
 
             'is_wfh' => $request->has('is_wfh'),
@@ -93,7 +113,7 @@ class JadwalKerjaController extends Controller
 
             'nama_jadwal' => $request->nama_jadwal,
 
-            'hari' => implode(',', $request->hari),
+            'hari' => implode(', ', $request->hari),
 
             'jam_masuk' => $request->jam_masuk,
             'jam_pulang' => $request->jam_pulang,
@@ -104,7 +124,7 @@ class JadwalKerjaController extends Controller
             'batas_awal_pulang' => $request->batas_awal_pulang,
             'batas_akhir_pulang' => $request->batas_akhir_pulang,
 
-            // fitur baru
+            // fitur
             'is_libur' => $request->has('is_libur'),
 
             'is_wfh' => $request->has('is_wfh'),

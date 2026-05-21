@@ -153,7 +153,7 @@
                                 stroke-width="2"
                                 d="M5 13l4 4L19 7" />
                         </svg>
-                        Simpan Pengumuman
+                        Simpan Perubahan
                     </x-primary-button>
 
                     </div>
