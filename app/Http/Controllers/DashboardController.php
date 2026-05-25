@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pengumuman;
+use App\Models\KalenderAkademik;
 use App\Models\TenagaKependidikan;
 use App\Models\UnitKerja;
 use App\Models\Presensi;
@@ -47,7 +49,7 @@ class DashboardController extends Controller
             ));
         }
 
-        // =========================
+       // =========================
         // PEGAWAI
         // =========================
         elseif ($role === 'pegawai') {
@@ -56,8 +58,18 @@ class DashboardController extends Controller
                 ->where('tanggal', $hariIni)
                 ->first();
 
+            $pengumumans = Pengumuman::whereDate('tanggal', $hariIni)
+                ->latest()
+                ->get();
+                
+            $kalenders = KalenderAkademik::latest()
+                ->take(5)
+                ->get();
+
             return view('dashboard.pegawai', compact(
-                'presensiHariIni'
+                'presensiHariIni',
+                'pengumumans',
+                'kalenders'
             ));
         }
 

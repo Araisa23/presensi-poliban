@@ -6,13 +6,13 @@
                     {{ __('Tambah Lokasi Kantor') }}
                 </h2>
                 <p class="mt-1 text-black-70 text-sm font-medium">
-                    Tentukan lokasi kantor langsung melalui peta.
+                    Tentukan lokasi kantor dan radius presensi langsung melalui peta.
                 </p>
             </div>
         </div>
     </x-slot>
 
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-7xl mx-auto mt-6">
 
         <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl p-6 sm:p-8 border border-slate-100/70 dark:border-white/10">
 
@@ -112,24 +112,6 @@
 
                 {{-- BUTTON --}}
                 <div class="flex items-center justify-end mt-6 gap-3">
-
-                    <a href="{{ route('admin.lokasi-kantor.index') }}"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition">
-
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor">
-
-                            <path stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M15 19l-7-7 7-7" />
-                        </svg>
-
-                        Kembali
-                    </a>
 
                     <x-primary-button class="gap-2">
 

@@ -56,7 +56,7 @@
                                         type="checkbox"
                                         name="hari[]"
                                         value="{{ $hari }}"
-                                        class="rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                        class="rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
                                     >
 
                                     <span class="font-semibold text-slate-700">
@@ -122,7 +122,7 @@
                                     type="checkbox"
                                     name="is_wfh"
                                     value="1"
-                                    class="mt-1 rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                    class="mt-1 rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
                                 >
 
                                 <div>
@@ -145,7 +145,7 @@
                                     name="use_location"
                                     value="1"
                                     checked
-                                    class="mt-1 rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                    class="mt-1 rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
                                 >
 
                                 <div>
@@ -168,7 +168,7 @@
                                     name="use_camera"
                                     value="1"
                                     checked
-                                    class="mt-1 rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                    class="mt-1 rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
                                 >
 
                                 <div>

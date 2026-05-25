@@ -60,7 +60,7 @@
                                         type="checkbox"
                                         name="hari[]"
                                         value="{{ $hari }}"
-                                        class="rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                        class="rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
                                         {{ in_array($hari, $selectedHari) ? 'checked' : '' }}
                                     >
 
@@ -128,7 +128,7 @@
                                     type="checkbox"
                                     name="is_wfh"
                                     value="1"
-                                    class="mt-1 rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                    class="mt-1 rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
                                     {{ old('is_wfh', $jadwalKerja->is_wfh) ? 'checked' : '' }}
                                 >
 
@@ -151,7 +151,7 @@
                                     type="checkbox"
                                     name="use_location"
                                     value="1"
-                                    class="mt-1 rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                    class="mt-1 rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
                                     {{ old('use_location', $jadwalKerja->use_location) ? 'checked' : '' }}
                                 >
 
@@ -174,7 +174,7 @@
                                     type="checkbox"
                                     name="use_camera"
                                     value="1"
-                                    class="mt-1 rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                    class="mt-1 rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
                                     {{ old('use_camera', $jadwalKerja->use_camera) ? 'checked' : '' }}
                                 >
 

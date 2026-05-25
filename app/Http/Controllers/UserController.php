@@ -22,6 +22,27 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
+    public function administrator(Request $request)
+    {
+        $query = User::where('role_id', 1);
+
+        // SEARCH
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%')
+                ->orWhere('nip', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $users = $query->latest()->paginate(10);
+
+        return view(
+            'admin.manajemen-user.administrator.index',
+            compact('users')
+        );
+    }
+    
     /*
     |--------------------------------------------------------------------------
     | CREATE
@@ -40,28 +61,24 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nip'             => 'required|unique:users,nip',
             'name'            => 'required',
             'jenis_kelamin'   => 'required',
-            'pangkat'         => 'nullable',
             'role_id'         => 'required',
+
+            'nip' => [
+                'nullable',
+                'unique:users,nip',
+            ],
+
+            'email' => [
+                'nullable',
+                'email',
+                'unique:users,email',
+            ],
         ]);
 
-        User::create([
-            'nip'             => $request->nip,
-            'name'            => $request->name,
-            'jenis_kelamin'   => $request->jenis_kelamin,
-            'pangkat'         => $request->pangkat,
-            'unit_kerja'      => $request->unit_kerja,
-
-            // password default = NIP
-            'password'        => Hash::make($request->nip),
-
-            'role_id'         => $request->role_id,
-        ]);
-
-        return redirect()
-            ->route('admin.users.index')
+    return redirect()
+        ->route('manajemen-user.administrator')
             ->with('success', 'User berhasil ditambahkan');
     }
     /*
@@ -91,7 +108,7 @@ class UserController extends Controller
         );
 
         return redirect()
-            ->route('admin.users.index')
+            ->route('manajemen-user.administrator')
             ->with('success', 'Data pegawai berhasil diimport');
     }
 
@@ -122,8 +139,8 @@ class UserController extends Controller
             'nip'  => $request->nip,
         ]);
 
-        return redirect()
-            ->route('admin.users.index')
+    return redirect()
+        ->route('manajemen-user.administrator')
             ->with('success', 'User berhasil diupdate');
     }
 
@@ -137,7 +154,8 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()
-            ->route('admin.users.index')
+            ->route('manajemen-user.administrator')
             ->with('success', 'User berhasil dihapus');
     }
+
 }

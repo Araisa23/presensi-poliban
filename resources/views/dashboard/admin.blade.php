@@ -4,139 +4,82 @@
 
             <!-- LEFT -->
             <div>
-                <p class="text-[#f4c542] text-xs font-black uppercase tracking-[0.35em]">
-                    Sistem Presensi POLIBAN
-                </p>
+                <p class="text-[#006fcf] text-[10px] font-black uppercase tracking-[0.3em] mb-1">Halo {{ Auth::user()->name }}!</p>
 
-                <h2 class="mt-2 text-3xl xl:text-4xl font-black text-black leading-tight">
-                    Dashboard Administrator
-                </h2>
+                <h2 class="mt-2 text-3xl xl:text-4xl font-black text-black leading-tight">Selamat Datang di Dashboard Admin</h2>
 
-                <p class="mt-2 text-black/70 text-sm max-w-2xl">
-                    Monitoring kehadiran tenaga kependidikan secara realtime
-                    berbasis lokasi GPS dan dokumentasi selfie.
-                </p>
+                <p class="mt-2 text-black/70 text-sm max-w-2xl">Pantau dan kelola seluruh data presensi dengan mudah.</p>
             </div>
 
             <!-- RIGHT -->
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                <div class="bg-white/10 backdrop-blur rounded-2xl px-5 py-4 border border-white/10">
-                    <p class="text-white/60 text-xs uppercase tracking-widest font-bold">
+                {{-- TANGGAL --}}
+                <div class="bg-white rounded-2xl px-5 py-4 shadow-lg border border-slate-200">
+                    <p class="text-slate-400 text-xs uppercase tracking-widest font-black">
                         Hari Ini
                     </p>
 
-                    <h3 class="text-white text-lg font-black mt-1">
-                        {{ now()->translatedFormat('l, d F Y') }}
+                    <h3 class="text-slate-800 text-lg font-black mt-1">
+                        {{ now()->translatedFormat('l') }}
                     </h3>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                        {{ now()->translatedFormat('d F Y') }}
+                    </p>
                 </div>
 
-                <div class="bg-[#f4c542] rounded-2xl px-5 py-4 shadow-xl">
-                    <p class="text-[#0b3c70]/70 text-xs uppercase tracking-widest font-black">
-                        Waktu
+                {{-- JAM --}}
+                <div class="bg-[#0b3c70] rounded-2xl px-5 py-4 shadow-xl">
+                    <p class="text-blue-100 text-xs uppercase tracking-widest font-black">
+                        Waktu Sekarang
                     </p>
 
-                    <h3 class="text-[#0b3c70] text-2xl font-black mt-1">
+                    <h3 class="text-white text-3xl font-black mt-1 tracking-wide">
                         <span id="clock"></span>
                     </h3>
+
+                    <p class="text-blue-200 text-sm mt-1">
+                        Zona WITA
+                    </p>
                 </div>
 
             </div>
-        </div>
 
-        <!-- CLOCK -->
-        <script>
-            function updateClock() {
-                const now = new Date();
+            <!-- CLOCK -->
+            <script>
 
-                const time = now.toLocaleTimeString('id-ID', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
+                function updateClock() {
 
-                document.getElementById('clock').innerHTML = time + ' WITA';
-            }
+                    const now = new Date();
 
-            setInterval(updateClock, 1000);
-            updateClock();
-        </script>
+                    // JAM
+                    const time = now.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+
+                    // TANGGAL
+                    const date = now.toLocaleDateString('id-ID', {
+                        weekday: 'long',
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+
+                    document.getElementById('clock').innerHTML = time;
+                    document.getElementById('date-now').innerHTML = date;
+                }
+
+                setInterval(updateClock, 1000);
+
+                updateClock();
+
+            </script>
     </x-slot>
 
     <div class="space-y-8">
-
-        <!-- QUICK ACTION -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-
-            <a href="{{ route('admin.pegawai.index') }}"
-                class="group bg-white rounded-3xl p-6 shadow-lg border border-slate-100 hover:-translate-y-1 transition">
-
-                <div class="w-14 h-14 rounded-2xl bg-[#0b3c70] text-white flex items-center justify-center shadow-lg">
-                    👥
-                </div>
-
-                <h3 class="mt-5 text-lg font-black text-slate-800">
-                    Data Pegawai
-                </h3>
-
-                <p class="mt-1 text-sm text-slate-500">
-                    Kelola data tenaga kependidikan
-                </p>
-
-            </a>
-
-            <a href="{{ route('admin.presensi.index') }}"
-                class="group bg-white rounded-3xl p-6 shadow-lg border border-slate-100 hover:-translate-y-1 transition">
-
-                <div class="w-14 h-14 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg">
-                    🕒
-                </div>
-
-                <h3 class="mt-5 text-lg font-black text-slate-800">
-                    Data Presensi
-                </h3>
-
-                <p class="mt-1 text-sm text-slate-500">
-                    Monitoring presensi harian
-                </p>
-
-            </a>
-
-            <a href="{{ route('admin.jadwal-kerja.index') }}"
-                class="group bg-white rounded-3xl p-6 shadow-lg border border-slate-100 hover:-translate-y-1 transition">
-
-                <div class="w-14 h-14 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-lg">
-                    📅
-                </div>
-
-                <h3 class="mt-5 text-lg font-black text-slate-800">
-                    Jadwal Kerja
-                </h3>
-
-                <p class="mt-1 text-sm text-slate-500">
-                    Atur jadwal dan WFH Jumat
-                </p>
-
-            </a>
-
-            <a href="{{ route('admin.users.index') }}"
-                class="group bg-white rounded-3xl p-6 shadow-lg border border-slate-100 hover:-translate-y-1 transition">
-
-                <div class="w-14 h-14 rounded-2xl bg-[#f4c542] text-[#0b3c70] flex items-center justify-center shadow-lg">
-                    ⚙️
-                </div>
-
-                <h3 class="mt-5 text-lg font-black text-slate-800">
-                    Data Users
-                </h3>
-
-                <p class="mt-1 text-sm text-slate-500">
-                    Manajemen akun pengguna
-                </p>
-
-            </a>
-
-        </div>
 
         <!-- STATISTIC -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -332,123 +275,111 @@
 
         </script>
 
-        <!-- TABLE -->
-        <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100">
+        {{-- TABLE --}}
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-soft overflow-hidden">
 
-            <!-- HEADER -->
-            <div class="px-8 py-6 border-b border-slate-100 bg-slate-50">
+            <div class="px-6 py-5 border-b border-slate-200">
 
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <h3 class="text-lg font-black text-slate-800">
+                    Data Presensi Hari Ini
+                </h3>
 
-                    <div>
-                        <h3 class="text-2xl font-black text-[#0b3c70]">
-                            Presensi Hari Ini
-                        </h3>
-
-                        <p class="mt-1 text-sm text-slate-500">
-                            Monitoring kehadiran tenaga kependidikan secara realtime.
-                        </p>
-                    </div>
-
-                    <div class="flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-50 text-emerald-700 font-bold text-sm">
-                        🟢 Sistem Aktif
-                    </div>
-
-                </div>
             </div>
 
-            <!-- TABLE -->
             <div class="overflow-x-auto">
 
-                <table class="min-w-full">
+                <table class="w-full text-sm">
 
-                    <thead class="bg-[#0b3c70] text-white">
-
+                    <thead class="bg-slate-50">
                         <tr>
-                            <th class="px-6 py-5 text-left text-xs font-black uppercase tracking-widest">
+
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black text-left">
                                 Pegawai
                             </th>
 
-                            <th class="px-6 py-5 text-left text-xs font-black uppercase tracking-widest">
-                                Unit Kerja
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black text-center">
+                                Tanggal
                             </th>
 
-                            <th class="px-6 py-5 text-left text-xs font-black uppercase tracking-widest">
-                                Jam Masuk
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black text-center">
+                                Masuk
                             </th>
 
-                            <th class="px-6 py-5 text-left text-xs font-black uppercase tracking-widest">
-                                Jam Pulang
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black text-center">
+                                Pulang
                             </th>
 
-                            <th class="px-6 py-5 text-left text-xs font-black uppercase tracking-widest">
-                                Status
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black text-center">
+                                Foto
                             </th>
+
                         </tr>
-
                     </thead>
 
                     <tbody class="divide-y divide-slate-100">
 
-                        @forelse($presensiHariIni as $presensi)
+                        @forelse($presensiHariIni as $p)
 
                             <tr class="hover:bg-slate-50 transition">
 
-                                <!-- PEGAWAI -->
-                                <td class="px-6 py-5">
+                                {{-- PEGAWAI --}}
+                                <td class="px-6 py-4">
 
-                                    <div class="flex items-center gap-4">
+                                    <div class="font-black text-slate-800">
+                                        {{ $p->tenagaKependidikan->nama ?? '-' }}
+                                    </div>
 
-                                        <div class="w-12 h-12 rounded-2xl bg-[#0b3c70] text-white flex items-center justify-center font-black">
-                                            {{ strtoupper(substr($presensi->tenagaKependidikan->nama ?? 'P',0,1)) }}
-                                        </div>
-
-                                        <div>
-                                            <div class="font-black text-slate-800">
-                                                {{ $presensi->tenagaKependidikan->nama ?? '-' }}
-                                            </div>
-
-                                            <div class="text-xs text-slate-400 font-semibold">
-                                                {{ $presensi->tenagaKependidikan->nip ?? '-' }}
-                                            </div>
-                                        </div>
-
+                                    <div class="text-xs text-slate-400">
+                                        {{ $p->tenagaKependidikan->nip ?? '-' }}
                                     </div>
 
                                 </td>
 
-                                <!-- UNIT -->
-                                <td class="px-6 py-5 text-sm font-semibold text-slate-600">
-                                    {{ $presensi->tenagaKependidikan->unitKerja->nama_unit ?? '-' }}
+                                {{-- TANGGAL --}}
+                                <td class="px-6 py-4 text-center text-slate-700 font-semibold">
+                                    {{ \Carbon\Carbon::parse($p->tanggal)->format('d M Y') }}
                                 </td>
 
-                                <!-- MASUK -->
-                                <td class="px-6 py-5">
-                                    <span class="inline-flex items-center px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 text-xs font-black">
-                                        {{ $presensi->jam_masuk ?? '-' }}
+                                {{-- MASUK --}}
+                                <td class="px-6 py-4 text-center">
+
+                                    <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-black">
+                                        {{ $p->jam_masuk ?? '--:--' }}
                                     </span>
+
                                 </td>
 
-                                <!-- PULANG -->
-                                <td class="px-6 py-5">
-                                    <span class="inline-flex items-center px-4 py-2 rounded-xl bg-blue-100 text-blue-700 text-xs font-black">
-                                        {{ $presensi->jam_pulang ?? '-' }}
+                                {{-- PULANG --}}
+                                <td class="px-6 py-4 text-center">
+
+                                    <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-black">
+                                        {{ $p->jam_pulang ?? '--:--' }}
                                     </span>
+
                                 </td>
 
-                                <!-- STATUS -->
-                                <td class="px-6 py-5">
+                                {{-- FOTO --}}
+                                <td class="px-6 py-4 text-center">
 
-                                    @if($presensi->jam_pulang)
+                                    @if($p->foto && $p->foto->count() > 0)
 
-                                        <span class="inline-flex items-center px-4 py-2 rounded-xl bg-blue-100 text-blue-700 text-xs font-black">
-                                            Presensi Lengkap
-                                        </span>
+                                        <div class="flex justify-center -space-x-2">
+
+                                            @foreach($p->foto as $f)
+
+                                                <img
+                                                    src="{{ asset('storage/presensi/' . $f->foto) }}"
+                                                    class="w-10 h-10 rounded-full object-cover border-2 border-white shadow"
+                                                >
+
+                                            @endforeach
+
+                                        </div>
 
                                     @else
 
-                                        <span class="inline-flex items-center px-4 py-2 rounded-xl bg-yellow-100 text-yellow-700 text-xs font-black">
-                                            Belum Pulang
+                                        <span class="text-xs text-slate-400">
+                                            No Photo
                                         </span>
 
                                     @endif
@@ -460,25 +391,13 @@
                         @empty
 
                             <tr>
-                                <td colspan="5" class="py-16 text-center">
 
-                                    <div class="flex flex-col items-center justify-center">
+                                <td colspan="5" class="text-center py-12 text-slate-400 font-medium">
 
-                                        <div class="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center text-4xl">
-                                            📭
-                                        </div>
-
-                                        <h3 class="mt-5 text-xl font-black text-slate-700">
-                                            Belum Ada Presensi
-                                        </h3>
-
-                                        <p class="mt-2 text-slate-400">
-                                            Belum ada pegawai yang melakukan presensi hari ini.
-                                        </p>
-
-                                    </div>
+                                    Belum ada data presensi hari ini
 
                                 </td>
+
                             </tr>
 
                         @endforelse
@@ -492,5 +411,5 @@
         </div>
 
     </div>
+
 </x-app-layout>
-```

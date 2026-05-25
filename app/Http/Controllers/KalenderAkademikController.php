@@ -6,6 +6,7 @@ use App\Models\HariLibur;
 use App\Models\KalenderAkademik;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class KalenderAkademikController extends Controller
 {
@@ -27,63 +28,29 @@ class KalenderAkademikController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-
-            'judul' => 'required|string|max:255',
-
-            'tanggal_mulai' => 'required|date',
-
+            'judul'           => 'required|string|max:255',
+            'jenis'           => 'required|in:akademik,nasional',
+            'tanggal_mulai'   => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
-
-            'jenis' => 'required|string',
+            'keterangan'      => 'nullable|string'
         ]);
 
-        $event = KalenderAkademik::create([
+        KalenderAkademik::create([
 
-            'judul' => $request->judul,
+            'judul'            => $request->judul,
 
-            'tanggal_mulai' => $request->tanggal_mulai,
+            'jenis'            => $request->jenis,
 
-            'tanggal_selesai' => $request->tanggal_selesai,
+            'tanggal_mulai'    => $request->tanggal_mulai,
 
-            'jenis' => $request->jenis,
+            'tanggal_selesai'  => $request->tanggal_selesai,
 
-            'is_libur' => $request->has('is_libur'),
+            'keterangan'       => $request->keterangan,
 
-            'keterangan' => $request->keterangan,
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | AUTO INSERT KE HARI LIBUR
-        |--------------------------------------------------------------------------
-        */
-
-        if ($event->is_libur) {
-
-            $mulai = Carbon::parse($event->tanggal_mulai);
-
-            $selesai = $event->tanggal_selesai
-                ? Carbon::parse($event->tanggal_selesai)
-                : Carbon::parse($event->tanggal_mulai);
-
-            while ($mulai->lte($selesai)) {
-
-                HariLibur::updateOrCreate(
-                    [
-                        'tanggal' => $mulai->toDateString()
-                    ],
-                    [
-                        'keterangan' => $event->judul
-                    ]
-                );
-
-                $mulai->addDay();
-            }
-        }
-
-        return redirect()
-            ->route('kalender-akademik.index')
-            ->with('success', 'Event berhasil ditambahkan.');
+        return redirect()->route('admin.kalender-akademik.index')
+            ->with('success', 'Libur / Agenda berhasil ditambahkan!');
     }
 
     public function edit(KalenderAkademik $kalenderAkademik)
@@ -160,9 +127,9 @@ class KalenderAkademikController extends Controller
             }
         }
 
-        return redirect()
-            ->route('kalender-akademik.index')
-            ->with('success', 'Event berhasil diperbarui.');
+    return redirect()
+        ->route('admin.kalender-akademik.index')
+        ->with('success', 'Kalender berhasil diperbarui.');
     }
 
     public function destroy(KalenderAkademik $kalenderAkademik)

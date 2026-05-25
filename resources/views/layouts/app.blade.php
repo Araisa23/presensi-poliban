@@ -7,11 +7,9 @@
 
         <title>Presensi Tendik Poliban</title>
 
-        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
         <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
         <script>
             tailwind.config = {
@@ -41,7 +39,7 @@
                 animation: fade-in 0.4s ease-out;
             }
 
-            /* Subtle scrollbar polish (safe, optional) */
+            /* Subtle scrollbar polish */
             * { scrollbar-width: thin; scrollbar-color: rgba(100,116,139,.6) transparent; }
             *::-webkit-scrollbar { width: 10px; height: 10px; }
             *::-webkit-scrollbar-thumb { background: rgba(100,116,139,.35); border-radius: 999px; border: 3px solid transparent; background-clip: content-box; }
@@ -51,68 +49,82 @@
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     
     </head>
-    <body class="font-sans antialiased text-slate-900 bg-slate-100">
-        <div class="min-h-screen flex">
-            @include('layouts.sidebar')
+<body x-data="{ sidebarOpen: false }" class="font-sans antialiased text-slate-900 bg-slate-50">
 
-            <div class="flex-1 min-w-0">
-                <div class="h-14 px-4 sm:px-6 flex items-center justify-between bg-gradient-to-r from-[#0b2c52] to-indigo-700 text-white border-b border-white/10">
-                    <div class="flex items-center gap-3 lg:hidden">
-                        <a href="{{ route('dashboard') }}" class="w-9 h-9 rounded-2xl bg-white/10 ring-1 ring-white/15 flex items-center justify-center font-black">
-                            P
-                        </a>
-                        <div class="text-sm font-black tracking-tight">Presensi Tendik Poliban</div>
+    <div class="min-h-screen flex flex-col">
+        
+        {{-- NAVBAR (Full Width dengan Gradasi & Logo Poliban) --}}
+        <nav class="h-16 flex items-center justify-between bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white sticky top-0 z-40 shadow-sm">
+            
+            {{-- SISI KIRI: Tombol Mobile & Logo Poliban Baru --}}
+            <div class="flex items-center h-full">
+                {{-- Tombol Hamburger (Hanya muncul di Mobile/HP) --}}
+                <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden ml-4 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+
+                {{-- Komponen Logo & Judul dari Kamu (Disesuaikan h-full agar pas dengan navbar) --}}
+                <div class="h-full px-4 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm ring-1 ring-white/20">
+                        <img src="{{ asset('images/poliban.png') }}" alt="Logo POLIBAN" class="w-7 h-7 object-contain">
                     </div>
-
-                    <div class="hidden lg:block text-sm font-black tracking-tight opacity-90">
-                        {{ config('app.name', 'Presensi Tendik Poliban') }}
-                    </div>
-
-                    <div class="flex items-center gap-3">
-                        <div class="hidden sm:flex items-center gap-2 rounded-2xl bg-white/10 px-3 py-2 ring-1 ring-white/15">
-                            <span class="text-xs font-black uppercase tracking-[0.25em] text-black-70">{{ Auth::user()->role->name ?? 'user' }}</span>
-                        </div>
-
-                        <x-dropdown align="right" width="48">
-                            <x-slot name="trigger">
-                                <button class="inline-flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-2xl text-white bg-white/10 hover:bg-white/15 ring-1 ring-white/15 shadow-soft transition">
-                                    <span class="max-w-[160px] truncate">{{ Auth::user()->name }}</span>
-                                    <svg class="fill-current h-4 w-4 opacity-90" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </x-slot>
-
-                            <x-slot name="content">
-                                <x-dropdown-link :href="route('profile.edit')">
-                                    {{ __('Profile') }}
-                                </x-dropdown-link>
-
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <x-dropdown-link :href="route('logout')"
-                                        onclick="event.preventDefault(); this.closest('form').submit();">
-                                        {{ __('Log Out') }}
-                                    </x-dropdown-link>
-                                </form>
-                            </x-slot>
-                        </x-dropdown>
+                    <div class="leading-tight hidden sm:block"> {{-- Hidden sm:block menjaga agar text tidak hancur di layar hp yang sangat kecil --}}
+                        <div class="text-sm font-black tracking-tight">Presensi Tenaga Kependidikan</div>
+                        <div class="text-[10px] font-black uppercase tracking-[0.25em] text-white/70">Politeknik Negeri Banjarmasin</div>
                     </div>
                 </div>
-
-                @if (isset($header))
-                    <header class="px-4 sm:px-6 py-6">
-                        <div class="rounded-2xl bg-white ring-1 ring-slate-900/10 shadow-soft px-6 py-5">
-                            {{ $header }}
-                        </div>
-                    </header>
-                @endif
-
-                <main class="animate-content px-4 sm:px-6 py-6">
-                    {{ $slot }}
-                </main>
             </div>
+
+            {{-- SISI KANAN: Profil & Logout Dropdown --}}
+            <div class="px-6 flex items-center">
+                <x-dropdown align="right" width="48">
+                    <x-slot name="trigger">
+                        {{-- Tombol profil diubah jadi semi-transparan putih agar menyatu dengan tema biru --}}
+                        <button class="px-4 py-2 text-sm font-bold bg-white/10 text-white rounded-xl hover:bg-white/20 border border-white/10 transition-colors">
+                            {{ Auth::user()->name ?? 'Pimpinan' }}
+                        </button>
+                    </x-slot>
+                    <x-slot name="content">
+                        <x-dropdown-link :href="route('profile.edit')">Profile</x-dropdown-link>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">Logout</x-dropdown-link>
+                        </form>
+                    </x-slot>
+                </x-dropdown>
+            </div>
+        </nav>
+
+        <div class="flex flex-1 relative">
+            
+            {{-- OVERLAY BACKGROUND (Untuk Mobile saat Sidebar Terbuka) --}}
+            <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 bg-slate-900/40 z-40 lg:hidden" x-transition></div>
+
+            {{-- SIDEBAR (Hanya di Bawah Navbar) --}}
+            <aside class="fixed inset-y-0 left-0 lg:top-20 z-50 w-72 bg-white border-r border-slate-200 transform transition-transform lg:translate-x-0 lg:static lg:h-[calc(100vh-5rem)]"
+                   :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+                @include('layouts.sidebar')
+            </aside>
+
+            {{-- KONTEN UTAMA --}}
+            <main class="flex-1 p-6 overflow-y-auto lg:h-[calc(100vh-4rem)]">
+                
+                {{-- TAMBAHKAN BLOK INI: Cek apakah halaman mengirimkan slot header --}}
+                @isset($header)
+                    <header class="mb-6 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        {{ $header }}
+                    </header>
+                @endisset
+
+                {{-- Isi Konten Halaman Utama --}}
+                {{ $slot }}
+                
+            </main>
+            
         </div>
-        @stack('scripts')
-    </body>
+    </div>
+
+</body>
 </html>

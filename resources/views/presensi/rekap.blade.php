@@ -1,7 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-slate-500 text-xs font-black uppercase tracking-[0.25em]">Rekap</p>
             <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                 {{ __('Rekapitulasi Presensi Bulanan') }}
             </h2>
@@ -44,7 +43,7 @@
                         </select>
                     </div>
                     <div class="flex space-x-2">
-                        <button type="submit" class="flex-1 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition">Tampilkan</button>
+                        <button type="submit" class="flex-1 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition">Tampilkan</button>
                     </div>
                 </form>
                 

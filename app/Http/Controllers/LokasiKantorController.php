@@ -9,10 +9,15 @@ class LokasiKantorController extends Controller
 {
     public function index()
     {
-        $lokasiKantor = LokasiKantor::paginate(10);
+        $lokasiKantor = LokasiKantor::first();
+
+        if (!$lokasiKantor) {
+            return redirect()->route('admin.lokasi-kantor.create')
+                ->with('info', 'Silakan tambahkan lokasi kantor terlebih dahulu.');
+        }
+
         return view('admin.lokasi-kantor.index', compact('lokasiKantor'));
     }
-
     public function create()
     {
         return view('admin.lokasi-kantor.create');
@@ -22,14 +27,21 @@ class LokasiKantorController extends Controller
     {
         $request->validate([
             'nama_lokasi' => 'required|string|max:255',
-            'latitude' => 'required|string',
-            'longitude' => 'required|string',
+            'latitude' => 'required',
+            'longitude' => 'required',
             'radius' => 'required|integer',
         ]);
 
-        LokasiKantor::create($request->all());
+        LokasiKantor::create([
+            'nama_lokasi' => $request->nama_lokasi,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'radius' => $request->radius,
+        ]);
 
-        return redirect()->route('admin.lokasi-kantor.index')->with('success', 'Lokasi kantor berhasil ditambahkan.');
+        return redirect()
+            ->route('admin.lokasi-kantor.index')
+            ->with('success', 'Lokasi kantor berhasil ditambahkan.');
     }
 
     public function edit(LokasiKantor $lokasiKantor)
@@ -41,19 +53,29 @@ class LokasiKantorController extends Controller
     {
         $request->validate([
             'nama_lokasi' => 'required|string|max:255',
-            'latitude' => 'required|string',
-            'longitude' => 'required|string',
-            'radius' => 'required|integer',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'radius' => 'required|integer|min:1',
         ]);
 
-        $lokasiKantor->update($request->all());
+        $lokasiKantor->update([
+            'nama_lokasi' => $request->nama_lokasi,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'radius' => $request->radius,
+        ]);
 
-        return redirect()->route('admin.lokasi-kantor.index')->with('success', 'Lokasi kantor berhasil diperbarui.');
+        return redirect()
+            ->route('admin.lokasi-kantor.index')
+            ->with('success', 'Radius berhasil diperbarui.');
     }
 
     public function destroy(LokasiKantor $lokasiKantor)
     {
         $lokasiKantor->delete();
-        return redirect()->route('admin.lokasi-kantor.index')->with('success', 'Lokasi kantor berhasil dihapus.');
+
+        return redirect()
+            ->route('admin.lokasi-kantor.index')
+            ->with('success', 'Lokasi kantor berhasil dihapus.');
     }
 }

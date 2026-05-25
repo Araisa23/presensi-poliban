@@ -26,7 +26,7 @@
                         <div class="flex items-start justify-between gap-6">
                             <div>
                                 <h3 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight">
-                                    Selamat datang, <span class="text-indigo-600 dark:text-indigo-400">{{ explode(' ', Auth::user()->name)[0] }}</span>
+                                    Selamat datang, <span class="text-[#006fcf] dark:text-indigo-400">{{ explode(' ', Auth::user()->name)[0] }}</span>
                                 </h3>
                                 <p class="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
                                     Anda sudah berhasil masuk ke sistem. Gunakan menu di atas untuk mulai mengelola presensi.
@@ -41,7 +41,7 @@
                             <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-white/80 dark:bg-white/10 text-slate-700 dark:text-slate-100 hover:bg-white dark:hover:bg-white/15 ring-1 ring-slate-900/10 dark:ring-white/10 shadow-soft transition">
                                 Kelola Profil
                             </a>
-                            <a href="{{ route('dashboard') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition">
+                            <a href="{{ route('dashboard') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition">
                                 Buka Dashboard
                             </a>
                         </div>

@@ -3,18 +3,18 @@
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
                 <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-                    {{ __('Data Administrator') }}
+                    {{ __('Data Pimpinan') }}
                 </h2>
 
                 <p class="mt-1 text-black-70 text-sm font-medium">
-                    Kelola seluruh akun administrator sistem presensi.
+                    Kelola seluruh akun pimpinan sistem presensi.
                 </p>
             </div>
 
             <a href="{{ route('admin.users.create') }}"
                 class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition min-w-[180px]">
 
-                + Tambah Administrator
+                + Tambah Pimpinan
             </a>
         </div>
     </x-slot>
@@ -51,14 +51,14 @@
                     <div class="md:col-span-2">
 
                         <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Cari Administrator
+                            Cari Pimpinan
                         </label>
 
                         <input
                             type="text"
                             name="search"
                             value="{{ request('search') }}"
-                            placeholder="Cari admin..."
+                            placeholder="Cari pimpinan..."
                             class="w-full rounded-2xl border-slate-200
                             dark:border-white/10 bg-white dark:bg-white/5
                             px-4 py-3 text-sm font-medium
@@ -84,7 +84,7 @@
                         </button>
 
                         <a
-                            href="{{ route('admin.users.index') }}"
+                            href="{{ route('admin.pimpinan.index') }}"
                             class="inline-flex items-center justify-center 
                             px-5 py-3 rounded-2xl font-black text-xs 
                             uppercase tracking-[0.18em]
@@ -141,7 +141,7 @@
                     {{-- BODY --}}
                     <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
 
-                        @forelse($users as $user)
+                        @forelse($pimpinan as $user)
 
                             <tr class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition-colors duration-150 group">
 
@@ -203,7 +203,7 @@
 
                                         <span class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></span>
 
-                                        Administrator
+                                        Pimpinan
 
                                     </span>
 
@@ -366,7 +366,7 @@
             {{-- PAGINATION --}}
             <div class="p-6 border-t border-slate-100/70 dark:border-white/10 bg-slate-50/60 dark:bg-white/5">
 
-                {{ $users->links() }}
+                {{ $pimpinan->links() }}
 
             </div>
 

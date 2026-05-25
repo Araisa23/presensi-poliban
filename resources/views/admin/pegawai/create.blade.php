@@ -110,7 +110,7 @@
 
                     {{-- BACK BUTTON --}}
                     <a href="{{ route('admin.pegawai.index') }}"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition">
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 hover:scale-[1.02] transition">
 
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="w-4 h-4"
@@ -128,7 +128,12 @@
                     </a>
 
                     {{-- SAVE BUTTON --}}
-                    <x-primary-button class="gap-2">
+                    <button
+                        type="submit"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl
+                        bg-[#1D4ED8] hover:bg-[#1E40AF]
+                        text-white font-semibold shadow-lg hover:scale-[1.02] transition"
+                    >
 
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="w-4 h-4"
@@ -141,8 +146,9 @@
                                 stroke-width="2"
                                 d="M5 13l4 4L19 7" />
                         </svg>
-                        Simpan Pengumuman
-                    </x-primary-button>
+
+                        Simpan Pegawai
+                    </button>
 
                     </div>
                 </form>

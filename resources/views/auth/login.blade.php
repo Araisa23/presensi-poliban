@@ -96,7 +96,7 @@
             <input
                 id="remember_me"
                 type="checkbox"
-                class="w-4 h-4 text-indigo-600 bg-gray-50 border-gray-200 rounded focus:ring-indigo-500 focus:ring-2"
+                class="w-4 h-4 text-[#006fcf] bg-gray-50 border-gray-200 rounded focus:ring-indigo-500 focus:ring-2"
                 name="remember"
             >
 

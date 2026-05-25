@@ -45,7 +45,7 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="text-sm font-bold text-indigo-600 hover:text-indigo-500 transition-colors" href="{{ route('login') }}">
+            <a class="text-sm font-bold text-[#006fcf] hover:text-indigo-500 transition-colors" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
             </a>
 

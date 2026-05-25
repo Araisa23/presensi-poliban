@@ -59,8 +59,8 @@ class PegawaiController extends Controller
         $user = User::create([
             'name' => $data['nama'],
             'nip' => $data['nip'],
-            'password' => Hash::make('password123'),
-            'role_id' => 2, // pegawai
+            'password' => Hash::make($data['nip']),
+            'role_id' => 2,
         ]);
 
         // BUAT DATA PEGAWAI
@@ -110,6 +110,11 @@ class PegawaiController extends Controller
                 'unit_kerja_id'   => $data['unit_kerja_id'],
             ]);
 
+            $pegawai->user->update([
+                'name' => $data['nama'],
+                'nip'  => $data['nip'],
+            ]);
+
             return redirect()
                 ->route('admin.pegawai.index')
                 ->with('success', 'Pegawai berhasil diperbarui.');
@@ -117,15 +122,16 @@ class PegawaiController extends Controller
 
         public function destroy($id)
         {
+            $pegawai = TenagaKependidikan::findOrFail($id);
 
-        $pegawai = TenagaKependidikan::findOrFail($id);
+            $pegawai->user()->delete();
 
-        $pegawai->delete();
+            $pegawai->delete();
 
-        return redirect()
-            ->route('admin.pegawai.index')
-            ->with('success', 'Pegawai berhasil dihapus.');
-    }
+            return redirect()
+                ->route('admin.pegawai.index')
+                ->with('success', 'Pegawai berhasil dihapus.');
+        }
 
     public function import(Request $request)
     {

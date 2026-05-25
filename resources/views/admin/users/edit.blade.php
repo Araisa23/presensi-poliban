@@ -12,8 +12,9 @@
 
     <div class="max-w-4xl mx-auto">
         <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl p-6 sm:p-8 border border-slate-100/70 dark:border-white/10">
-            <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-6">
+            <form method="POST" action="{{ route('admin.users.update', $user->id) }}" class="space-y-6">
                 @csrf
+                @method('PUT')
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -25,12 +26,27 @@
                             class="block mt-1 w-full" 
                             type="text" 
                             name="nip" 
-                            :value="old('nip')" 
+                            :value="old('nip', $user->nip)" 
                             required 
                         />
                         <x-input-error :messages="$errors->get('nip')" class="mt-2" />
                     </div>
 
+                    <!-- Email -->
+                    <div>
+                        <x-input-label for="email" :value="__('Email')" />
+
+                        <x-text-input
+                            id="email"
+                            class="block mt-1 w-full"
+                            type="email"
+                            name="email"
+                            :value="old('email', $user->email ?? '')"
+                        />
+
+                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                    </div>
+                    
                     <!-- Nama -->
                     <div>
                         <x-input-label for="name" :value="__('Nama Lengkap')" />
@@ -39,7 +55,7 @@
                             class="block mt-1 w-full" 
                             type="text" 
                             name="name" 
-                            :value="old('name')" 
+                            :value="old('name', $user->name)" 
                             required 
                         />
                         <x-input-error :messages="$errors->get('name')" class="mt-2" />
@@ -56,10 +72,10 @@
                             required
                         >
                             <option value="">-- Pilih Jenis Kelamin --</option>
-                            <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>
+                            <option value="Laki-laki" {{ old('jenis_kelamin', $user->jenis_kelamin) == 'Laki-laki' ? 'selected' : '' }}>
                                 Laki-laki
                             </option>
-                            <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>
+                            <option value="Perempuan" {{ old('jenis_kelamin', $user->jenis_kelamin) == 'Perempuan' ? 'selected' : '' }}>
                                 Perempuan
                             </option>
                         </select>
@@ -75,7 +91,7 @@
                             class="block mt-1 w-full" 
                             type="text" 
                             name="pangkat" 
-                            :value="old('pangkat')" 
+                            :value="old('pangkat', $user->pangkat)" 
                             placeholder="Opsional"
                         />
                         <x-input-error :messages="$errors->get('pangkat')" class="mt-2" />
@@ -92,9 +108,9 @@
                             required
                         >
                             <option value="">-- Pilih Role Akses --</option>
-                            <option value="2" {{ old('role_id') == '2' ? 'selected' : '' }}>Pegawai</option>
-                            <option value="1" {{ old('role_id') == '1' ? 'selected' : '' }}>Admin</option>
-                            <option value="3" {{ old('role_id') == '3' ? 'selected' : '' }}>Pimpinan</option>
+                            <option value="2" {{ old('role_id', $user->role_id) == '2' ? 'selected' : '' }}>Pegawai</option>
+                            <option value="1" {{ old('role_id', $user->role_id) == '1' ? 'selected' : '' }}>Admin</option>
+                            <option value="3" {{ old('role_id', $user->role_id) == '3' ? 'selected' : '' }}>Pimpinan</option>
                         </select>
 
                         <x-input-error :messages="$errors->get('role_id')" class="mt-2" />

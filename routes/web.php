@@ -11,6 +11,8 @@ use App\Http\Controllers\JadwalKerjaController;
 use App\Http\Controllers\LokasiKantorController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\PimpinanManagementController;
+use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,6 +32,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+
+    Route::get('/manajemen-user', [UserManagementController::class, 'index'])
+        ->name('manajemen-user.index');
+
+    Route::get('/manajemen-user/administrator', [UserController::class, 'administrator'])
+        ->name('manajemen-user.administrator');
+
+    Route::get('/admin/pimpinan', [PimpinanManagementController::class, 'index'])
+        ->name('admin.pimpinan.index');
 
     /*
     |--------------------------------------------------------------------------
@@ -69,6 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/presensi/{id}', [PresensiController::class, 'show'])
             ->name('presensi.show');
+
     });
 
     /*

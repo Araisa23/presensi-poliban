@@ -28,6 +28,91 @@
             </div>
         @endif
 
+        {{-- FILTER --}}
+        <form method="GET" class="mb-6">
+
+            <div class="bg-white dark:bg-slate-900 rounded-3xl 
+                border border-slate-100/70 dark:border-white/10 
+                shadow-soft p-5">
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+                    {{-- SEARCH --}}
+                    <div class="md:col-span-2">
+
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                            Cari Pegawai
+                        </label>
+
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Cari nama / NIP..."
+                            class="w-full rounded-2xl border-slate-200
+                            dark:border-white/10 bg-white dark:bg-white/5
+                            px-4 py-3 text-sm font-medium
+                            text-slate-700 dark:text-slate-100
+                            focus:ring-2 focus:ring-indigo-500"
+                        >
+
+                    </div>
+
+                    {{-- TANGGAL --}}
+                    <div>
+
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                            Tanggal
+                        </label>
+
+                        <input
+                            type="date"
+                            name="tanggal"
+                            value="{{ request('tanggal') }}"
+                            class="w-full rounded-2xl border-slate-200
+                            dark:border-white/10 bg-white dark:bg-white/5
+                            px-4 py-3 text-sm font-medium
+                            text-slate-700 dark:text-slate-100
+                            focus:ring-2 focus:ring-indigo-500"
+                        >
+
+                    </div>
+
+                    {{-- BUTTON --}}
+                    <div class="flex items-end gap-2">
+
+                        <button
+                            type="submit"
+                            class="w-full inline-flex items-center justify-center 
+                            px-5 py-3 rounded-2xl font-black text-xs 
+                            uppercase tracking-[0.18em]
+                            bg-gradient-to-r from-[#004b8d] to-[#006fcf]
+                            text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)]
+                            hover:scale-[1.01] transition"
+                        >
+                            Filter
+                        </button>
+
+                        <a
+                            href="{{ route('admin.presensi.index') }}"
+                            class="inline-flex items-center justify-center 
+                            px-5 py-3 rounded-2xl font-black text-xs 
+                            uppercase tracking-[0.18em]
+                            bg-slate-100 dark:bg-white/5
+                            text-slate-600 dark:text-slate-200
+                            hover:bg-slate-200 dark:hover:bg-white/10 transition"
+                        >
+                            Reset
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
         <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">
 
             <div class="overflow-x-auto">
