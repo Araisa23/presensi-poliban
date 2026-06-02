@@ -1,7 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-slate-500 text-xs font-black uppercase tracking-[0.25em]">Presensi</p>
             <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                 {{ __('Presensi Hari Ini') }}
             </h2>
@@ -13,29 +12,49 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10 p-6 sm:p-8">
             
-                        <!-- Camera Preview -->
+                        @if($jadwal?->use_camera)
+
                         <div class="relative rounded-3xl overflow-hidden bg-black aspect-video flex items-center justify-center border border-slate-100/70 dark:border-white/10 shadow-soft">
                             <video id="video" autoplay playsinline class="w-full h-full object-cover transform scale-x-[-1]"></video>
                             <canvas id="canvas" class="hidden"></canvas>
                         </div>
 
+                        @endif
+
                         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="rounded-3xl border border-slate-100/70 dark:border-white/10 bg-slate-50/60 dark:bg-white/5 p-5">
-                                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Lokasi</h3>
-                                <div id="location-info" class="mt-1 text-lg font-black text-slate-900 dark:text-white">
-                                    Mencari lokasi...
-                                </div>
-                                <div id="location-coords" class="text-xs text-slate-500 dark:text-slate-300 mt-1 italic">
-                                    Sedang melacak koordinat GPS...
-                                </div>
+                        @if($jadwal?->use_location)
+
+                        <div class="rounded-3xl border border-slate-100/70 dark:border-white/10 bg-slate-50/60 dark:bg-white/5 p-5">
+                            <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Lokasi</h3>
+
+                            <div id="location-info" class="mt-1 text-lg font-black text-slate-900 dark:text-white">
+                                Mencari lokasi...
                             </div>
+
+                            <div id="location-coords" class="text-xs text-slate-500 dark:text-slate-300 mt-1 italic">
+                                Sedang melacak koordinat GPS...
+                            </div>
+                        </div>
+
+                        @endif
 
                             <div class="rounded-3xl border border-slate-100/70 dark:border-white/10 bg-slate-50/60 dark:bg-white/5 p-5">
                                 <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Instruksi</h3>
                                 <ul class="mt-2 text-sm font-medium text-slate-600 dark:text-slate-200 space-y-1">
-                                    <li>- Pastikan wajah terlihat jelas.</li>
-                                    <li>- Izinkan akses lokasi & kamera.</li>
-                                    <li>- Tunggu status lokasi “terkunci”.</li>
+
+                                    @if($jadwal?->use_camera)
+                                        <li>- Pastikan wajah terlihat jelas.</li>
+                                    @endif
+
+                                    @if($jadwal?->use_location)
+                                        <li>- Izinkan akses lokasi GPS.</li>
+                                        <li>- Tunggu status lokasi “terkunci”.</li>
+                                    @endif
+
+                                    @if($jadwal?->is_wfh)
+                                        <li>- Mode WFH aktif hari ini.</li>
+                                    @endif
+
                                 </ul>
                             </div>
                         </div>
@@ -60,14 +79,23 @@
                         <p class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-300">Sebelum menekan tombol kirim, pastikan semua siap.</p>
 
                         <div class="mt-4 space-y-3">
-                            <div class="flex items-center justify-between gap-4 rounded-2xl bg-slate-50/70 dark:bg-white/5 ring-1 ring-slate-900/5 dark:ring-white/10 px-4 py-3">
-                                <span class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Kamera</span>
-                                <span class="text-sm font-bold text-slate-700 dark:text-slate-100">Aktif</span>
-                            </div>
-                            <div class="flex items-center justify-between gap-4 rounded-2xl bg-slate-50/70 dark:bg-white/5 ring-1 ring-slate-900/5 dark:ring-white/10 px-4 py-3">
-                                <span class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Lokasi</span>
-                                <span id="location-status-chip" class="text-sm font-bold text-slate-700 dark:text-slate-100">Menunggu...</span>
-                            </div>
+                        @if($jadwal?->use_camera)
+
+                        <div class="flex items-center justify-between gap-4 rounded-2xl bg-slate-50/70 dark:bg-white/5 ring-1 ring-slate-900/5 dark:ring-white/10 px-4 py-3">
+                            <span class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Kamera</span>
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-100">Aktif</span>
+                        </div>
+
+                        @endif
+
+                        @if($jadwal?->use_location)
+
+                        <div class="flex items-center justify-between gap-4 rounded-2xl bg-slate-50/70 dark:bg-white/5 ring-1 ring-slate-900/5 dark:ring-white/10 px-4 py-3">
+                            <span class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Lokasi</span>
+                            <span id="location-status-chip" class="text-sm font-bold text-slate-700 dark:text-slate-100">Menunggu...</span>
+                        </div>
+
+                        @endif
                         </div>
                     </div>
                 </div>
@@ -91,7 +119,9 @@
             const locationStatusChip = document.getElementById('location-status-chip');
 
             // 1. Get Location
-            if (navigator.geolocation) {
+                @if($jadwal?->use_location)
+
+                if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(
                     (position) => {
                         lat = position.coords.latitude;
@@ -114,6 +144,7 @@
                 showAlert('Browser Anda tidak mendukung Geolocation.', 'error');
             }
 
+            @endif
             // 2. Access Camera
             async function initCamera() {
                 try {
@@ -128,23 +159,38 @@
                     btnAbsen.disabled = true;
                 }
             }
+            @if($jadwal?->use_camera)
             initCamera();
+            @endif
 
             // 3. Handle Capture and Submit
             btnAbsen.addEventListener('click', async function() {
+                @if($jadwal?->use_location)
+
                 if (!lat || !lon) {
                     showAlert('Harap tunggu hingga koordinat lokasi terkunci.', 'warning');
                     return;
                 }
 
+                @endif
+
                 setLoading(true);
 
                 // Capture image from video
+                let imageData = null;
+
+                @if($jadwal?->use_camera)
+
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
+
                 const context = canvas.getContext('2d');
+
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const imageData = canvas.toDataURL('image/png');
+
+                imageData = canvas.toDataURL('image/png');
+
+                @endif
 
                 try {
                     const response = await fetch("{{ route('pegawai.presensi.store') }}", {
@@ -156,8 +202,8 @@
                             'Accept': 'application/json'
                         },
                         body: JSON.stringify({
-                            latitude: lat.toString(),
-                            longitude: lon.toString(),
+                            latitude: lat ? lat.toString() : null,
+                            longitude: lon ? lon.toString() : null,
                             foto: imageData,
                         })
                     });

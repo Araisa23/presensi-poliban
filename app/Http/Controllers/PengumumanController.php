@@ -58,13 +58,17 @@ class PengumumanController extends Controller
         $pengumuman = Pengumuman::findOrFail($id);
 
         $request->validate([
-            'judul' => 'required',
-            'isi'   => 'required',
+            'judul'   => 'required',
+            'isi'     => 'required',
+            'tanggal' => 'required|date',
+            'status'  => 'required|boolean',
         ]);
 
         $pengumuman->update([
-            'judul' => $request->judul,
-            'isi'   => $request->isi,
+            'judul'   => $request->judul,
+            'isi'     => $request->isi,
+            'tanggal' => $request->tanggal,
+            'status'  => $request->status,
         ]);
 
         return redirect()

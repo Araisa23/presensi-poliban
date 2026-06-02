@@ -61,25 +61,36 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'            => 'required',
-            'jenis_kelamin'   => 'required',
-            'role_id'         => 'required',
-
-            'nip' => [
-                'nullable',
-                'unique:users,nip',
-            ],
-
-            'email' => [
-                'nullable',
-                'email',
-                'unique:users,email',
-            ],
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8',
+            'role_id' => 'required',
         ]);
 
-    return redirect()
-        ->route('manajemen-user.administrator')
-            ->with('success', 'User berhasil ditambahkan');
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role_id' => $request->role_id,
+
+            // dummy karena kolom masih ada di database
+            'nip' => 'ADM-' . time(),
+        ]);
+
+        if ($user->role_id == 1) {
+            return redirect()
+                ->route('manajemen-user.administrator')
+                ->with('success', 'Administrator berhasil ditambahkan');
+        }
+
+        if ($user->role_id == 3) {
+            return redirect()
+                ->route('admin.pimpinan.index')
+                ->with('success', 'Pimpinan berhasil ditambahkan');
+        }
+
+        return redirect()
+            ->route('admin.users.index');
     }
     /*
     |--------------------------------------------------------------------------

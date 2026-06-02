@@ -14,18 +14,18 @@ class StorePresensiRequest extends FormRequest
     public function rules()
     {
         return [
-            'latitude' => 'required|string',
-            'longitude' => 'required|string',
-            'foto' => 'required|string',
+            'latitude' => 'nullable|string',
+            'longitude' => 'nullable|string',
+            'foto' => 'nullable|string',
         ];
     }
 
     public function messages()
     {
         return [
-            'latitude.required' => 'Lokasi latitude tidak ditemukan.',
-            'longitude.required' => 'Lokasi longitude tidak ditemukan.',
-            'foto.required' => 'Foto presensi diperlukan.',
+            'latitude.string' => 'Format latitude tidak valid.',
+            'longitude.string' => 'Format longitude tidak valid.',
+            'foto.string' => 'Format foto tidak valid.',
         ];
     }
 }

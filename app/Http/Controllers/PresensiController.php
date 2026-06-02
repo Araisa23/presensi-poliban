@@ -23,7 +23,17 @@ class PresensiController extends Controller
 
     public function create()
     {
-        return view('presensi.create');
+        $namaHari = $this->presensiService
+            ->getIndonesianDayName(Carbon::today()->dayOfWeek);
+
+        $jadwal = JadwalKerja::get()->first(function ($item) use ($namaHari) {
+
+            $hariArray = array_map('trim', explode(',', $item->hari));
+
+            return in_array($namaHari, $hariArray);
+        });
+
+        return view('presensi.create', compact('jadwal'));
     }
 
     public function index()
@@ -104,7 +114,7 @@ class PresensiController extends Controller
 
             $jadwal = JadwalKerja::get()->first(function ($item) use ($namaHari) {
 
-                $hariArray = explode(',', $item->hari);
+                $hariArray = array_map('trim', explode(',', $item->hari));
 
                 return in_array($namaHari, $hariArray);
             });

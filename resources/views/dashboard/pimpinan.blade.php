@@ -1,11 +1,44 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <p class="text-[#006fcf] text-[10px] font-black uppercase tracking-[0.3em] mb-1">Halo {{ Auth::user()->name }}!</p>
-            <h2 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
-                Dashboard Monitoring Presensi
-            </h2>
-            <p class="mt-1 text-slate-500 text-sm font-medium">Monitoring kehadiran pegawai secara realtime.</p>
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+
+            {{-- LEFT --}}
+            <div>
+                <p class="text-[#006fcf] text-[10px] font-black uppercase tracking-[0.3em] mb-1">
+                    Halo {{ Auth::user()->name }}!
+                </p>
+
+                <h2 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
+                    Dashboard Monitoring Presensi
+                </h2>
+
+                <p class="mt-1 text-slate-500 text-sm font-medium">
+                    Monitoring kehadiran pegawai secara realtime.
+                </p>
+            </div>
+
+            {{-- RIGHT --}}
+            <div class="flex items-center gap-2">
+
+                <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200">
+                    <div class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                        Hari Ini
+                    </div>
+
+                    <div class="mt-1 text-sm font-bold text-slate-800">
+                        {{ now()->translatedFormat('l, d F Y') }}
+                    </div>
+
+                    <div
+                        id="clock"
+                        class="text-[#006fcf] font-black text-lg tabular-nums"
+                    >
+                        --:--:--
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </x-slot>
 
@@ -72,4 +105,19 @@
             </div>
         </div>
     </div>
+
+    <script>
+    function updateClock() {
+        const now = new Date();
+
+        const time = now.toLocaleTimeString('id-ID', {
+            hour12: false
+        });
+
+        document.getElementById('clock').textContent = time;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
 </x-app-layout>

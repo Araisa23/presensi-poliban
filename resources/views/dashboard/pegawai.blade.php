@@ -11,22 +11,29 @@
                     Silahkan lakukan Presensi Harian Anda.
                 </p>
             </div>
-            <div class="hidden sm:flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 ring-1 ring-slate-900/10">
-                <div class="w-10 h-10 rounded-2xl bg-white ring-1 ring-slate-900/10 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            {{-- RIGHT --}}
+            <div class="flex items-center gap-2">
+
+                <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200">
+                    <div class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                        Hari Ini
+                    </div>
+
+                    <div
+                        id="date-now"
+                        class="mt-1 text-sm font-bold text-slate-800"
+                    >
+                        {{ now()->translatedFormat('l, d F Y') }}
+                    </div>
+
+                    <div
+                        id="clock"
+                        class="text-[#006fcf] font-black text-lg tabular-nums"
+                    >
+                        --:--:--
+                    </div>
                 </div>
-                <div class="leading-tight" x-data="{
-                    time: '',
-                    date: '',
-                    updateTime() {
-                        const now = new Date();
-                        this.time = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                        this.date = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                    }
-                }" x-init="updateTime(); setInterval(() => updateTime(), 1000)">
-                    <div class="font-black tabular-nums text-slate-900 text-lg" x-text="time"></div>
-                    <div class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500" x-text="date"></div>
-                </div>
+
             </div>
         </div>
     </x-slot>
@@ -93,7 +100,7 @@
                                         </div>
 
                                         <span class="text-xs text-slate-400 whitespace-nowrap">
-                                            {{ $pengumuman->created_at->format('d M Y') }}
+                                            {{ \Carbon\Carbon::parse($pengumuman->tanggal)->translatedFormat('d F Y') }}
                                         </span>
 
                                     </div>
@@ -408,7 +415,12 @@
 
                     this.selectedEvents = this.events.filter(event => {
 
-                        return event.tanggal_mulai === clickedDate;
+                        if (!event.tanggal_selesai) {
+                            return event.tanggal_mulai === clickedDate;
+                        }
+
+                        return clickedDate >= event.tanggal_mulai
+                            && clickedDate <= event.tanggal_selesai;
 
                     });
 
@@ -422,9 +434,16 @@
                     const checkDate =
                         `${year}-${month}-${String(day).padStart(2, '0')}`;
 
-                    return this.events.some(event =>
-                        event.tanggal_mulai === checkDate
-                    );
+                    return this.events.some(event => {
+
+                        if (!event.tanggal_selesai) {
+                            return event.tanggal_mulai === checkDate;
+                        }
+
+                        return checkDate >= event.tanggal_mulai
+                            && checkDate <= event.tanggal_selesai;
+
+                    });
 
                 }
 
@@ -434,4 +453,30 @@
 
     </script>
 
+    <script>
+        function updateClock() {
+            const now = new Date();
+
+            const time = now.toLocaleTimeString('id-ID', {
+                hour12: false
+            });
+
+            const date = now.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            document.getElementById('clock').textContent = time;
+
+            const dateElement = document.getElementById('date-now');
+            if (dateElement) {
+                dateElement.textContent = date;
+            }
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
 </x-app-layout>

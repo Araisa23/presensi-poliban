@@ -58,12 +58,13 @@ class DashboardController extends Controller
                 ->where('tanggal', $hariIni)
                 ->first();
 
-            $pengumumans = Pengumuman::whereDate('tanggal', $hariIni)
-                ->latest()
+            $pengumumans = Pengumuman::where('status', 1)
+                ->whereDate('tanggal', '>=', now())
+                ->orderBy('tanggal')
                 ->get();
                 
-            $kalenders = KalenderAkademik::latest()
-                ->take(5)
+            $kalenders = KalenderAkademik::whereMonth('tanggal_mulai', now()->month)
+                ->whereYear('tanggal_mulai', now()->year)
                 ->get();
 
             return view('dashboard.pegawai', compact(

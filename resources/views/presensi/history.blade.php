@@ -1,7 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-slate-500 text-xs font-black uppercase tracking-[0.25em]">Presensi</p>
             <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                 {{ __('Riwayat Presensi Saya') }}
             </h2>

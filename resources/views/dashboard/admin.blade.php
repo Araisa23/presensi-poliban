@@ -2,81 +2,49 @@
     <x-slot name="header">
         <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
 
-            <!-- LEFT -->
+            {{-- LEFT --}}
             <div>
-                <p class="text-[#006fcf] text-[10px] font-black uppercase tracking-[0.3em] mb-1">Halo {{ Auth::user()->name }}!</p>
+                <p class="text-[#006fcf] text-[10px] font-black uppercase tracking-[0.3em] mb-1">
+                    Halo, {{ Auth::user()->name }}
+                </p>
 
-                <h2 class="mt-2 text-3xl xl:text-4xl font-black text-black leading-tight">Selamat Datang di Dashboard Admin</h2>
+                <h2 class="text-3xl xl:text-4xl font-black tracking-tight leading-tight">
+                    Dashboard Monitoring Presensi
+                </h2>
 
-                <p class="mt-2 text-black/70 text-sm max-w-2xl">Pantau dan kelola seluruh data presensi dengan mudah.</p>
+                <p class="mt-2 text-slate-500 text-sm font-medium">
+                    Pantau dan kelola seluruh data presensi dengan mudah.
+                </p>
             </div>
 
-            <!-- RIGHT -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {{-- RIGHT --}}
+    <div class="flex items-center gap-2">
 
-                {{-- TANGGAL --}}
-                <div class="bg-white rounded-2xl px-5 py-4 shadow-lg border border-slate-200">
-                    <p class="text-slate-400 text-xs uppercase tracking-widest font-black">
-                        Hari Ini
-                    </p>
+        <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200">
 
-                    <h3 class="text-slate-800 text-lg font-black mt-1">
-                        {{ now()->translatedFormat('l') }}
-                    </h3>
-
-                    <p class="text-sm text-slate-500 mt-1">
-                        {{ now()->translatedFormat('d F Y') }}
-                    </p>
-                </div>
-
-                {{-- JAM --}}
-                <div class="bg-[#0b3c70] rounded-2xl px-5 py-4 shadow-xl">
-                    <p class="text-blue-100 text-xs uppercase tracking-widest font-black">
-                        Waktu Sekarang
-                    </p>
-
-                    <h3 class="text-white text-3xl font-black mt-1 tracking-wide">
-                        <span id="clock"></span>
-                    </h3>
-
-                    <p class="text-blue-200 text-sm mt-1">
-                        Zona WITA
-                    </p>
-                </div>
-
+            <div class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                Hari Ini
             </div>
 
-            <!-- CLOCK -->
-            <script>
+            <div
+                id="date-now"
+                class="mt-1 text-sm font-bold text-slate-800"
+            >
+                {{ now()->translatedFormat('l, d F Y') }}
+            </div>
 
-                function updateClock() {
+            <div
+                id="clock"
+                class="text-[#006fcf] font-black text-lg tabular-nums"
+            >
+                --:--:--
+            </div>
 
-                    const now = new Date();
+        </div>
 
-                    // JAM
-                    const time = now.toLocaleTimeString('id-ID', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
+    </div>
 
-                    // TANGGAL
-                    const date = now.toLocaleDateString('id-ID', {
-                        weekday: 'long',
-                        day: '2-digit',
-                        month: 'long',
-                        year: 'numeric'
-                    });
-
-                    document.getElementById('clock').innerHTML = time;
-                    document.getElementById('date-now').innerHTML = date;
-                }
-
-                setInterval(updateClock, 1000);
-
-                updateClock();
-
-            </script>
+        </div>
     </x-slot>
 
     <div class="space-y-8">
@@ -411,5 +379,27 @@
         </div>
 
     </div>
+    <script>
+    function updateClock() {
 
+        const now = new Date();
+
+        const time = now.toLocaleTimeString('id-ID', {
+            hour12: false
+        });
+
+        const date = now.toLocaleDateString('id-ID', {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+
+        document.getElementById('clock').textContent = time;
+        document.getElementById('date-now').textContent = date;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+    </script>
 </x-app-layout>

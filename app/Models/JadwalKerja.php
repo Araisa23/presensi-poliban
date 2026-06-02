@@ -10,6 +10,7 @@ class JadwalKerja extends Model
     use HasFactory;
 
     protected $table = 'jadwal_kerjas';
+
     protected $fillable = [
         'nama_jadwal',
         'hari',
@@ -23,5 +24,11 @@ class JadwalKerja extends Model
         'is_wfh',
         'use_camera',
         'use_location',
+    ];
+
+    protected $casts = [
+        'is_wfh' => 'boolean',
+        'use_camera' => 'boolean',
+        'use_location' => 'boolean',
     ];
 }

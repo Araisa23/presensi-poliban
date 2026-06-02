@@ -12,7 +12,6 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $adminRole = Role::where('name', 'admin')->first();
-        $pegawaiRole = Role::where('name', 'pegawai')->first();
         $pimpinanRole = Role::where('name', 'pimpinan')->first();
 
         User::create([
@@ -29,14 +28,6 @@ class UserSeeder extends Seeder
             'email' => 'pimpinan@admin.com',
             'password' => Hash::make('pimpinan123'),
             'role_id' => $pimpinanRole->id,
-        ]);
-
-        User::create([
-            'name' => 'Pegawai',
-            'nip' => '333333333',
-            'email' => 'pegawai@admin.com',
-            'password' => Hash::make('pegawai123'),
-            'role_id' => $pegawaiRole->id,
         ]);
     }
 }

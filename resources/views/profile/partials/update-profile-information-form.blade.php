@@ -7,12 +7,35 @@
         <p class="text-xs text-slate-400 mt-0.5">Perbarui nama dan alamat email akun Anda</p>
     </header>
 
-    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-4">
+    <form method="POST"
+      action="{{ route('profile.update') }}"
+      enctype="multipart/form-data"
+      class="space-y-4"
+      onsubmit="alert('FORM TERKIRIM')">
         @csrf
         @method('patch')
+<p id="selected-file" class="text-xs text-slate-500 mt-2"></p>
 
+<script>
+document.getElementById('foto').addEventListener('change', function() {
+    if(this.files.length > 0){
+        document.getElementById('selected-file').textContent =
+            this.files[0].name;
+    }
+});
+</script>
         {{-- Hidden input file yang di-trigger via label kolom kiri --}}
-        <input id="foto_profile" name="foto_profile" type="file" class="hidden">
+        <input
+            type="file"
+            id="foto"
+            name="foto"
+            class="hidden"
+            accept="image/*"
+        >
+
+        <p id="selected-file"
+        class="text-xs text-slate-500">
+        </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {{-- Nama Lengkap --}}
@@ -62,5 +85,25 @@
                 Simpan Perubahan
             </button>
         </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const fotoInput = document.getElementById('foto');
+            const fileText = document.getElementById('selected-file');
+
+            if (fotoInput) {
+                fotoInput.addEventListener('change', function () {
+
+                    if (this.files.length > 0) {
+                        fileText.textContent =
+                            'Foto dipilih: ' + this.files[0].name;
+                    }
+
+                });
+            }
+
+        });
+        </script>
     </form>
 </div>
