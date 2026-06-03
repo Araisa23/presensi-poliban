@@ -21,12 +21,15 @@ class UnitKerjaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_unit' => 'required|string|max:255',
+            'nama_unit' => 'required|string|max:255|unique:unit_kerjas,nama_unit',
+        ], [
+            'nama_unit.unique' => 'Nama unit kerja sudah ada.',
         ]);
 
         UnitKerja::create($request->all());
 
-        return redirect()->route('admin.unit-kerja.index')->with('success', 'Unit kerja berhasil ditambahkan.');
+        return redirect()->route('admin.unit-kerja.index')
+            ->with('success', 'Unit kerja berhasil ditambahkan.');
     }
 
     public function edit(UnitKerja $unitKerja)
@@ -37,12 +40,15 @@ class UnitKerjaController extends Controller
     public function update(Request $request, UnitKerja $unitKerja)
     {
         $request->validate([
-            'nama_unit' => 'required|string|max:255',
+            'nama_unit' => 'required|string|max:255|unique:unit_kerjas,nama_unit,' . $unitKerja->id,
+        ], [
+            'nama_unit.unique' => 'Nama unit kerja sudah ada.',
         ]);
 
         $unitKerja->update($request->all());
 
-        return redirect()->route('admin.unit-kerja.index')->with('success', 'Unit kerja berhasil diperbarui.');
+        return redirect()->route('admin.unit-kerja.index')
+            ->with('success', 'Unit kerja berhasil diperbarui.');
     }
 
     public function destroy(UnitKerja $unitKerja)
