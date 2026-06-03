@@ -12,19 +12,12 @@
                     Selamat datang di Dashboard Admin
                 </h2>
 
-                <p class="mt-2 text-slate-500 text-sm font-medium">
-                    Pantau dan kelola seluruh data presensi dengan mudah.
-                </p>
             </div>
 
             {{-- RIGHT --}}
     <div class="flex items-center gap-2">
 
         <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200">
-
-            <div class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                Hari Ini
-            </div>
 
             <div
                 id="date-now"
