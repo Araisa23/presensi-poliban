@@ -149,7 +149,7 @@
             <span class="w-8 h-8 rounded-xl bg-white ring-1 ring-slate-900/10 flex items-center justify-center">
                 <svg class="w-4 h-4 {{ request()->routeIs('admin.kalender-akademik.*') ? 'text-indigo-700' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10m-11 6h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </span>
-            Kalender Akademik
+            Kalender
         </a>
         
         <a href="{{ route('admin.presensi.index') }}"

@@ -34,13 +34,13 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
         <div class="hidden lg:flex flex-col justify-between p-10 relative">
 
             <div>
-                <p class="uppercase tracking-[0.35em] text-blue-300 text-sm font-semibold">
-                    Presensi
+                <p class="uppercase tracking-[0.35em] text-white/80 text-sm font-semibold">
+                    PRESENSI
                 </p>
 
                 <h1 class="mt-6 text-5xl font-extrabold leading-tight text-white">
                     Sistem Presensi
-                    <span class="block text-blue-300">
+                    <span class="block text-white/80">
                         Tenaga Kependidikan
                     </span>
                 </h1>

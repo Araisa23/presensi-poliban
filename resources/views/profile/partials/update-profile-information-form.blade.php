@@ -7,36 +7,52 @@
         <p class="text-xs text-slate-400 mt-0.5">Perbarui nama dan alamat email akun Anda</p>
     </header>
 
-    <form method="POST"
-      action="{{ route('profile.update') }}"
-      enctype="multipart/form-data"
-      class="space-y-4"
-      onsubmit="alert('FORM TERKIRIM')">
-        @csrf
-        @method('patch')
-<p id="selected-file" class="text-xs text-slate-500 mt-2"></p>
-
-<script>
-document.getElementById('foto').addEventListener('change', function() {
-    if(this.files.length > 0){
-        document.getElementById('selected-file').textContent =
-            this.files[0].name;
-    }
-});
-</script>
-        {{-- Hidden input file yang di-trigger via label kolom kiri --}}
-        <input
-            type="file"
-            id="foto"
-            name="foto"
-            class="hidden"
-            accept="image/*"
+    @if(session('success'))
+        <div
+            x-data="{ show:true }"
+            x-show="show"
+            x-transition
+            x-init="setTimeout(() => show=false, 4000)"
+            class="mb-6"
         >
+            <div class="rounded-3xl border border-emerald-200 bg-emerald-50 px-5 py-4 shadow-soft">
+                <div class="flex items-center gap-3">
 
-        <p id="selected-file"
-        class="text-xs text-slate-500">
-        </p>
+                    <div class="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center">
+                        ✓
+                    </div>
 
+                    <div>
+                        <p class="font-black text-emerald-800">
+                            Berhasil
+                        </p>
+
+                        <p class="text-sm text-emerald-700">
+                            {{ session('success') }}
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <form
+        method="POST"
+        action="{{ route('profile.update') }}"
+        enctype="multipart/form-data"
+        class="space-y-4"
+    >
+    @csrf
+    @method('patch')
+
+    <input
+        type="file"
+        id="foto"
+        name="foto"
+        class="hidden"
+        accept="image/*"
+    >
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {{-- Nama Lengkap --}}
             <div>
@@ -86,24 +102,5 @@ document.getElementById('foto').addEventListener('change', function() {
             </button>
         </div>
 
-        <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            const fotoInput = document.getElementById('foto');
-            const fileText = document.getElementById('selected-file');
-
-            if (fotoInput) {
-                fotoInput.addEventListener('change', function () {
-
-                    if (this.files.length > 0) {
-                        fileText.textContent =
-                            'Foto dipilih: ' + this.files[0].name;
-                    }
-
-                });
-            }
-
-        });
-        </script>
     </form>
 </div>

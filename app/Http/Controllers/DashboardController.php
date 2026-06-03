@@ -40,12 +40,31 @@ class DashboardController extends Controller
                 ->latest()
                 ->get();
 
+
+            $grafikKehadiran = [];
+            $labelHari = [];
+
+            for ($i = 6; $i >= 0; $i--) {
+
+                $tanggal = Carbon::now()->subDays($i);
+
+                $labelHari[] = $tanggal->translatedFormat('D');
+
+                $grafikKehadiran[] = Presensi::whereDate(
+                    'tanggal',
+                    $tanggal
+                )
+                ->whereNotNull('jam_masuk')
+                ->count();
+            }
             return view('dashboard.admin', compact(
                 'totalPegawai',
                 'totalUnit',
                 'hadirHariIni',
                 'totalAlfa',
-                'presensiHariIni'
+                'presensiHariIni',
+                'grafikKehadiran',
+                'labelHari'
             ));
         }
 
@@ -77,21 +96,40 @@ class DashboardController extends Controller
         // =========================
         // PIMPINAN
         // =========================
-        elseif ($role === 'pimpinan') {
+    elseif ($role === 'pimpinan') {
 
-            $totalPegawai = TenagaKependidikan::count();
+        $totalPegawai = TenagaKependidikan::count();
 
-            $hadirHariIni = Presensi::where('tanggal', $hariIni)
-                ->count();
+        $hadirHariIni = Presensi::whereDate('tanggal', $hariIni)
+            ->count();
 
-            $tidakHadir = $totalPegawai - $hadirHariIni;
+        $tidakHadir = $totalPegawai - $hadirHariIni;
 
-            return view('dashboard.pimpinan', compact(
-                'totalPegawai',
-                'hadirHariIni',
-                'tidakHadir'
-            ));
+        $grafikKehadiran = [];
+        $labelHari = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+
+            $tanggal = Carbon::now()->subDays($i);
+
+            $labelHari[] = $tanggal->translatedFormat('D');
+
+            $grafikKehadiran[] = Presensi::whereDate(
+                'tanggal',
+                $tanggal
+            )
+            ->whereNotNull('jam_masuk')
+            ->count();
         }
+
+        return view('dashboard.pimpinan', compact(
+            'totalPegawai',
+            'hadirHariIni',
+            'tidakHadir',
+            'grafikKehadiran',
+            'labelHari'
+        ));
+    }
 
         return abort(403);
     }

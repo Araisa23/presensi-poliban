@@ -82,8 +82,36 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         {{-- Tombol profil diubah jadi semi-transparan putih agar menyatu dengan tema biru --}}
-                        <button class="px-4 py-2 text-sm font-bold bg-white/10 text-white rounded-xl hover:bg-white/20 border border-white/10 transition-colors">
-                            {{ Auth::user()->name ?? 'Pimpinan' }}
+                        <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold bg-white/10 text-white rounded-xl hover:bg-white/20 border border-white/10 transition-colors">
+
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="w-4 h-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor">
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M5.121 17.804A9 9 0 1118.88 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+
+                            <span>
+                                {{ Auth::user()->name ?? 'Pimpinan' }}
+                            </span>
+
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="w-4 h-4 opacity-70"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor">
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+
                         </button>
                     </x-slot>
                     <x-slot name="content">

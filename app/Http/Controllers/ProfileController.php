@@ -25,13 +25,40 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-public function update(ProfileUpdateRequest $request): RedirectResponse
-{
-    dd(
-        $request->all(),
-        $request->hasFile('foto'),
-        $request->file('foto')
-    );
+    public function update(ProfileUpdateRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $validated = $request->validated();
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->nip = $validated['nip'] ?? null;
+        $user->jenis_kelamin = $validated['jenis_kelamin'] ?? null;
+
+        if ($request->hasFile('foto')) {
+
+            if (
+                $user->foto &&
+                Storage::disk('public')->exists($user->foto)
+            ) {
+                Storage::disk('public')->delete($user->foto);
+            }
+
+            $path = $request->file('foto')->store(
+                'profile',
+                'public'
+            );
+
+            $user->foto = $path;
+        }
+
+        $user->save();
+
+        return back()->with(
+            'success',
+            'Profil berhasil diperbarui.'
+        );
 }
     /**
      * Delete the user's account.

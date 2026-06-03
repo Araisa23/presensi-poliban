@@ -78,35 +78,140 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                    <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">Tren Kehadiran (6 Bulan Terakhir)</h3>
-                    <div class="h-64 flex items-center justify-center border-2 border-dashed border-slate-100 rounded-xl">
-                        <span class="text-slate-400 text-sm font-medium italic">Canvas Grafik Tren Presensi</span>
-                    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {{-- GRAFIK KEHADIRAN --}}
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">
+                    Tren Kehadiran Mingguan
+                </h3>
+
+                <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
+                    Realtime
+                </span>
+            </div>
+
+            <div id="attendanceChart"></div>
+
+        </div>
+
+        {{-- STATUS KEHADIRAN --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+
+            <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">
+                Status Kehadiran
+            </h3>
+
+            <div id="statusChart"></div>
+
+            <div class="mt-6 space-y-3">
+
+                <div class="flex justify-between text-sm font-bold">
+                    <span class="text-emerald-600">Hadir</span>
+                    <span>{{ $hadirHariIni }}</span>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                    <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">Status Kehadiran</h3>
-                    <div class="flex flex-col items-center">
-                        <div class="w-40 h-40 rounded-full border-8 border-indigo-100 border-t-indigo-600 mb-6"></div>
-                        <div class="w-full space-y-3">
-                            <div class="flex justify-between text-sm font-bold">
-                                <span class="text-slate-500">Hadir</span>
-                                <span class="text-slate-900">{{ $hadirHariIni }}</span>
-                            </div>
-                            <div class="flex justify-between text-sm font-bold">
-                                <span class="text-slate-500">Belum Hadir</span>
-                                <span class="text-slate-900">{{ $tidakHadir }}</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="flex justify-between text-sm font-bold">
+                    <span class="text-rose-600">Belum Hadir</span>
+                    <span>{{ $tidakHadir }}</span>
                 </div>
+
             </div>
+
         </div>
+
     </div>
+        </div>
 
     <script>
+
+        // AREA CHART
+        var attendanceOptions = {
+
+            chart: {
+                type: 'area',
+                height: 300,
+                toolbar: {
+                    show: false
+                }
+            },
+
+            series: [{
+                name: 'Jumlah Hadir',
+                data: @json($grafikKehadiran)
+            }],
+
+            xaxis: {
+                categories: @json($labelHari)
+            },
+
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+
+            dataLabels: {
+                enabled: false
+            },
+
+            colors: ['#006fcf'],
+
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    opacityFrom: 0.35,
+                    opacityTo: 0.05
+                }
+            },
+
+            grid: {
+                borderColor: '#e5e7eb'
+            }
+
+        };
+
+        new ApexCharts(
+            document.querySelector("#attendanceChart"),
+            attendanceOptions
+        ).render();
+
+
+        // DONUT CHART
+        var statusOptions = {
+
+            chart: {
+                type: 'donut',
+                height: 280
+            },
+
+            series: [
+                {{ $hadirHariIni }},
+                {{ $tidakHadir }}
+            ],
+
+            labels: [
+                'Hadir',
+                'Belum Hadir'
+            ],
+
+            colors: [
+                '#10b981',
+                '#f43f5e'
+            ],
+
+            legend: {
+                position: 'bottom'
+            }
+
+        };
+
+        new ApexCharts(
+            document.querySelector("#statusChart"),
+            statusOptions
+        ).render();
+
     function updateClock() {
         const now = new Date();
 

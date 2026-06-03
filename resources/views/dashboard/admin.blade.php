@@ -9,7 +9,7 @@
                 </p>
 
                 <h2 class="text-3xl xl:text-4xl font-black tracking-tight leading-tight">
-                    Dashboard Monitoring Presensi
+                    Selamat datang di Dashboard Admin
                 </h2>
 
                 <p class="mt-2 text-slate-500 text-sm font-medium">
@@ -194,11 +194,11 @@
 
                 series: [{
                     name: 'Jumlah Hadir',
-                    data: [180, 192, 176, 201, 154, 0, 0]
+                    data: @json($grafikKehadiran)
                 }],
 
                 xaxis: {
-                    categories: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
+                    categories: @json($labelHari)
                 },
 
                 stroke: {

@@ -16,50 +16,136 @@
 
     {{-- PERUBAHAN: Mengubah pt-3 menjadi pt-0 dan menambahkan lg:-mt-4 untuk mendongak konten ke atas mendekati header --}}
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-8 bg-slate-50/50 min-h-screen dark:bg-slate-900/50 lg:-mt-4">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             
-            {{-- ================= KOLOM KIRI (FOTO & INFO SINGKAT) ================= --}}
-            <div class="space-y-6 lg:col-span-1">
-                
-                {{-- Box Foto Profil --}}
-                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm text-center">
-                    <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 text-left mb-4 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 002-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        Foto Profil
-                    </h3>
-                    
-                    <div class="relative w-32 h-32 mx-auto mb-4">
-                    @if($user->foto)
-                    <a
-                        href="{{ asset('storage/profile/' . $user->foto) }}"
-                        target="_blank"
-                        class="px-3 py-2 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl"
+    {{-- ================= KOLOM KIRI (FOTO & INFO SINGKAT) ================= --}}
+    <div
+        x-data="{ openPreview: false }"
+        class="space-y-6 xl:col-span-4"
+    >
+
+        {{-- Box Foto Profil --}}
+        <div class="bg-white dark:bg-slate-800 p-7 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm text-center">
+
+            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 text-left mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 002-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Foto Profil
+            </h3>
+
+            <div class="relative w-40 h-40 mx-auto mb-5">
+
+                @if($user->foto)
+                    <img
+                        src="{{ asset('storage/' . $user->foto) }}"
+                        alt="Foto Profil"
+                        class="w-40 h-40 rounded-full object-cover border-4 border-slate-100 shadow-sm"
+                    >
+                @else
+                    <div class="w-40 h-40 rounded-full bg-slate-100 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-16 h-16 text-slate-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0
+                                4 4 0 018 0zM12 14a7 7 0 00-7 7
+                                h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                @endif
+
+                <label
+                    for="foto"
+                    class="absolute bottom-1 right-1 bg-blue-600 p-2 rounded-full text-white cursor-pointer hover:bg-blue-700 transition shadow-md"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </label>
+
+            </div>
+
+            <h4 class="font-bold text-slate-700 dark:text-white text-base">
+                {{ $user->display_name }}
+            </h4>
+
+            <p class="text-xs text-slate-400 mb-4">
+                {{ $user->email }}
+            </p>
+
+            <p
+                id="selected-file"
+                class="text-xs text-slate-500 mb-3"
+            ></p>
+
+            <div class="grid grid-cols-2 gap-2">
+
+                @if($user->foto)
+                    <button
+                        type="button"
+                        @click="openPreview = true"
+                        class="px-3 py-2 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 flex items-center justify-center gap-1"
                     >
                         Lihat
-                    </a>
-                    @endif
-                        <label for="foto" class="absolute bottom-1 right-1 bg-blue-600 p-2 rounded-full text-white cursor-pointer hover:bg-blue-700 transition shadow-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        </label>
-                    </div>
+                    </button>
+                @endif
 
-                    <h4 class="font-bold text-slate-700 dark:text-white text-base">{{ $user->display_name }}</h4>
-                    <p class="text-xs text-slate-400 mb-4">{{ $user->email }}</p>
+                <label
+                    for="foto"
+                    class="px-3 py-2 text-xs font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-1 cursor-pointer"
+                >
+                    Ganti
+                </label>
 
-                    <div class="grid grid-cols-2 gap-2">
-                        <button type="button" class="px-3 py-2 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 flex items-center justify-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                            Lihat
-                        </button>
-                        <label for="foto" class="px-3 py-2 text-xs font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-1 cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                            Ganti
-                        </label>
-                    </div>
-                </div>
+            </div>
+
+        </div>
+
+        {{-- MODAL PREVIEW --}}
+        @if($user->foto)
+        <div
+            x-show="openPreview"
+            x-transition.opacity
+            @keydown.escape.window="openPreview = false"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            style="display:none;"
+        >
+            <div
+                @click.away="openPreview = false"
+                class="relative bg-white dark:bg-slate-800 rounded-3xl p-4 max-w-4xl w-full shadow-2xl"
+            >
+
+                <button
+                    @click="openPreview = false"
+                    class="absolute top-3 right-3 w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center"
+                >
+                    ✕
+                </button>
+
+                <img
+                    src="{{ asset('storage/' . $user->foto) }}"
+                    alt="Foto Profil"
+                    class="w-full max-h-[85vh] object-contain rounded-2xl"
+                >
+
+            </div>
+        </div>
+        @endif
 
                 {{-- Box Info Akun (Metadata) --}}
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm space-y-4">
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
                     <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         Info Akun
@@ -94,7 +180,7 @@
             </div>
 
             {{-- ================= KOLOM KANAN (FORM UTAMA & KEAMANAN) ================= --}}
-            <div class="space-y-6 lg:col-span-2">
+            <div class="space-y-6 xl:col-span-8">
                 
                 {{-- Form 1: Informasi Profil --}}
                 @include('profile.partials.update-profile-information-form')
@@ -103,7 +189,7 @@
                 @include('profile.partials.update-password-form')
 
                 {{-- Box 3: Zona Bahaya (Hanya Logout Sederhana) --}}
-                <div class="bg-red-50/30 dark:bg-red-950/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/30">
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-red-200 dark:border-red-900/30 shadow-sm">
                     <header class="mb-4">
                         <h3 class="text-sm font-bold text-red-800 dark:text-red-400 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
