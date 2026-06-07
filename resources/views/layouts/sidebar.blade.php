@@ -189,14 +189,6 @@
             Monitoring
         </a>
 
-        <a href="{{ route('pimpinan.laporan.index') }}"
-           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {{ request()->routeIs('pimpinan.laporan.index') ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/10' : 'text-slate-700 hover:bg-slate-50' }}">
-            <span class="w-8 h-8 rounded-xl bg-white ring-1 ring-slate-900/10 flex items-center justify-center">
-                <svg class="w-4 h-4 {{ request()->routeIs('pimpinan.laporan.index') ? 'text-indigo-700' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6"/></svg>
-            </span>
-            Laporan Harian
-        </a>
-
         <a href="{{ route('pimpinan.rekap') }}"
            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {{ request()->routeIs('pimpinan.rekap') ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/10' : 'text-slate-700 hover:bg-slate-50' }}">
             <span class="w-8 h-8 rounded-xl bg-white ring-1 ring-slate-900/10 flex items-center justify-center">

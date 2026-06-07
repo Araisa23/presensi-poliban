@@ -164,10 +164,6 @@
                     </p>
                 </div>
 
-                <div class="px-4 py-2 rounded-2xl bg-[#0b3c70]/10 text-[#0b3c70] text-sm font-bold">
-                    Realtime Data
-                </div>
-
             </div>
 
             <div id="attendanceChart"></div>

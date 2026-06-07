@@ -79,7 +79,7 @@ class DashboardController extends Controller
 
             $pengumumans = Pengumuman::where('status', 1)
                 ->whereDate('tanggal', '>=', now())
-                ->orderBy('tanggal')
+                ->latest()
                 ->get();
                 
             $kalenders = KalenderAkademik::whereMonth('tanggal_mulai', now()->month)

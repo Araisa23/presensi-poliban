@@ -47,7 +47,7 @@ use Illuminate\Http\Request;
                 'hari'                => 'required|array',
 
                 'jam_masuk'           => 'required',
-                'jam_pulang'          => 'required',
+                'jam_pulang'          => 'required|after:jam_masuk',
 
                 'batas_awal_masuk'    => 'nullable',
                 'batas_akhir_masuk'   => 'nullable',
@@ -100,7 +100,7 @@ use Illuminate\Http\Request;
                 'hari'                => 'required|array',
 
                 'jam_masuk'           => 'required',
-                'jam_pulang'          => 'required',
+                'jam_pulang'          => 'required|after:jam_masuk',
 
                 'batas_awal_masuk'    => 'nullable',
                 'batas_akhir_masuk'   => 'nullable',

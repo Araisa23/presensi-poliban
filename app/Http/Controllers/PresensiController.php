@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Http\Requests\StorePresensiRequest;
 use App\Models\JadwalKerja;
 use App\Models\LokasiKantor;
@@ -36,11 +37,15 @@ class PresensiController extends Controller
         return view('presensi.create', compact('jadwal'));
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $presensi = Presensi::with('user.tenagaKependidikan')
-            ->latest()
-            ->paginate(10);
+        $query = Presensi::with('user.tenagaKependidikan');
+
+        if ($request->tanggal) {
+            $query->whereDate('tanggal', $request->tanggal);
+        }
+
+        $presensi = $query->latest()->paginate(10);
 
         return view('admin.presensi.index', compact('presensi'));
     }

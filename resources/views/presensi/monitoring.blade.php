@@ -1,12 +1,39 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-                {{ __('Monitoring Kehadiran Realtime') }}
-            </h2>
-            <p class="mt-1 text-slate-500 text-sm font-medium">
-                Pantau presensi per tanggal dengan ringkasan jam masuk/pulang.
-            </p>
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+
+            <div>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+                    {{ __('Monitoring Kehadiran Realtime') }}
+                </h2>
+                <p class="mt-1 text-slate-500 text-sm font-medium">
+                    Pantau presensi per tanggal dengan ringkasan jam masuk/pulang.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                onclick="window.print()"
+                class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl
+                    bg-white text-[#0b3c70]
+                    font-bold shadow-lg
+                    hover:scale-[1.02] transition print:hidden"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-12 0h12v4H6v-4z"/>
+                </svg>
+
+                Cetak Laporan
+            </button>
+
         </div>
     </x-slot>
 
@@ -40,10 +67,10 @@
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="bg-slate-50/70 dark:bg-white/5">
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70">Pegawai</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 text-center">Masuk</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 text-center">Pulang</th>
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 text-center">Lokasi</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">Pegawai</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Jam Masuk</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Jam Pulang</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
@@ -80,11 +107,13 @@
                                     </span>
                                 </td>
 
-                                {{-- LOKASI --}}
-                                <td class="px-8 py-5 text-center">
-                                    <div class="text-[10px] font-mono text-slate-500 truncate max-w-[150px]">
-                                        {{ round($p->lat, 4) }}, {{ round($p->lng, 4) }}
-                                    </div>
+                                {{-- STATUS --}}
+                                <td class="px-6 py-4 text-center">
+                                    @if($p->jam_masuk)
+                                        <span class="px-3 py-1.5 bg-emerald-50/80 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-200 rounded-full text-[10px] font-black uppercase tracking-[0.2em] ring-1 ring-emerald-600/10">Hadir</span>
+                                    @else
+                                        <span class="px-3 py-1.5 bg-rose-50/80 dark:bg-rose-500/10 text-rose-700 dark:text-rose-200 rounded-full text-[10px] font-black uppercase tracking-[0.2em] ring-1 ring-rose-600/10">Alpha</span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
