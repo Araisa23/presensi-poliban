@@ -42,9 +42,7 @@ use Illuminate\Http\Request;
         public function store(Request $request)
         {
             $request->validate([
-                'nama_jadwal'         => 'required|string|max:255',
-
-                'hari'                => 'required|array',
+                'nama_jadwal'         => 'required|in:WFO,WFH',
 
                 'jam_masuk'           => 'required',
                 'jam_pulang'          => 'required',
@@ -56,12 +54,26 @@ use Illuminate\Http\Request;
                 'batas_akhir_pulang'  => 'nullable',
             ]);
 
+            $isWFH = $request->nama_jadwal === 'WFH';
+
+            $hari = $isWFH
+                ? 'Jumat'
+                : 'Senin, Selasa, Rabu, Kamis';
+
+            $useCamera = true;
+            $useLocation = !$isWFH;
+
+            if (JadwalKerja::count() >= 2) {
+                return back()->with(
+                    'error',
+                    'Maksimal hanya 2 jadwal kerja (WFO dan WFH).'
+                );
+            }
             JadwalKerja::create([
 
                 'nama_jadwal' => $request->nama_jadwal,
 
-                // convert array hari -> string
-                'hari' => implode(', ', $request->hari),
+                'hari' => $hari,
 
                 'jam_masuk' => $request->jam_masuk,
                 'jam_pulang' => $request->jam_pulang,
@@ -72,16 +84,14 @@ use Illuminate\Http\Request;
                 'batas_awal_pulang' => $request->batas_awal_pulang,
                 'batas_akhir_pulang' => $request->batas_akhir_pulang,
 
-                // fitur
                 'is_libur' => $request->has('is_libur'),
 
-                'is_wfh' => $request->has('is_wfh'),
+                'is_wfh' => $isWFH,
 
-                'use_camera' => $request->has('use_camera'),
+                'use_camera' => $useCamera,
 
-                'use_location' => $request->has('use_location'),
+                'use_location' => $useLocation,
             ]);
-
             return redirect()
                 ->route('admin.jadwal-kerja.index')
                 ->with('success', 'Jadwal kerja berhasil ditambahkan.');
@@ -95,9 +105,7 @@ use Illuminate\Http\Request;
         public function update(Request $request, JadwalKerja $jadwalKerja)
         {
             $request->validate([
-                'nama_jadwal'         => 'required|string|max:255',
-
-                'hari'                => 'required|array',
+                'nama_jadwal'         => 'required|in:WFO,WFH',
 
                 'jam_masuk'           => 'required',
                 'jam_pulang'          => 'required',
@@ -109,11 +117,22 @@ use Illuminate\Http\Request;
                 'batas_akhir_pulang'  => 'nullable',
             ]);
 
+
+            $isWFH = $request->nama_jadwal === 'WFH';
+
+            $hari = $isWFH
+                ? 'Jumat'
+                : 'Senin, Selasa, Rabu, Kamis';
+
+            $useCamera = true;
+
+            $useLocation = !$isWFH;
+
             $jadwalKerja->update([
 
                 'nama_jadwal' => $request->nama_jadwal,
 
-                'hari' => implode(', ', $request->hari),
+                'hari' => $hari,
 
                 'jam_masuk' => $request->jam_masuk,
                 'jam_pulang' => $request->jam_pulang,
@@ -124,14 +143,13 @@ use Illuminate\Http\Request;
                 'batas_awal_pulang' => $request->batas_awal_pulang,
                 'batas_akhir_pulang' => $request->batas_akhir_pulang,
 
-                // fitur
                 'is_libur' => $request->has('is_libur'),
 
-                'is_wfh' => $request->has('is_wfh'),
+                'is_wfh' => $isWFH,
 
-                'use_camera' => $request->has('use_camera'),
+                'use_camera' => $useCamera,
 
-                'use_location' => $request->has('use_location'),
+                'use_location' => $useLocation,
             ]);
 
             return redirect()

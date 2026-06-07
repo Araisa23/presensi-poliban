@@ -7,9 +7,12 @@
             </h2>
             <p class="mt-1 text-black-70 text-sm font-medium">Atur jam masuk/pulang, status libur, dan jadwal operasional.</p>
             </div>
+
+            @if($jadwalKerja->count() < 2)
             <a href="{{ route('admin.jadwal-kerja.create') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition min-w-[180px]">
                 + Tambah Jadwal
             </a>
+            @endif
         </div>
     </x-slot>
 
@@ -20,104 +23,6 @@
                     {{ session('success') }}
                 </div>
             @endif
-
-            {{-- FILTER --}}
-            <form method="GET" class="mb-6">
-
-                <div class="bg-white dark:bg-slate-900 rounded-3xl 
-                            border border-slate-100/70 dark:border-white/10 
-                            shadow-soft p-5">
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-                        {{-- SEARCH --}}
-                        <div class="md:col-span-2">
-
-                            <label class="block mb-2 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                                Cari Jadwal
-                            </label>
-
-                            <input
-                                type="text"
-                                name="search"
-                                value="{{ request('search') }}"
-                                placeholder="Cari hari / nama jadwal..."
-                                class="w-full rounded-2xl border-slate-200
-                                    dark:border-white/10 bg-white dark:bg-white/5
-                                    px-4 py-3 text-sm font-medium
-                                    text-slate-700 dark:text-slate-100
-                                    placeholder:text-slate-400
-                                    focus:ring-2 focus:ring-indigo-500"
-                            >
-
-                        </div>
-
-                        {{-- STATUS --}}
-                        <div>
-
-                            <label class="block mb-2 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                                Status Jadwal
-                            </label>
-
-                            <select
-                                name="status"
-                                class="w-full rounded-2xl border-slate-200
-                                    dark:border-white/10 bg-white dark:bg-white/5
-                                    px-4 py-3 text-sm font-medium
-                                    text-slate-700 dark:text-slate-100
-                                    focus:ring-2 focus:ring-indigo-500"
-                            >
-
-                                <option value="">Semua Status</option>
-
-                                <option value="aktif"
-                                    {{ request('status') == 'aktif' ? 'selected' : '' }}>
-                                    Hari Kerja
-                                </option>
-
-                                <option value="libur"
-                                    {{ request('status') == 'libur' ? 'selected' : '' }}>
-                                    Hari Libur
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                        {{-- BUTTON --}}
-                        <div class="flex items-end gap-2">
-
-                            <button
-                                type="submit"
-                                class="w-full inline-flex items-center justify-center 
-                                    px-5 py-3 rounded-2xl font-black text-xs 
-                                    uppercase tracking-[0.18em]
-                                    bg-gradient-to-r from-[#004b8d] to-[#006fcf]
-                                    text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)]
-                                    hover:scale-[1.01] transition"
-                            >
-                                Filter
-                            </button>
-
-                            <a
-                                href="{{ route('admin.jadwal-kerja.index') }}"
-                                class="inline-flex items-center justify-center 
-                                    px-5 py-3 rounded-2xl font-black text-xs 
-                                    uppercase tracking-[0.18em]
-                                    bg-slate-100 dark:bg-white/5
-                                    text-slate-600 dark:text-slate-200
-                                    hover:bg-slate-200 dark:hover:bg-white/10 transition"
-                            >
-                                Reset
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </form>
 
             <!-- TABLE -->
             <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">

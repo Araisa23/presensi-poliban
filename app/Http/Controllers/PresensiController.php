@@ -182,6 +182,13 @@ class PresensiController extends Controller
                     $jadwal->batas_akhir_masuk
                 );
 
+
+                if ($jadwal->use_camera && !$request->foto) {
+
+                    return response()->json([
+                        'message' => 'Selfie wajib dilakukan sebelum presensi.'
+                    ], 400);
+                }
                 $presensi = Presensi::create([
                     'user_id'                 => $user->id,
                     'tenaga_kependidikan_id' => $pegawai->id,
@@ -235,6 +242,12 @@ class PresensiController extends Controller
                 $jadwal->batas_akhir_pulang
             );
 
+            if ($jadwal->use_camera && !$request->foto) {
+
+                return response()->json([
+                    'message' => 'Selfie wajib dilakukan sebelum presensi pulang.'
+                ], 400);
+            }
             $presensiHariIni->update([
                 'jam_pulang' => $waktuSekarang,
                 'lat'        => $request->latitude,

@@ -1,17 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
 
             {{-- LEFT --}}
             <div>
-                <p class="text-[#006fcf] text-[10px] font-black uppercase tracking-[0.3em] mb-1">
-                    Halo, {{ Auth::user()->name }}
+                <p class="text-[#006fcf] text-[10px] font-black uppercase tracking-[0.3em] mb-2">
+                    Halo {{ Auth::user()->name }}!
                 </p>
 
-                <h2 class="text-3xl xl:text-4xl font-black tracking-tight leading-tight">
-                    Selamat datang di Dashboard Admin
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight mb-1 text-slate-900">
+                    {{ __('Selamat Datang di Dashboard') }}
                 </h2>
-
             </div>
 
             {{-- RIGHT --}}
@@ -43,130 +42,114 @@
     <div class="space-y-8">
 
         <!-- STATISTIC -->
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-4">
 
             <!-- TOTAL PEGAWAI -->
-            <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-100">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                 <div class="flex items-center justify-between">
-
                     <div>
-                        <p class="text-xs uppercase tracking-[0.25em] text-slate-400 font-black">
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
                             Total Pegawai
                         </p>
 
-                        <h3 class="mt-3 text-5xl font-black text-[#0b3c70]">
+                        <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
                             {{ $totalPegawai }}
-                        </h3>
+                        </div>
 
-                        <p class="mt-2 text-sm text-slate-500 font-semibold">
-                            Tenaga Kependidikan
-                        </p>
+                        <div class="mt-1 text-xs font-bold text-slate-500">
+                            Terdaftar
+                        </div>
                     </div>
 
-                    <div class="w-16 h-16 rounded-3xl bg-[#0b3c70]/10 flex items-center justify-center text-3xl">
-                        👨‍💼
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
+                        👥
                     </div>
-
                 </div>
             </div>
 
             <!-- UNIT -->
-            <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-100">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                 <div class="flex items-center justify-between">
-
                     <div>
-                        <p class="text-xs uppercase tracking-[0.25em] text-slate-400 font-black">
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
                             Unit Kerja
                         </p>
 
-                        <h3 class="mt-3 text-5xl font-black text-blue-600">
+                        <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
                             {{ $totalUnit }}
-                        </h3>
+                        </div>
 
-                        <p class="mt-2 text-sm text-slate-500 font-semibold">
+                        <div class="mt-1 text-xs font-bold text-slate-500">
                             Unit Aktif
-                        </p>
+                        </div>
                     </div>
 
-                    <div class="w-16 h-16 rounded-3xl bg-blue-100 flex items-center justify-center text-3xl">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center">
                         🏢
                     </div>
-
                 </div>
             </div>
 
             <!-- HADIR -->
-            <div class="bg-white rounded-3xl p-6 shadow-lg border border-slate-100">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                 <div class="flex items-center justify-between">
-
                     <div>
-                        <p class="text-xs uppercase tracking-[0.25em] text-slate-400 font-black">
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-600">
                             Hadir Hari Ini
                         </p>
 
-                        <h3 class="mt-3 text-5xl font-black text-emerald-600">
+                        <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
                             {{ $hadirHariIni }}
-                        </h3>
+                        </div>
 
-                        <div class="mt-3 w-full bg-slate-100 rounded-full h-2">
-                            <div class="bg-emerald-500 h-2 rounded-full"
-                                style="width: {{ ($hadirHariIni / max($totalPegawai,1)) * 100 }}%">
-                            </div>
+                        <div class="mt-1 text-xs font-bold text-emerald-600">
+                            Sudah Presensi
                         </div>
                     </div>
 
-                    <div class="w-16 h-16 rounded-3xl bg-emerald-100 flex items-center justify-center text-3xl">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
                         ✅
                     </div>
-
                 </div>
             </div>
 
             <!-- ALFA -->
-            <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-6 shadow-lg text-white">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                 <div class="flex items-center justify-between">
-
                     <div>
-                        <p class="text-xs uppercase tracking-[0.25em] text-red-100 font-black">
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-rose-600">
                             Belum Presensi
                         </p>
 
-                        <h3 class="mt-3 text-5xl font-black">
+                        <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
                             {{ $totalAlfa }}
-                        </h3>
+                        </div>
 
-                        <p class="mt-2 text-sm text-red-100 font-semibold">
-                            Pegawai belum hadir
-                        </p>
+                        <div class="mt-1 text-xs font-bold text-rose-600">
+                            Belum Tercatat
+                        </div>
                     </div>
 
-                    <div class="w-16 h-16 rounded-3xl bg-white/10 flex items-center justify-center text-3xl">
-                        ❌
+                    <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-700 flex items-center justify-center">
+                        ⚠️
                     </div>
-
                 </div>
             </div>
 
         </div>
 
         <!-- GRAFIK -->
-        <div class="bg-white rounded-3xl shadow-lg border border-slate-100 p-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
 
-            <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center justify-between mb-6">
 
-                <div>
-                    <h3 class="text-2xl font-black text-[#0b3c70]">
+                    <h3 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight mb-1 text-slate-900">
                         Grafik Kehadiran Mingguan
                     </h3>
 
                     <p class="text-slate-500 text-sm mt-1">
                         Statistik presensi tenaga kependidikan minggu ini.
                     </p>
-                </div>
-
-                <div class="px-4 py-2 rounded-2xl bg-[#0b3c70]/10 text-[#0b3c70] text-sm font-bold">
-                    Realtime Data
-                </div>
 
             </div>
 
@@ -237,11 +220,11 @@
         </script>
 
         {{-- TABLE --}}
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-soft overflow-hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 
             <div class="px-6 py-5 border-b border-slate-200">
 
-                <h3 class="text-lg font-black text-slate-800">
+                <h3 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight mb-1 text-slate-900">
                     Data Presensi Hari Ini
                 </h3>
 

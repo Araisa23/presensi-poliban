@@ -64,108 +64,98 @@
         @endif
 
         {{-- FILTER --}}
-        <form method="GET" class="mb-6">
+    <form method="GET" class="mb-6">
 
-            <div class="bg-white dark:bg-slate-900 rounded-3xl 
-                        border border-slate-100/70 dark:border-white/10 
-                        shadow-soft p-5">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                    {{-- SEARCH --}}
-                    <div class="md:col-span-2">
+                {{-- SEARCH --}}
+                <div class="md:col-span-2">
 
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Cari Pegawai
-                        </label>
+                    <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                        Cari Agenda
+                    </label>
 
-                        <input
-                            type="text"
-                            name="search"
-                            value="{{ request('search') }}"
-                            placeholder="Cari nama / NIP..."
-                            class="mt-2 w-full rounded-2xl border border-slate-200 
-                                dark:border-white/10 bg-white dark:bg-white/5
-                                px-4 py-3 text-sm font-medium
-                                text-slate-700 dark:text-slate-100
-                                focus:ring-2 focus:ring-indigo-500"
-                        >
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Cari agenda atau keterangan..."
+                        class="mt-2 w-full rounded-2xl border border-slate-200
+                        bg-white px-4 py-3 text-sm font-medium
+                        text-slate-700
+                        focus:ring-2 focus:ring-[#006fcf]"
+                    >
 
-                    </div>
+                </div>
 
-                    {{-- UNIT KERJA --}}
-                    <div>
+                {{-- FILTER JENIS --}}
+                <div>
 
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Unit Kerja
-                        </label>
+                    <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                        Jenis Kalender
+                    </label>
 
-                        <select
-                            name="unit_kerja"
-                            class="mt-2 w-full rounded-2xl border border-slate-200 
-                                dark:border-white/10 bg-white dark:bg-white/5
-                                px-4 py-3 text-sm font-medium
-                                text-slate-700 dark:text-slate-100
-                                focus:ring-2 focus:ring-indigo-500"
-                        >
+                    <select
+                        name="jenis"
+                        class="mt-2 w-full rounded-2xl border border-slate-200
+                        bg-white px-4 py-3 text-sm font-medium
+                        text-slate-700
+                        focus:ring-2 focus:ring-[#006fcf]"
+                    >
 
-                            <option value="">Semua Unit Kerja</option>
+                        <option value="">Semua Jenis</option>
 
-                            @foreach($unitKerja as $unit)
+                        <option value="akademik"
+                            {{ request('jenis') == 'akademik' ? 'selected' : '' }}>
+                            Agenda Akademik
+                        </option>
 
-                                <option
-                                    value="{{ $unit->id }}"
-                                    {{ request('unit_kerja') == $unit->id ? 'selected' : '' }}
-                                >
-                                    {{ $unit->nama_unit }}
-                                </option>
+                        <option value="nasional"
+                            {{ request('jenis') == 'nasional' ? 'selected' : '' }}>
+                            Libur Nasional
+                        </option>
 
-                            @endforeach
+                    </select>
 
-                        </select>
+                </div>
 
-                    </div>
+                {{-- BUTTON --}}
+                <div class="flex items-end gap-2">
 
-                    {{-- BUTTON --}}
-                    <div class="flex items-end gap-2">
+                    <button
+                        type="submit"
+                        class="w-full inline-flex items-center justify-center
+                        px-5 py-3 rounded-2xl font-black text-xs
+                        uppercase tracking-[0.18em]
+                        bg-gradient-to-r from-[#004b8d] to-[#006fcf]
+                        text-white
+                        hover:scale-[1.01] transition">
 
-                        {{-- FILTER --}}
-                        <button
-                            type="submit"
-                            class="w-full inline-flex items-center justify-center 
-                                px-5 py-3 rounded-2xl font-black text-xs 
-                                uppercase tracking-[0.18em]
-                                bg-gradient-to-r from-[#004b8d] to-[#006fcf]
-                                text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)]
-                                hover:scale-[1.01] transition"
-                        >
+                        Filter
 
-                            Filter
+                    </button>
 
-                        </button>
+                    <a
+                        href="{{ route('admin.kalender-akademik.index') }}"
+                        class="inline-flex items-center justify-center
+                        px-5 py-3 rounded-2xl font-black text-xs
+                        uppercase tracking-[0.18em]
+                        bg-slate-100 text-slate-600
+                        hover:bg-slate-200 transition">
 
-                        {{-- RESET --}}
-                        <a
-                            href="{{ route('admin.pegawai.index') }}"
-                            class="inline-flex items-center justify-center 
-                                px-5 py-3 rounded-2xl font-black text-xs 
-                                uppercase tracking-[0.18em]
-                                bg-slate-100 dark:bg-white/5
-                                text-slate-600 dark:text-slate-200
-                                hover:bg-slate-200 dark:hover:bg-white/10 transition"
-                        >
+                        Reset
 
-                            Reset
-
-                        </a>
-
-                    </div>
+                    </a>
 
                 </div>
 
             </div>
 
-        </form>
+        </div>
+
+    </form>
 
         <!-- TABLE -->
         <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">

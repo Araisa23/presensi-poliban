@@ -3,11 +3,11 @@
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <!-- LEFT -->
             <div>
-                <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-                    Kalender Libur Nasional & Akademik
-                </h2>
-                <p class="mt-1 text-black-70 text-sm font-medium">
-                    Kelola hari libur nasional dan agenda akademik kampus dengan mudah.
+                <h3 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-slate-900">
+                    Kalender Akademik & Libur Nasional
+                </h3>
+                <p class="text-slate-500 text-sm mt-1">
+                    Kelola agenda akademik dan hari libur nasional.
                 </p>
             </div>
 
@@ -18,7 +18,7 @@
                bg-gradient-to-r from-[#004b8d] to-[#006fcf]
                text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)]
                ring-1 ring-[#0b3c70]/20 transition text-center min-w-[180px]">
-                + Tambah Hari Libur
+                + Tambah Hari Libur/Agenda
             </a>
         </div>
     </x-slot>
@@ -27,247 +27,345 @@
 
         <!-- ALERT -->
         @if(session('success'))
-            <div class="p-4 rounded-2xl bg-emerald-50/70 dark:bg-emerald-500/10 border border-emerald-200/70 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-200 shadow-soft">
+            <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/70 text-emerald-800 shadow-soft">
                 {{ session('success') }}
             </div>
         @endif
 
         <!-- STATISTIC -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {{-- TOTAL AGENDA AKADEMIK --}}
-            <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100/70 dark:border-white/10 shadow-soft">
+
+            {{-- TOTAL AGENDA --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Total Agenda
-                        </p>
-                        <h3 class="mt-3 text-4xl font-black text-slate-800 dark:text-white">
-                            {{ $events->count() }}
-                        </h3>
-                        <p class="mt-2 text-sm text-slate-500">
-                            Agenda akademik
-                        </p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Total Agenda</p>
+                        <h3 class="mt-2 text-4xl font-black text-slate-900">{{ $events->count() }}</h3>
+                        <p class="mt-1 text-xs font-bold text-slate-500">Kalender Aktif</p>
                     </div>
-                    <div class="w-14 h-14 rounded-2xl bg-[#0b3c70]/10 dark:bg-[#0b3c70]/100/10 flex items-center justify-center text-[#006fcf] dark:text-indigo-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z" />
-                        </svg>
-                    </div>
+                    <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-[#006fcf]">📅</div>
                 </div>
             </div>
 
-            {{-- LIBUR --}}
-            <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100/70 dark:border-white/10 shadow-soft">
+            {{-- HARI LIBUR --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Hari Libur
-                        </p>
-                        <h3 class="mt-3 text-4xl font-black text-slate-800 dark:text-white">
-                            {{ $events->where('jenis', 'nasional')->count() }}
-                        </h3>
-                        <p class="mt-2 text-sm text-slate-500">
-                            Libur nasional tersimpan
-                        </p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Hari Libur</p>
+                        <h3 class="mt-2 text-4xl font-black text-slate-900">{{ $events->where('jenis', 'nasional')->count() }}</h3>
+                        <p class="mt-1 text-xs font-bold text-slate-500">Libur Nasional</p>
                     </div>
-                    <div class="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 118 0v2m-4-6v6" />
-                        </svg>
-                    </div>
+                    <div class="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600">🏖️</div>
                 </div>
             </div>
 
-            {{-- TAHUN --}}
-            <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100/70 dark:border-white/10 shadow-soft">
+            {{-- TAHUN AKTIF --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Tahun Aktif
-                        </p>
-                        <h3 class="mt-3 text-4xl font-black text-slate-800 dark:text-white">
-                            {{ now()->year }}
-                        </h3>
-                        <p class="mt-2 text-sm text-slate-500">
-                            Kalender aktif
-                        </p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Tahun Aktif</p>
+                        <h3 class="mt-2 text-4xl font-black text-slate-900">{{ now()->year }}</h3>
+                        <p class="mt-1 text-xs font-bold text-slate-500">Kalender Aktif</p>
                     </div>
-                    <div class="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" />
-                        </svg>
-                    </div>
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">📆</div>
                 </div>
             </div>
+
         </div>
 
         <!-- CALENDAR -->
-        <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">
-            <div class="px-6 py-5 border-b border-slate-100/70 dark:border-white/10">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+            {{-- HEADER --}}
+            <div class="px-6 py-5 border-b border-slate-100">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+                    {{-- TITLE --}}
                     <div>
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white">
-                            Kalender Akademik & Hari Libur Nasional
+                        <h3 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-slate-900">
+                            Kalender Akademik
                         </h3>
-                        <p class="mt-1 text-sm text-slate-500">
-                            Lihat agenda akademik dan hari libur nasional dalam satu tampilan kalender.
-                        </p>
+                        <p class="text-slate-500 text-sm mt-1">Agenda akademik dan hari libur nasional.</p>
                     </div>
-                    <div class="flex items-center gap-4 text-sm">
+
+                    {{-- LEGEND + FILTER --}}
+                    <div class="flex flex-wrap items-center gap-4 text-sm">
+
                         <div class="flex items-center gap-2">
                             <div class="w-3 h-3 rounded-full bg-[#0b3c70]"></div>
-                            <span class="text-slate-600 dark:text-slate-300 font-semibold">
-                                Agenda Akademik
-                            </span>
+                            <span class="text-slate-600 font-semibold">Agenda Akademik</span>
                         </div>
+
                         <div class="flex items-center gap-2">
                             <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                            <span class="text-slate-600 dark:text-slate-300 font-semibold">
-                                Hari Libur
-                            </span>
+                            <span class="text-slate-600 font-semibold">Libur Nasional</span>
                         </div>
+
+                        {{-- DROPDOWN TAHUN --}}
+                        @php
+                            $minYear = $events->min(fn($e) => \Carbon\Carbon::parse($e->tanggal_mulai)->year) ?? now()->year;
+                            $maxYear = max($events->max(fn($e) => \Carbon\Carbon::parse($e->tanggal_mulai)->year) ?? now()->year, now()->year + 2);
+                        @endphp
+                        <div
+                            x-data="{
+                                open: false,
+                                selected: '{{ now()->year }}'
+                            }"
+                            class="relative"
+                        >
+                            {{-- BUTTON --}}
+                            <button
+                                @click="open = !open"
+                                type="button"
+                                class="flex items-center gap-3 px-5 py-2.5 bg-white
+                                border-2 border-slate-200 rounded-2xl shadow-sm
+                                text-sm font-bold text-slate-700
+                                hover:border-[#0b3c70] hover:shadow-md
+                                transition-all duration-200"
+                            >
+                                <span x-text="selected"></span>
+                                <svg
+                                    class="w-4 h-4 text-slate-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': open }"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+
+                            {{-- MENU --}}
+                            <div
+                                x-show="open"
+                                @click.outside="open = false"
+                                x-transition:enter="transition ease-out duration-150"
+                                x-transition:enter-start="opacity-0 scale-95"
+                                x-transition:enter-end="opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 scale-100"
+                                x-transition:leave-end="opacity-0 scale-95"
+                                x-cloak
+                                class="absolute right-0 mt-2 w-full min-w-[110px]
+                                bg-white rounded-2xl shadow-xl border border-slate-200
+                                overflow-hidden z-50"
+                            >
+                                @for($year = min($minYear, now()->year - 2); $year <= $maxYear; $year++)
+                                    <button
+                                        type="button"
+                                        @click="
+                                            selected = '{{ $year }}';
+                                            open = false;
+                                            calendar.gotoDate('{{ $year }}-01-01');
+                                        "
+                                        class="w-full text-left px-4 py-3 text-sm font-semibold
+                                        text-slate-700 hover:bg-blue-50 hover:text-[#0b3c70]
+                                        transition-colors duration-150"
+                                        :class="selected === '{{ $year }}' ? 'bg-blue-50 text-[#0b3c70]' : ''"
+                                    >
+                                        {{ $year }}
+                                    </button>
+                                @endfor
+                            </div>
+                        </div>
+
                     </div>
+
                 </div>
             </div>
+
+            {{-- BODY --}}
             <div class="p-6">
                 <div id="calendar"></div>
             </div>
+
         </div>
 
         <!-- EVENT TABLE -->
-        <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+            <div class="px-6 py-5 border-b border-slate-200">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+                    <h3 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-slate-900">
+                        Data Kalender
+                    </h3>
+
+                    {{-- FILTER & SEARCH --}}
+                    <div class="flex flex-wrap items-center gap-3">
+
+                        {{-- SEARCH --}}
+                        <div class="relative">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1116.65 2a7.5 7.5 0 010 14.65z"/>
+                            </svg>
+                            <input
+                                type="text"
+                                id="searchInput"
+                                placeholder="Cari agenda..."
+                                class="pl-9 pr-4 py-2 rounded-xl border border-slate-300 bg-white
+                                text-sm font-medium text-slate-700 shadow-sm w-48
+                                focus:ring-2 focus:ring-[#0b3c70] focus:border-[#0b3c70] outline-none">
+                        </div>
+
+                        {{-- FILTER JENIS --}}
+                        <select
+                            id="filterJenis"
+                            class="px-4 py-2 rounded-xl border border-slate-300 bg-white
+                            text-sm font-semibold text-slate-700 shadow-sm
+                            focus:ring-2 focus:ring-[#0b3c70] focus:border-[#0b3c70]">
+                            <option value="semua">Semua Jenis</option>
+                            <option value="akademik">Akademik</option>
+                            <option value="nasional">Libur Nasional</option>
+                        </select>
+
+                    </div>
+
+                </div>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50/70 dark:bg-white/5">
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">
+                        <tr class="bg-slate-50/70">
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">
                                 Agenda / Hari Libur
                             </th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">
-                                Tanggal
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black text-center border-b border-slate-100">
+                                Jenis
                             </th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">
+                                Tanggal Mulai
+                            </th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">
+                                Tanggal Selesai
+                            </th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">
                                 Keterangan
                             </th>
-                            <th class="px-6 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">
+                            <th class="px-6 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">
                                 Aksi
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
+                    <tbody id="eventTableBody" class="divide-y divide-slate-100">
                         @forelse($events as $event)
-                            <tr class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition">
+                            <tr class="hover:bg-slate-50 transition event-row"
+                                data-judul="{{ strtolower($event->judul) }}"
+                                data-jenis="{{ $event->jenis }}">
+
+                                {{-- JUDUL --}}
                                 <td class="px-6 py-5">
-                                    <div class="font-black text-slate-800 dark:text-white">
-                                        {{ $event->judul }}
-                                    </div>
+                                    <div class="font-semibold text-slate-800">{{ $event->judul }}</div>
                                 </td>
-                                <td class="px-6 py-5 text-sm text-slate-600 dark:text-slate-300">
+
+                                {{-- JENIS --}}
+                                <td class="px-6 py-5 text-center">
+                                    @if($event->jenis == 'nasional')
+                                        <span class="px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-bold">
+                                            Libur Nasional
+                                        </span>
+                                    @else
+                                        <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
+                                            Akademik
+                                        </span>
+                                    @endif
+                                </td>
+
+                                {{-- TANGGAL MULAI --}}
+                                <td class="px-6 py-5 text-sm text-slate-600">
                                     {{ \Carbon\Carbon::parse($event->tanggal_mulai)->translatedFormat('d F Y') }}
                                 </td>
-                                <td class="px-6 py-5 text-sm text-slate-500">
-                                    {{ $event->keterangan }}
-                                </td>
-                                <td class="px-8 py-5 text-right">
 
-                                    <div class="flex items-center justify-end gap-3"
-                                        x-data="{ openDeleteModal: false }">
+                                {{-- TANGGAL SELESAI --}}
+                                <td class="px-6 py-5 text-sm text-slate-600">
+                                    @if($event->tanggal_selesai && $event->tanggal_selesai != $event->tanggal_mulai)
+                                        {{ \Carbon\Carbon::parse($event->tanggal_selesai)->translatedFormat('d F Y') }}
+                                    @else
+                                        <span class="text-slate-400">—</span>
+                                    @endif
+                                </td>
+
+                                {{-- KETERANGAN --}}
+                                <td class="px-6 py-5 text-sm text-slate-500">
+                                    {{ $event->keterangan ?? '-' }}
+                                </td>
+
+                                {{-- AKSI --}}
+                                <td class="px-6 py-5 text-right">
+                                    <div class="inline-flex items-center gap-2">
 
                                         {{-- EDIT --}}
                                         <a href="{{ route('admin.kalender-akademik.edit', $event->id) }}"
-                                        class="inline-flex items-center px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-[0.15em] text-[#0b3c70] dark:text-blue-200 bg-blue-50/80 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition ring-1 ring-blue-600/10">
-
+                                            class="inline-flex items-center justify-center
+                                            px-4 py-2 rounded-2xl text-[11px]
+                                            font-black uppercase tracking-[0.18em]
+                                            bg-white text-slate-700 hover:bg-slate-50
+                                            ring-1 ring-slate-200 shadow-sm transition">
                                             Edit
                                         </a>
 
                                         {{-- DELETE --}}
-                                        <button
-                                            type="button"
-                                            @click="openDeleteModal = true"
-                                            class="inline-flex items-center px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-[0.15em] text-rose-700 dark:text-rose-200 bg-rose-50/80 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 transition ring-1 ring-rose-600/10">
+                                        <div x-data="{ openDeleteModal: false }" class="inline-flex items-center">
 
-                                            Hapus
-                                        </button>
-
-                                        {{-- MODAL --}}
-                                        <div
-                                            x-show="openDeleteModal"
-                                            x-transition
-                                            class="fixed inset-0 z-50 flex items-center justify-center p-4"
-                                            style="display: none;"
-                                        >
-
-                                            {{-- OVERLAY --}}
-                                            <div
-                                                class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
-                                                @click="openDeleteModal = false"
-                                            ></div>
+                                            <button
+                                                type="button"
+                                                @click="openDeleteModal = true"
+                                                class="inline-flex items-center justify-center
+                                                px-4 py-2 rounded-2xl text-[11px]
+                                                font-black uppercase tracking-[0.18em]
+                                                bg-rose-50 text-rose-700 hover:bg-rose-100
+                                                ring-1 ring-rose-200 transition">
+                                                Hapus
+                                            </button>
 
                                             {{-- MODAL --}}
-                                            <div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+                                            <div
+                                                x-show="openDeleteModal"
+                                                x-transition
+                                                class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                                                style="display:none;">
 
-                                                <div class="p-8">
+                                                <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+                                                    @click="openDeleteModal = false">
+                                                </div>
 
-                                                    <div class="w-16 h-16 mx-auto rounded-3xl bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-300 flex items-center justify-center">
+                                                <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+                                                    <div class="p-8">
 
-                                                        <svg class="w-8 h-8"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24">
+                                                        <div class="w-16 h-16 mx-auto rounded-3xl bg-rose-100 text-rose-600 flex items-center justify-center">
+                                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7"/>
+                                                            </svg>
+                                                        </div>
 
-                                                            <path stroke-linecap="round"
-                                                                stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7"/>
-                                                        </svg>
+                                                        <div class="mt-6 text-center">
+                                                            <h3 class="text-xl font-black text-slate-900">Hapus Kalender?</h3>
+                                                            <p class="mt-2 text-sm text-slate-500 leading-relaxed">
+                                                                <span class="font-bold text-rose-600">{{ $event->judul }}</span>
+                                                                akan dihapus permanen.
+                                                            </p>
+                                                        </div>
 
-                                                    </div>
-
-                                                    <div class="mt-6 text-center">
-
-                                                        <h3 class="text-xl font-black text-slate-900 dark:text-white">
-                                                            Hapus Kalender?
-                                                        </h3>
-
-                                                        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                                                            Kalender
-                                                            <span class="font-bold text-rose-600">
-                                                                {{ $event->judul }}
-                                                            </span>
-                                                            akan dihapus permanen.
-                                                        </p>
-
-                                                    </div>
-
-                                                    <div class="mt-8 flex items-center justify-center gap-3">
-
-                                                        {{-- CANCEL --}}
-                                                        <button
-                                                            type="button"
-                                                            @click="openDeleteModal = false"
-                                                            class="px-5 py-2.5 rounded-2xl border border-slate-300 dark:border-white/10 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-
-                                                            Batal
-                                                        </button>
-
-                                                        {{-- DELETE --}}
-                                                        <form action="{{ route('admin.kalender-akademik.destroy', $event->id) }}"
-                                                            method="POST">
-
-                                                            @csrf
-                                                            @method('DELETE')
+                                                        <div class="mt-8 flex items-center justify-center gap-3">
 
                                                             <button
-                                                                type="submit"
-                                                                class="px-5 py-2.5 rounded-2xl bg-rose-600 text-white font-semibold hover:bg-rose-700 transition">
-
-                                                                Ya, Hapus
+                                                                type="button"
+                                                                @click="openDeleteModal = false"
+                                                                class="px-5 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition">
+                                                                Batal
                                                             </button>
 
-                                                        </form>
+                                                            <form action="{{ route('admin.kalender-akademik.destroy', $event->id) }}" method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button
+                                                                    type="submit"
+                                                                    class="px-5 py-2.5 rounded-2xl bg-rose-600 text-white font-semibold hover:bg-rose-700 transition">
+                                                                    Ya, Hapus
+                                                                </button>
+                                                            </form>
+
+                                                        </div>
 
                                                     </div>
-
                                                 </div>
 
                                             </div>
@@ -275,75 +373,210 @@
                                         </div>
 
                                     </div>
-
                                 </td>
+
                             </tr>
                         @empty
-                            <tr>
-                                <td colspan="4" class="px-6 py-12 text-center text-slate-400 font-medium italic">
-                                    Belum ada agenda atau hari libur akademik.
+                            <tr id="emptyOriginal">
+                                <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+                                    Belum ada data kalender.
                                 </td>
                             </tr>
                         @endforelse
+
+                        {{-- EMPTY STATE UNTUK FILTER --}}
+                        <tr id="emptyFilter" style="display:none;">
+                            <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+                                Tidak ada data yang sesuai dengan filter.
+                            </td>
+                        </tr>
+
                     </tbody>
                 </table>
             </div>
+
         </div>
+
     </div>
 
-    <!-- FULLCALENDAR SCRIPTS AND STYLES -->
+    <!-- FULLCALENDAR STYLES -->
     <style>
-        .fc { font-family: inherit; }
-        .fc-toolbar-title { font-size: 1.2rem !important; font-weight: 900 !important; color: #0f172a; }
-        .dark .fc-toolbar-title { color: white; }
-        .fc-button {
-            background: #006fcf !important;
-            border: none !important;
-            border-radius: 16px !important;
-            font-weight: 700 !important;
-            text-transform: uppercase;
-            font-size: 11px !important;
-            letter-spacing: .08em;
-            padding: .7rem 1rem !important;
-            box-shadow: 0 10px 20px rgba(11,60,112,.25);}
-        .fc-button:hover {background: #1D4ED8 !important;}
-        .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid { border-color: rgb(241 245 249) !important; }
-        .dark .fc-theme-standard td, .dark .fc-theme-standard th, .dark .fc-theme-standard .fc-scrollgrid { border-color: rgba(255,255,255,.08) !important; }
-        .fc-daygrid-day-number { font-weight: 700; color: #334155; }
-        .dark .fc-daygrid-day-number { color: white; }
-        .fc-col-header-cell { background: rgb(248 250 252); padding: .8rem 0; }
-        .dark .fc-col-header-cell { background: rgba(255,255,255,.03); }
-        .fc-event { border: none !important; border-radius: 10px !important; padding: 2px 6px !important; font-size: 11px !important; font-weight: 700 !important; }
+    .fc { font-family: inherit; }
+    .fc-toolbar { margin-bottom: 1rem !important; }
+    .fc-toolbar-title { font-size: 1.4rem !important; font-weight: 900 !important; color: #0f172a; }
+    .fc .fc-button-group { gap: 8px; }
+    .fc-button {
+        background: #006fcf !important;
+        border: none !important;
+        border-radius: 12px !important;
+        font-weight: 700 !important;
+        font-size: 12px !important;
+        padding: .55rem .9rem !important;
+        box-shadow: none !important;
+    }
+    .fc-button:hover { background: #0b3c70 !important; }
+    .fc-today-button {
+        background: white !important;
+        color: #0b3c70 !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    .fc-day-today { background: rgba(11,60,112,.05) !important; }
+    .fc-theme-standard td,
+    .fc-theme-standard th,
+    .fc-theme-standard .fc-scrollgrid { border-color: #e2e8f0 !important; }
+    .fc-col-header-cell { background: #f8fafc; padding: .7rem 0; }
+    .fc-daygrid-day-number { font-weight: 700; color: #334155; }
+    .fc-event {
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 2px 6px !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        cursor: pointer;
+    }
+    .fc-daygrid-day-frame { min-height: 65px !important; }
+    .fc-daygrid-body-natural .fc-daygrid-day-events { margin-bottom: 0 !important; }
+    .fc-header-toolbar { margin-bottom: 0.8rem !important; }
+
+    /* EVENT TOOLTIP */
+    #fc-tooltip {
+        position: fixed;
+        z-index: 9999;
+        background: #0f172a;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        pointer-events: none;
+        max-width: 220px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        display: none;
+        line-height: 1.5;
+    }
     </style>
 
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <!-- TOOLTIP EL -->
+    <div id="fc-tooltip"></div>
+
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const calendarEl = document.getElementById('calendar');
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                height: 700,
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek'
-                },
-                events: [
-                @foreach($events as $event)
-                {
-                    title: '{{ $event->judul }}',
-                    start: '{{ $event->tanggal_mulai }}',
-                    end: '{{ \Carbon\Carbon::parse($event->tanggal_selesai)->addDay()->format("Y-m-d") }}',
+    document.addEventListener('DOMContentLoaded', function () {
 
-                    color: '{{ $event->jenis == "nasional" ? "#ef4444" : "#0b3c70" }}'
-                },
-                @endforeach
+        const calendarEl = document.getElementById('calendar');
+        const yearSelector = document.getElementById('yearSelector');
+        const tooltip = document.getElementById('fc-tooltip');
 
-                ]
-            });
-            calendar.render();
+
+        @php
+            $calendarEvents = $events->map(function($e) {
+                return [
+                    'id'    => $e->id,
+                    'title' => $e->judul,
+                    'start' => $e->tanggal_mulai,
+                    'end'   => $e->tanggal_selesai
+                                ? \Carbon\Carbon::parse($e->tanggal_selesai)->addDay()->format('Y-m-d')
+                                : \Carbon\Carbon::parse($e->tanggal_mulai)->addDay()->format('Y-m-d'),
+                    'color' => $e->jenis === 'nasional' ? '#ef4444' : '#0b3c70',
+                    'extendedProps' => [
+                        'jenis'           => $e->jenis,
+                        'keterangan'      => $e->keterangan ?? '-',
+                        'tanggal_mulai'   => \Carbon\Carbon::parse($e->tanggal_mulai)->translatedFormat('d F Y'),
+                        'tanggal_selesai' => $e->tanggal_selesai
+                                            ? \Carbon\Carbon::parse($e->tanggal_selesai)->translatedFormat('d F Y')
+                                            : null,
+                    ],
+                ];
+            })->values()->toArray();
+        @endphp
+        const events = {!! json_encode($calendarEvents) !!};
+
+        // expose ke window agar Alpine.js dropdown bisa akses
+        window.calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: 'auto',
+            contentHeight: 450,
+            headerToolbar: {
+                left: 'prev,next',
+                center: 'title',
+                right: 'today'
+            },
+            buttonText: { today: 'Hari Ini' },
+            events: events,
+
+            // ✅ sync Alpine dropdown saat kalender navigasi prev/next
+            datesSet: function(dateInfo) {
+                const centerDate = new Date((dateInfo.start.getTime() + dateInfo.end.getTime()) / 2);
+                const currentYear = String(centerDate.getFullYear());
+                // update semua Alpine x-data yang punya property 'selected'
+                document.querySelectorAll('[x-data]').forEach(function(el) {
+                    if (el.__x && el.__x.$data.selected !== undefined) {
+                        el.__x.$data.selected = currentYear;
+                    }
+                });
+            },
+
+            // ✅ TOOLTIP saat hover event
+            eventMouseEnter: function(info) {
+                const props = info.event.extendedProps;
+                const jenis = props.jenis === 'nasional' ? '🏖️ Libur Nasional' : '📅 Akademik';
+                let html = `<div style="font-size:13px;font-weight:800;margin-bottom:4px">${info.event.title}</div>`;
+                html += `<div style="opacity:.8;margin-bottom:2px">${jenis}</div>`;
+                html += `<div style="opacity:.7">${props.tanggal_mulai}`;
+                if (props.tanggal_selesai && props.tanggal_selesai !== props.tanggal_mulai) {
+                    html += ` → ${props.tanggal_selesai}`;
+                }
+                html += `</div>`;
+                if (props.keterangan && props.keterangan !== '-') {
+                    html += `<div style="opacity:.6;margin-top:4px;font-size:11px">${props.keterangan}</div>`;
+                }
+                tooltip.innerHTML = html;
+                tooltip.style.display = 'block';
+            },
+            eventMouseLeave: function() {
+                tooltip.style.display = 'none';
+            },
+            eventDidMount: function(info) {
+                info.el.addEventListener('mousemove', function(e) {
+                    tooltip.style.left = (e.clientX + 12) + 'px';
+                    tooltip.style.top  = (e.clientY + 12) + 'px';
+                });
+            },
         });
+
+        window.calendar.render();
+
+        // ✅ SEARCH + FILTER TABLE
+        const searchInput  = document.getElementById('searchInput');
+        const filterJenis  = document.getElementById('filterJenis');
+        const rows         = document.querySelectorAll('.event-row');
+        const emptyFilter  = document.getElementById('emptyFilter');
+
+        function applyFilter() {
+            const keyword = searchInput.value.toLowerCase().trim();
+            const jenis   = filterJenis.value;
+            let visibleCount = 0;
+
+            rows.forEach(function(row) {
+                const judulMatch = row.dataset.judul.includes(keyword);
+                const jenisMatch = jenis === 'semua' || row.dataset.jenis === jenis;
+
+                if (judulMatch && jenisMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            emptyFilter.style.display = visibleCount === 0 ? '' : 'none';
+        }
+
+        if (searchInput) searchInput.addEventListener('input', applyFilter);
+        if (filterJenis) filterJenis.addEventListener('change', applyFilter);
+
+    });
     </script>
 </x-app-layout>

@@ -20,61 +20,27 @@
 
                 <div class="p-8 space-y-8">
 
-                    {{-- NAMA JADWAL --}}
                     <div>
-                        <x-input-label for="nama_jadwal" :value="__('Nama Jadwal')" />
+                        <x-input-label for="tipe_jadwal" :value="__('Tipe Jadwal')" />
 
-                        <x-text-input
-                            id="nama_jadwal"
-                            class="block mt-2 w-full"
-                            type="text"
+                        <select
                             name="nama_jadwal"
-                            :value="old('nama_jadwal', $jadwalKerja->nama_jadwal)"
+                            id="tipe_jadwal"
+                            class="mt-2 block w-full rounded-xl border-slate-300 focus:border-[#006fcf] focus:ring-[#006fcf]"
                             required
-                        />
+                        >
+                            <option value="WFO"
+                                {{ old('nama_jadwal', $jadwalKerja->nama_jadwal) == 'WFO' ? 'selected' : '' }}>
+                                WFO (Senin - Kamis)
+                            </option>
+
+                            <option value="WFH"
+                                {{ old('nama_jadwal', $jadwalKerja->nama_jadwal) == 'WFH' ? 'selected' : '' }}>
+                                WFH (Jumat)
+                            </option>
+                        </select>
 
                         <x-input-error :messages="$errors->get('nama_jadwal')" class="mt-2" />
-                    </div>
-
-                    {{-- PILIH HARI --}}
-                    <div>
-                        <x-input-label :value="__('Pilih Hari')" />
-
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
-
-                            @php
-                                $selectedHari = old('hari', json_decode($jadwalKerja->hari, true) ?? []);
-                            @endphp
-
-                            @foreach ([
-                                'Senin',
-                                'Selasa',
-                                'Rabu',
-                                'Kamis',
-                                'Jumat'
-                            ] as $hari)
-
-                                <label class="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 cursor-pointer hover:border-indigo-400 transition">
-
-                                    <input
-                                        type="checkbox"
-                                        name="hari[]"
-                                        value="{{ $hari }}"
-                                        class="rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
-                                        {{ in_array($hari, $selectedHari) ? 'checked' : '' }}
-                                    >
-
-                                    <span class="font-semibold text-slate-700">
-                                        {{ $hari }}
-                                    </span>
-
-                                </label>
-
-                            @endforeach
-
-                        </div>
-
-                        <x-input-error :messages="$errors->get('hari')" class="mt-2" />
                     </div>
 
                     {{-- JAM --}}
@@ -112,87 +78,43 @@
 
                     </div>
 
-                    {{-- PENGATURAN --}}
-                    <div class="bg-slate-50 rounded-3xl p-6 border border-slate-200">
+                    {{-- INFORMASI OTOMATIS --}}
+                    <div class="rounded-3xl border border-blue-100 bg-blue-50 p-5">
 
-                        <h3 class="text-sm font-black uppercase tracking-[0.2em] text-slate-500 mb-5">
-                            Pengaturan Presensi
-                        </h3>
+                        <div class="flex gap-3">
 
-                        <div class="space-y-5">
+                            <div class="w-10 h-10 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                                <svg class="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
 
-                            {{-- WFH --}}
-                            <label class="flex items-start gap-4 cursor-pointer">
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
 
-                                <input
-                                    type="checkbox"
-                                    name="is_wfh"
-                                    value="1"
-                                    class="mt-1 rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
-                                    {{ old('is_wfh', $jadwalKerja->is_wfh) ? 'checked' : '' }}
-                                >
+                                </svg>
+                            </div>
 
-                                <div>
-                                    <p class="font-bold text-slate-800">
-                                        Mode WFH
-                                    </p>
+                            <div>
 
-                                    <p class="text-sm text-slate-500 mt-1">
-                                        Pegawai dapat presensi dari luar kantor.
-                                    </p>
-                                </div>
+                                <p class="font-bold text-blue-900">
+                                    Pengaturan Presensi Otomatis
+                                </p>
 
-                            </label>
+                                <ul class="mt-2 text-sm text-blue-700 list-disc list-inside space-y-1">
+                                    <li>Senin–Kamis : WFO + Lokasi + Selfie</li>
+                                    <li>Jumat : WFH + Selfie</li>
+                                    <li>Validasi lokasi otomatis aktif untuk jadwal WFO</li>
+                                    <li>Selfie wajib pada seluruh jadwal kerja</li>
+                                </ul>
 
-                            {{-- VALIDASI LOKASI --}}
-                            <label class="flex items-start gap-4 cursor-pointer">
-
-                                <input
-                                    type="checkbox"
-                                    name="use_location"
-                                    value="1"
-                                    class="mt-1 rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
-                                    {{ old('use_location', $jadwalKerja->use_location) ? 'checked' : '' }}
-                                >
-
-                                <div>
-                                    <p class="font-bold text-slate-800">
-                                        Gunakan Validasi Lokasi
-                                    </p>
-
-                                    <p class="text-sm text-slate-500 mt-1">
-                                        Sistem mengecek radius kantor saat presensi.
-                                    </p>
-                                </div>
-
-                            </label>
-
-                            {{-- SELFIE --}}
-                            <label class="flex items-start gap-4 cursor-pointer">
-
-                                <input
-                                    type="checkbox"
-                                    name="use_camera"
-                                    value="1"
-                                    class="mt-1 rounded border-slate-300 text-[#006fcf] shadow-sm focus:ring-indigo-500"
-                                    {{ old('use_camera', $jadwalKerja->use_camera) ? 'checked' : '' }}
-                                >
-
-                                <div>
-                                    <p class="font-bold text-slate-800">
-                                        Wajib Selfie Kamera
-                                    </p>
-
-                                    <p class="text-sm text-slate-500 mt-1">
-                                        Pegawai wajib selfie saat presensi.
-                                    </p>
-                                </div>
-
-                            </label>
+                            </div>
 
                         </div>
-                    </div>
 
+                    </div>
                 </div>
 
                 {{-- FOOTER --}}

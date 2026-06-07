@@ -78,14 +78,27 @@
             </div>
 
             {{-- SISI KANAN: Profil & Logout Dropdown --}}
-            <div class="px-6 flex items-center">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        {{-- Tombol profil diubah jadi semi-transparan putih agar menyatu dengan tema biru --}}
-                        <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold bg-white/10 text-white rounded-xl hover:bg-white/20 border border-white/10 transition-colors">
+    <div class="px-6 flex items-center">
+        <x-dropdown align="right" width="72">
 
+            <x-slot name="trigger">
+
+                <button
+                    class="inline-flex items-center gap-3 px-2 py-2
+                    bg-white/10 hover:bg-white/20
+                    border border-white/20
+                    rounded-2xl transition-all duration-200">
+
+                    <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
+
+                        @if(Auth::user()->foto)
+                            <img
+                                src="{{ asset('storage/' . Auth::user()->foto) }}"
+                                alt="Profile"
+                                class="w-full h-full object-cover">
+                        @else
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                class="w-4 h-4"
+                                class="w-6 h-6 text-white"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -94,14 +107,101 @@
                                     stroke-linejoin="round"
                                     stroke-width="2"
                                     d="M5.121 17.804A9 9 0 1118.88 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
 
-                            <span>
-                                {{ Auth::user()->name ?? 'Pimpinan' }}
-                            </span>
+                            </svg>
+                        @endif
+
+                    </div>
+
+                    <div class="hidden sm:block text-left">
+
+                        <div class="text-sm font-bold text-white leading-none">
+                            {{ Auth::user()->name }}
+                        </div>
+
+                        <div class="text-[11px] text-white/70">
+                            {{ Auth::user()->email }}
+                        </div>
+
+                    </div>
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4 text-white/80"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7" />
+
+                    </svg>
+
+                </button>
+
+            </x-slot>
+
+            <x-slot name="content">
+
+                <div class="w-80 bg-white rounded-3xl overflow-hidden shadow-xl">
+
+                    {{-- HEADER --}}
+                    <div class="p-5">
+
+                        <div class="flex items-center gap-3">
+
+                            <div class="w-14 h-14 rounded-2xl bg-slate-100 overflow-hidden flex items-center justify-center">
+
+                                @if(Auth::user()->foto)
+                                    <img
+                                        src="{{ asset('storage/' . Auth::user()->foto) }}"
+                                        alt="Profile"
+                                        class="w-full h-full object-cover">
+                                @else
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="w-8 h-8 text-slate-500"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor">
+
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M5.121 17.804A9 9 0 1118.88 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+
+                                    </svg>
+                                @endif
+
+                            </div>
+
+                            <div>
+
+                                <h4 class="font-black text-slate-800">
+                                    {{ Auth::user()->name }}
+                                </h4>
+
+                                <p class="text-xs text-slate-400">
+                                    {{ Auth::user()->email }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {{-- MENU --}}
+                    <div class="border-t border-slate-100 py-2">
+
+                        <a
+                            href="{{ route('profile.edit') }}"
+                            class="flex items-center gap-3 px-5 py-3
+                            text-slate-700 font-bold
+                            hover:bg-slate-50 transition">
 
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                class="w-4 h-4 opacity-70"
+                                class="w-5 h-5 text-[#006fcf]"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -109,20 +209,55 @@
                                 <path stroke-linecap="round"
                                     stroke-linejoin="round"
                                     stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
+                                    d="M5.121 17.804A9 9 0 1118.88 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+
                             </svg>
 
-                        </button>
-                    </x-slot>
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">Profile</x-dropdown-link>
+                            Pengaturan Akun
+
+                        </a>
+
+                    </div>
+
+                    {{-- LOGOUT --}}
+                    <div class="border-t border-slate-100 py-2">
+
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">Logout</x-dropdown-link>
+
+                            <button
+                                type="submit"
+                                class="w-full flex items-center gap-3 px-5 py-3
+                                text-rose-600 font-bold
+                                hover:bg-rose-50 transition">
+
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor">
+
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7"/>
+
+                                </svg>
+
+                                Logout
+
+                            </button>
+
                         </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
+
+                    </div>
+
+                </div>
+
+            </x-slot>
+
+        </x-dropdown>
+    </div>
         </nav>
 
         <div class="flex flex-1 relative">
