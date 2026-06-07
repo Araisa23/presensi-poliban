@@ -81,22 +81,20 @@
 
                         </div>
 
-                        <div class="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+                        <div class="space-y-4 max-h-[350px] overflow-y-auto pr-2"
+                             x-data="{ openModal: false, selectedPengumuman: null }">
 
                             @forelse($pengumumans as $pengumuman)
 
-                                <div class="p-4 rounded-2xl border border-slate-200 hover:border-blue-300 transition">
+                                <div class="p-4 rounded-2xl border border-slate-200 hover:border-blue-300 transition cursor-pointer"
+                                     @click="selectedPengumuman = {{ $pengumuman->id }}; openModal = true">
 
                                     <div class="flex items-start justify-between gap-4">
 
                                         <div>
-                                            <h4 class="font-bold text-slate-800">
+                                            <h4 class="font-bold text-slate-800 hover:text-blue-600 transition">
                                                 {{ $pengumuman->judul }}
                                             </h4>
-
-                                            <p class="mt-2 text-sm text-slate-600 leading-relaxed">
-                                                {{ $pengumuman->isi }}
-                                            </p>
                                         </div>
 
                                         <span class="text-xs text-slate-400 whitespace-nowrap">
@@ -114,6 +112,68 @@
                                 </div>
 
                             @endforelse
+
+                            {{-- MODAL DETAIL --}}
+                            <div x-show="openModal"
+                                 x-transition
+                                 class="fixed inset-0 z-50 flex items-center justify-center p-4">
+
+                                <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+                                     @click="openModal = false"></div>
+
+                                <div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden"
+                                     @click.stop>
+
+                                    <div class="p-6">
+
+                                        <template x-if="selectedPengumuman">
+                                            <div>
+                                                @foreach($pengumumans as $pengumuman)
+                                                    <template x-if="selectedPengumuman === {{ $pengumuman->id }}">
+                                                        <div>
+                                                            <h3 class="text-xl font-black text-slate-900 dark:text-white mb-4">
+                                                                {{ $pengumuman->judul }}
+                                                            </h3>
+
+                                                            <div class="space-y-4">
+
+                                                                <div>
+                                                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                                                                        Deskripsi
+                                                                    </p>
+                                                                    <p class="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+                                                                        {{ $pengumuman->isi }}
+                                                                    </p>
+                                                                </div>
+
+                                                                <div>
+                                                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                                                                        Tanggal Acara
+                                                                    </p>
+                                                                    <p class="text-sm text-slate-700 dark:text-slate-200">
+                                                                        {{ \Carbon\Carbon::parse($pengumuman->tanggal)->translatedFormat('d F Y') }}
+                                                                    </p>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                @endforeach
+                                            </div>
+                                        </template>
+
+                                        <div class="mt-6">
+                                            <button @click="openModal = false"
+                                                    class="w-full px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)] hover:scale-[1.01] transition">
+                                                Tutup
+                                            </button>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
 
                         </div>
 

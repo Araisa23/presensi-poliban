@@ -64,6 +64,7 @@
         @endif
 
         {{-- FILTER --}}
+<<<<<<< HEAD
     <form method="GET" class="mb-6">
 
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
@@ -149,13 +150,52 @@
 
                     </a>
 
-                </div>
+=======
+        <form method="GET" action="{{ route('admin.pegawai.index') }}" class="mb-6">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100/70 dark:border-white/10 shadow-soft p-5">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                            Cari Pegawai
+                        </label>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau NIP..."
+                            class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                            Unit Kerja
+                        </label>
+                        <select name="unit_kerja" class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Semua Unit Kerja</option>
+                            @foreach($unitKerja as $uk)
+                                <option value="{{ $uk->id }}" {{ request('unit_kerja') == $uk->id ? 'selected' : '' }}>
+                                    {{ $uk->nama_unit }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button type="submit" class="flex-1 inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)] hover:scale-[1.01] transition">
+                            Filter
+                        </button>
+                        <a href="{{ route('admin.pegawai.index') }}" class="inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10 transition">
+                            Reset
+                        </a>
+                    </div>
+>>>>>>> 620f82bcabd279746bbf92a3da08520618b60111
+                </div>
             </div>
+<<<<<<< HEAD
 
         </div>
 
     </form>
+=======
+        </form>
+>>>>>>> 620f82bcabd279746bbf92a3da08520618b60111
 
         <!-- TABLE -->
         <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">

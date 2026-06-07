@@ -44,21 +44,21 @@ class LaporanController extends Controller
 
     public function rekap(Request $request)
     {
-        $bulan = $request->get('bulan', Carbon::now()->month);
-        $tahun = $request->get('tahun', Carbon::now()->year);
-        $userId = $request->get('user_id');
+        $bulan = $request->query('bulan', Carbon::now()->month);
+        $tahun = $request->query('tahun', Carbon::now()->year);
+        $userId = $request->query('user_id');
 
         $rekap = $this->calculateRekap($bulan, $tahun, $userId);
-        $pegawaiList = TenagaKependidikan::all();
+        $pegawaiList = TenagaKependidikan::whereNotNull('user_id')->get();
 
         return view('presensi.rekap', compact('rekap', 'bulan', 'tahun', 'pegawaiList', 'userId'));
     }
 
     public function exportExcel(Request $request)
     {
-        $bulan = $request->get('bulan', Carbon::now()->month);
-        $tahun = $request->get('tahun', Carbon::now()->year);
-        $userId = $request->get('user_id');
+        $bulan = $request->input('bulan', Carbon::now()->month);
+        $tahun = $request->input('tahun', Carbon::now()->year);
+        $userId = $request->input('user_id');
 
         $rekap = $this->calculateRekap($bulan, $tahun, $userId);
         return Excel::download(new PresensiExport($rekap), "rekap_presensi_{$bulan}_{$tahun}.xlsx");
@@ -67,9 +67,9 @@ class LaporanController extends Controller
     public function exportPdf(Request $request)
     {
         set_time_limit(300);
-        $bulan = $request->get('bulan', Carbon::now()->month);
-        $tahun = $request->get('tahun', Carbon::now()->year);
-        $userId = $request->get('user_id');
+        $bulan = $request->input('bulan', Carbon::now()->month);
+        $tahun = $request->input('tahun', Carbon::now()->year);
+        $userId = $request->input('user_id');
 
         $rekap = $this->calculateRekap($bulan, $tahun, $userId);
         $namaBulan = Carbon::create()->month($bulan)->monthName;
@@ -85,7 +85,10 @@ class LaporanController extends Controller
 
         $query = TenagaKependidikan::with(['presensi' => function($q) use ($bulan, $tahun) {
             $q->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
-        }, 'unitKerja']);
+        }, 'unitKerja'])
+        ->whereHas('presensi', function($q) use ($bulan, $tahun) {
+            $q->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
+        });
 
         if ($userId) {
             $query->where('user_id', $userId);
@@ -105,6 +108,7 @@ class LaporanController extends Controller
                 'hadir' => $hadir,
                 'alfa' => $alfa > 0 ? $alfa : 0,
                 'total_hari' => $totalWorkingDays,
+                'user_id' => $p->user_id,
             ];
         }
 
