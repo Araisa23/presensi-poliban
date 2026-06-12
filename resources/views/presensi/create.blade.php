@@ -102,6 +102,57 @@
             </div>
     </div>
 
+    {{-- POPUP SUKSES PRESENSI --}}
+    <div id="success-modal"
+         class="hidden fixed inset-0 z-50 items-center justify-center p-4"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="success-modal-title">
+
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+
+        <div class="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+
+            <div class="p-8 text-center">
+
+                <div id="success-modal-icon-masuk"
+                     class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-5 ring-1 ring-emerald-600/10">
+
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+
+                </div>
+
+                <div id="success-modal-icon-pulang"
+                     class="hidden w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-5 ring-1 ring-amber-600/10">
+
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+
+                </div>
+
+                <h3 id="success-modal-title" class="text-xl font-black text-slate-900 dark:text-white mb-2">
+                    Berhasil!
+                </h3>
+
+                <p id="success-modal-message" class="text-sm font-medium text-slate-600 dark:text-slate-300"></p>
+
+                <button id="success-modal-btn"
+                        type="button"
+                        class="mt-6 w-full px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)] hover:scale-[1.01] transition">
+                    OK
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -113,6 +164,11 @@
             const locationInfo = document.getElementById('location-info');
             const locationCoords = document.getElementById('location-coords');
             const alertContainer = document.getElementById('alert-container');
+            const successModal = document.getElementById('success-modal');
+            const successModalMessage = document.getElementById('success-modal-message');
+            const successModalBtn = document.getElementById('success-modal-btn');
+            const successModalIconMasuk = document.getElementById('success-modal-icon-masuk');
+            const successModalIconPulang = document.getElementById('success-modal-icon-pulang');
 
             let lat = null;
             let lon = null;
@@ -211,10 +267,7 @@
                     const result = await response.json();
 
                     if (response.ok) {
-                        showAlert(result.message, 'success');
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 2000);
+                        showSuccessModal(result.message, result.type);
                     } else {
                         showAlert(result.message || 'Terjadi kesalahan.', 'error');
                     }
@@ -224,6 +277,25 @@
                 } finally {
                     setLoading(false);
                 }
+            });
+
+            function showSuccessModal(message, type) {
+                successModalMessage.textContent = message;
+
+                if (type === 'pulang') {
+                    successModalIconMasuk.classList.add('hidden');
+                    successModalIconPulang.classList.remove('hidden');
+                } else {
+                    successModalIconMasuk.classList.remove('hidden');
+                    successModalIconPulang.classList.add('hidden');
+                }
+
+                successModal.classList.remove('hidden');
+                successModal.classList.add('flex');
+            }
+
+            successModalBtn.addEventListener('click', function() {
+                window.location.reload();
             });
 
             function showAlert(message, type) {

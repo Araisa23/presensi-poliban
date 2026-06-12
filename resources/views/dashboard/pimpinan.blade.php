@@ -21,9 +21,6 @@
             <div class="flex items-center gap-2">
 
                 <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200">
-                    <div class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                        Hari Ini
-                    </div>
 
                     <div class="mt-1 text-sm font-bold text-slate-800">
                         {{ now()->translatedFormat('l, d F Y') }}

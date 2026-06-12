@@ -185,7 +185,7 @@
                             <th class="px-6 py-5 text-[10px] font-black 
                                        text-slate-400 uppercase tracking-[0.25em] 
                                        border-b border-slate-100/70 
-                                       dark:border-white/10 text-right">
+                                       dark:border-white/10 text-center">
                                 Aksi
                             </th>
 
@@ -252,9 +252,9 @@
                                 </td>
 
                                 <!-- AKSI -->
-                                <td class="px-6 py-5 text-right">
+                                <td class="px-6 py-5 text-center">
 
-                                    <div class="inline-flex items-center gap-2">
+                                    <div class="flex items-center justify-center gap-2">
 
                                         <!-- EDIT -->
                                         <a href="{{ route('admin.pengumuman.edit', $item->id) }}"

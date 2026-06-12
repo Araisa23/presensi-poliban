@@ -12,12 +12,26 @@
                     Silahkan lakukan Presensi Harian Anda.
                 </p>
             </div>
+            {{-- RIGHT --}}
+            <div class="flex items-center gap-2">
 
-            {{-- CLOCK --}}
-            <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200 text-right">
-                <div class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Hari Ini</div>
-                <div id="date-now" class="mt-1 text-sm font-bold text-slate-800"></div>
-                <div id="clock" class="text-[#006fcf] font-black text-lg tabular-nums">--:--:--</div>
+                <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200">
+
+                    <div
+                        id="date-now"
+                        class="mt-1 text-sm font-bold text-slate-800"
+                    >
+                        {{ now()->translatedFormat('l, d F Y') }}
+                    </div>
+
+                    <div
+                        id="clock"
+                        class="text-[#006fcf] font-black text-lg tabular-nums"
+                    >
+                        --:--:--
+                    </div>
+                </div>
+
             </div>
         </div>
     </x-slot>
@@ -46,16 +60,25 @@
                     <div class="space-y-3 max-h-[320px] overflow-y-auto pr-1"
                          x-data="{ openModal: false, selectedId: null }">
 
-                        @forelse($pengumumans as $pengumuman)
-                            <div class="p-4 rounded-2xl border border-slate-200 hover:border-[#006fcf]/40 hover:bg-blue-50/30 transition cursor-pointer"
-                                 @click="selectedId = {{ $pengumuman->id }}; openModal = true">
-                                <div class="flex items-start justify-between gap-4">
-                                    <h4 class="font-bold text-slate-800 text-sm leading-snug">
-                                        {{ $pengumuman->judul }}
-                                    </h4>
-                                    <span class="text-[11px] text-slate-400 whitespace-nowrap flex-shrink-0">
-                                        {{ \Carbon\Carbon::parse($pengumuman->tanggal)->translatedFormat('d F Y') }}
-                                    </span>
+                            @forelse($pengumumans as $pengumuman)
+
+                                <div class="p-4 rounded-2xl border border-slate-200 hover:border-blue-300 transition cursor-pointer"
+                                     @click="selectedPengumuman = {{ $pengumuman->id }}; openModal = true">
+
+                                    <div class="flex items-start justify-between gap-4">
+
+                                        <div>
+                                            <h4 class="font-bold text-slate-800 hover:text-blue-600 transition">
+                                                {{ $pengumuman->judul }}
+                                            </h4>
+                                        </div>
+
+                                        <span class="text-xs text-slate-400 whitespace-nowrap">
+                                            {{ $pengumuman->created_at->translatedFormat('d F Y') }}
+                                        </span>
+
+                                    </div>
+
                                 </div>
                             </div>
                         @empty

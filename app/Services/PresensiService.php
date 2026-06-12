@@ -123,11 +123,43 @@ class PresensiService
     }
 
     /**
+     * Cek apakah tanggal tersebut adalah hari kerja (Senin-Jumat, bukan hari libur)
+     */
+    public function isWorkingDay($tanggal)
+    {
+        $date = Carbon::parse($tanggal);
+        $dayOfWeek = $date->dayOfWeek;
+
+        // Skip Sabtu (6) dan Minggu (0)
+        if ($dayOfWeek === 0 || $dayOfWeek === 6) {
+            return [
+                'status' => false,
+                'keterangan' => $this->getIndonesianDayName($dayOfWeek)
+            ];
+        }
+
+        // Cek hari libur
+        $checkLibur = $this->isHoliday($tanggal);
+        if ($checkLibur['status']) {
+            return [
+                'status' => false,
+                'keterangan' => $checkLibur['keterangan']
+            ];
+        }
+
+        return [
+            'status' => true,
+            'keterangan' => null
+        ];
+    }
+
+    /**
      * Hitung total hari kerja dalam satu bulan.
      * Aturan:
      *   ✅ Hanya Senin–Jumat (isWeekday())
      *   ✅ Exclude libur dari tabel HariLibur
      *   ✅ Exclude libur nasional dari tabel KalenderAkademik (jenis = 'nasional')
+     * Hari kerja = Senin-Jumat, kecuali hari libur/tanggal merah.
      */
     public function getWorkingDays($bulan, $tahun)
     {
@@ -159,27 +191,11 @@ class PresensiService
         $liburNasionalDates = array_unique($liburNasionalDates);
 
         $workingDaysArr = [];
-        $current = $startDate->copy();
 
-        while ($current->lte($endDate)) {
-
-            // ✅ FIX: skip Sabtu (6) dan Minggu (0)
-            if ($current->isWeekend()) {
-                $current->addDay();
-                continue;
-            }
-
-            // Skip libur dari tabel HariLibur
-            $isHariLibur = $this->isHoliday($current->toDateString());
-            if ($isHariLibur['status']) {
-                $current->addDay();
-                continue;
-            }
-
-            // Skip libur nasional dari KalenderAkademik
-            if (in_array($current->toDateString(), $liburNasionalDates)) {
-                $current->addDay();
-                continue;
+        while ($startDate->lte($endDate)) {
+            $check = $this->isWorkingDay($startDate->toDateString());
+            if ($check['status']) {
+                $workingDaysArr[] = $startDate->toDateString();
             }
 
             $workingDaysArr[] = $current->toDateString();

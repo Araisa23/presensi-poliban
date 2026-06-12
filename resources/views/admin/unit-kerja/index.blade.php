@@ -25,7 +25,15 @@
                     <thead>
                         <tr class="bg-slate-50/70 dark:bg-white/5">
                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">Nama Unit</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-right">Aksi</th>
+                            <th class="px-6 py-5 border-b border-slate-100/70 dark:border-white/10">
+                                <div class="flex justify-end">
+                                    <div class="relative inline-flex items-center gap-2">
+                                        <span class="invisible inline-flex items-center justify-center px-4 py-2 rounded-2xl border border-slate-200 text-xs font-black uppercase tracking-[0.15em]">Edit</span>
+                                        <span class="invisible inline-flex items-center justify-center px-4 py-2 rounded-2xl border border-red-200 text-xs font-black uppercase tracking-[0.15em]">Hapus</span>
+                                        <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] whitespace-nowrap">Aksi</span>
+                                    </div>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
@@ -38,10 +46,12 @@
                             </td>
 
                             {{-- AKSI --}}
-                            <td class="px-6 py-5 text-right">
+                            <td class="px-6 py-5">
 
-                                <div class="flex items-center justify-end gap-2"
+                                <div class="flex justify-end"
                                     x-data="{ openDeleteModal: false }">
+
+                                    <div class="relative inline-flex items-center gap-2">
 
                                     {{-- EDIT --}}
                                     <a href="{{ route('admin.unit-kerja.edit', $unit->id) }}"
@@ -58,6 +68,8 @@
                                     >
                                         Hapus
                                     </button>
+
+                                    </div>
 
                                     {{-- MODAL --}}
                                     <div
