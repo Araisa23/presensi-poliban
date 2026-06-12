@@ -128,22 +128,27 @@ class PresensiService
     public function isWorkingDay($tanggal)
     {
         $date = Carbon::parse($tanggal);
-        $dayOfWeek = $date->dayOfWeek;
 
-        // Skip Sabtu (6) dan Minggu (0)
-        if ($dayOfWeek === 0 || $dayOfWeek === 6) {
+        if ($date->dayOfWeek === 0 || $date->dayOfWeek === 6) {
             return [
                 'status' => false,
-                'keterangan' => $this->getIndonesianDayName($dayOfWeek)
+                'keterangan' => $this->getIndonesianDayName($date->dayOfWeek)
             ];
         }
 
-        // Cek hari libur
-        $checkLibur = $this->isHoliday($tanggal);
-        if ($checkLibur['status']) {
+        $libur = $this->isHoliday($tanggal);
+
+        if ($libur['status']) {
             return [
                 'status' => false,
-                'keterangan' => $checkLibur['keterangan']
+                'keterangan' => $libur['keterangan']
+            ];
+        }
+
+        if ($this->isNationalHoliday($tanggal)) {
+            return [
+                'status' => false,
+                'keterangan' => 'Libur Nasional'
             ];
         }
 
@@ -166,40 +171,17 @@ class PresensiService
         $startDate = Carbon::create($tahun, $bulan, 1)->startOfDay();
         $endDate   = $startDate->copy()->endOfMonth();
 
-        // Ambil semua libur nasional di bulan ini sekaligus (efisien, 1 query)
-        $liburNasional = KalenderAkademik::where('jenis', 'nasional')
-            ->where(function ($q) use ($startDate, $endDate) {
-                $q->whereBetween('tanggal_mulai', [$startDate->toDateString(), $endDate->toDateString()])
-                  ->orWhereBetween('tanggal_selesai', [$startDate->toDateString(), $endDate->toDateString()])
-                  ->orWhere(function ($q2) use ($startDate, $endDate) {
-                      $q2->where('tanggal_mulai', '<=', $startDate->toDateString())
-                         ->where('tanggal_selesai', '>=', $endDate->toDateString());
-                  });
-            })
-            ->get();
-
-        // Expand range libur nasional jadi array tanggal individual
-        $liburNasionalDates = [];
-        foreach ($liburNasional as $libur) {
-            $cur = Carbon::parse($libur->tanggal_mulai);
-            $end = Carbon::parse($libur->tanggal_selesai ?? $libur->tanggal_mulai);
-            while ($cur->lte($end)) {
-                $liburNasionalDates[] = $cur->toDateString();
-                $cur->addDay();
-            }
-        }
-        $liburNasionalDates = array_unique($liburNasionalDates);
-
         $workingDaysArr = [];
 
         while ($startDate->lte($endDate)) {
+
             $check = $this->isWorkingDay($startDate->toDateString());
+
             if ($check['status']) {
                 $workingDaysArr[] = $startDate->toDateString();
             }
 
-            $workingDaysArr[] = $current->toDateString();
-            $current->addDay();
+            $startDate->addDay();
         }
 
         return $workingDaysArr;

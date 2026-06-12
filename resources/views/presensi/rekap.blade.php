@@ -3,53 +3,34 @@
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
 
             <div>
-                <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-                    {{ __('Rekapitulasi Presensi') }}
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-slate-900">
+                    Rekapitulasi Presensi
                 </h2>
-
                 <p class="mt-1 text-slate-500 text-sm font-medium">
-                    Ringkasan kehadiran pegawai per bulan.
+                    Ringkasan kehadiran pegawai per bulan (hari kerja Senin–Jumat).
                 </p>
             </div>
 
-            <div class="flex gap-2">
-                <a href="{{ route('pimpinan.rekap.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'user_id' => $userId]) }}" 
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('pimpinan.rekap.excel', ['bulan' => $bulan, 'tahun' => $tahun, 'user_id' => $userId]) }}"
                    class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl
-                          bg-emerald-600 text-white
-                          font-bold shadow-lg
-                          hover:scale-[1.02] transition">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="w-5 h-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-
-                        <path stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
+                          bg-emerald-600 text-white text-xs font-black uppercase tracking-[0.18em]
+                          shadow-sm hover:bg-emerald-700 hover:scale-[1.02] transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-
                     Export Excel
                 </a>
 
-                <a href="{{ route('pimpinan.rekap.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'user_id' => $userId]) }}" 
+                <a href="{{ route('pimpinan.rekap.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'user_id' => $userId]) }}"
                    class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl
-                          bg-rose-600 text-white
-                          font-bold shadow-lg
-                          hover:scale-[1.02] transition">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="w-5 h-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-
-                        <path stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
+                          bg-rose-600 text-white text-xs font-black uppercase tracking-[0.18em]
+                          shadow-sm hover:bg-rose-700 hover:scale-[1.02] transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-12 0h12v4H6v-4z"/>
                     </svg>
-
                     Export PDF
                 </a>
             </div>
@@ -57,50 +38,127 @@
         </div>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        {{-- STAT CARDS --}}
+        @php
+            $totalPegawai  = count($rekap);
+            $totalHariKerja = $rekap[0]['total_hari'] ?? 0;
+            $rataHadir     = $totalPegawai > 0
+                ? round(collect($rekap)->avg('hadir'), 1)
+                : 0;
+            $totalAlfa     = collect($rekap)->sum('alfa');
+        @endphp
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+            {{-- Total Pegawai --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Total Pegawai</p>
+                        <h3 class="mt-1.5 text-3xl font-black text-slate-900">{{ $totalPegawai }}</h3>
+                        <p class="mt-1 text-xs font-bold text-slate-500">Bulan ini</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#006fcf]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Hari Kerja --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Hari Kerja</p>
+                        <h3 class="mt-1.5 text-3xl font-black text-slate-900">{{ $totalHariKerja }}</h3>
+                        <p class="mt-1 text-xs font-bold text-slate-500">Senin – Jumat</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Rata-rata Hadir --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Rata Hadir</p>
+                        <h3 class="mt-1.5 text-3xl font-black text-slate-900">{{ $rataHadir }}</h3>
+                        <p class="mt-1 text-xs font-bold text-slate-500">Hari / pegawai</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Total Alpha --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Total Alpha</p>
+                        <h3 class="mt-1.5 text-3xl font-black text-slate-900">{{ $totalAlfa }}</h3>
+                        <p class="mt-1 text-xs font-bold text-slate-500">Semua pegawai</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+        </div>
 
         {{-- FILTER --}}
-        <form action="{{ route('pimpinan.rekap') }}" method="GET" class="mb-6">
+        <form action="{{ route('pimpinan.rekap') }}" method="GET">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5">
 
-            <div class="bg-white dark:bg-slate-900 rounded-3xl
-                        border border-slate-100/70 dark:border-white/10
-                        shadow-soft p-5">
+                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-4">
+                    Filter Data
+                </p>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
+                    {{-- BULAN --}}
                     <div>
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 block mb-2">
                             Bulan
                         </label>
-
                         <select name="bulan"
-                                class="w-full rounded-2xl border-slate-200
-                                       dark:border-white/10
-                                       bg-white dark:bg-white/5
-                                       px-4 py-3 text-sm font-medium
-                                       text-slate-700 dark:text-slate-100
-                                       focus:ring-2 focus:ring-indigo-500">
+                                class="w-full rounded-2xl border border-slate-200
+                                       bg-white px-4 py-3 text-sm font-medium
+                                       text-slate-700 shadow-sm
+                                       focus:ring-2 focus:ring-[#0b3c70] focus:border-[#0b3c70]
+                                       focus:outline-none">
                             @for($i = 1; $i <= 12; $i++)
                                 <option value="{{ $i }}" {{ $bulan == $i ? 'selected' : '' }}>
-                                    {{ \Carbon\Carbon::create()->month($i)->monthName }}
+                                    {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
                                 </option>
                             @endfor
                         </select>
                     </div>
 
+                    {{-- TAHUN --}}
                     <div>
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 block mb-2">
                             Tahun
                         </label>
-
                         <select name="tahun"
-                                class="w-full rounded-2xl border-slate-200
-                                       dark:border-white/10
-                                       bg-white dark:bg-white/5
-                                       px-4 py-3 text-sm font-medium
-                                       text-slate-700 dark:text-slate-100
-                                       focus:ring-2 focus:ring-indigo-500">
-                            @for($i = 2024; $i <= 2030; $i++)
+                                class="w-full rounded-2xl border border-slate-200
+                                       bg-white px-4 py-3 text-sm font-medium
+                                       text-slate-700 shadow-sm
+                                       focus:ring-2 focus:ring-[#0b3c70] focus:border-[#0b3c70]
+                                       focus:outline-none">
+                            @for($i = 2024; $i <= now()->year + 1; $i++)
                                 <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>
                                     {{ $i }}
                                 </option>
@@ -108,37 +166,39 @@
                         </select>
                     </div>
 
+                    {{-- PEGAWAI --}}
                     <div>
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 block mb-2">
                             Pegawai
                         </label>
-
                         <select name="user_id"
-                                class="w-full rounded-2xl border-slate-200
-                                       dark:border-white/10
-                                       bg-white dark:bg-white/5
-                                       px-4 py-3 text-sm font-medium
-                                       text-slate-700 dark:text-slate-100
-                                       focus:ring-2 focus:ring-indigo-500">
+                                class="w-full rounded-2xl border border-slate-200
+                                       bg-white px-4 py-3 text-sm font-medium
+                                       text-slate-700 shadow-sm
+                                       focus:ring-2 focus:ring-[#0b3c70] focus:border-[#0b3c70]
+                                       focus:outline-none">
                             <option value="">Semua Pegawai</option>
                             @foreach($pegawaiList as $pegawai)
-                                <option value="{{ $pegawai->user_id }}" {{ $userId == $pegawai->user_id ? 'selected' : '' }}>
+                                <option value="{{ $pegawai->user_id }}"
+                                    {{ $userId == $pegawai->user_id ? 'selected' : '' }}>
                                     {{ $pegawai->nama }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
+                    {{-- SUBMIT --}}
                     <div>
-                        <button
-                            type="submit"
-                            class="w-full inline-flex items-center justify-center
-                                   px-5 py-3 rounded-2xl font-black text-xs
-                                   uppercase tracking-[0.18em]
-                                   bg-gradient-to-r from-[#004b8d] to-[#006fcf]
-                                   text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)]
-                                   hover:scale-[1.01] transition"
-                        >
+                        <button type="submit"
+                                class="w-full inline-flex items-center justify-center gap-2
+                                       px-5 py-3 rounded-2xl font-black text-xs
+                                       uppercase tracking-[0.18em]
+                                       bg-gradient-to-r from-[#004b8d] to-[#006fcf]
+                                       text-white shadow-sm
+                                       hover:opacity-90 hover:scale-[1.01] transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                            </svg>
                             Filter
                         </button>
                     </div>
@@ -146,103 +206,171 @@
                 </div>
 
             </div>
-
         </form>
 
-        {{-- TABLE REKAP --}}
-        <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">
+        {{-- TABLE --}}
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+
+            {{-- TABLE HEADER INFO --}}
+            <div class="px-6 py-5 border-b border-slate-100">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                        <h3 class="text-lg font-black text-slate-900 tracking-tight">
+                            Data Rekap —
+                            <span class="text-[#006fcf]">
+                                {{ \Carbon\Carbon::create()->month($bulan)->translatedFormat('F') }} {{ $tahun }}
+                            </span>
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Dihitung dari hari kerja Senin–Jumat
+                            @if($totalHariKerja > 0)
+                                · {{ $totalHariKerja }} hari kerja
+                            @endif
+                        </p>
+                    </div>
+                    <span class="text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                        {{ $totalPegawai }} pegawai
+                    </span>
+                </div>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr class="bg-slate-50/70 dark:bg-white/5">
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">Pegawai</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">Unit Kerja</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Total Hari Kerja</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Hadir</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Alpha</th>
+                        <tr class="bg-slate-50/70">
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">
+                                Pegawai
+                            </th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">
+                                Unit Kerja
+                            </th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100 text-center">
+                                Hari Kerja
+                            </th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100 text-center">
+                                Hadir
+                            </th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100 text-center">
+                                Alpha
+                            </th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100 text-center">
+                                % Kehadiran
+                            </th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
+                    <tbody class="divide-y divide-slate-100">
+
                         @forelse($rekap as $r)
-                            <tr class="hover:bg-slate-50/70 dark:hover:bg-white/5 transition">
+                            @php
+                                $persen = $r['total_hari'] > 0
+                                    ? round(($r['hadir'] / $r['total_hari']) * 100)
+                                    : 0;
+
+                                $barColor = match(true) {
+                                    $persen >= 90 => 'bg-emerald-500',
+                                    $persen >= 75 => 'bg-yellow-400',
+                                    default       => 'bg-rose-500',
+                                };
+
+                                $textColor = match(true) {
+                                    $persen >= 90 => 'text-emerald-700',
+                                    $persen >= 75 => 'text-yellow-700',
+                                    default       => 'text-rose-700',
+                                };
+                            @endphp
+
+                            <tr class="hover:bg-slate-50 transition">
+
+                                {{-- NAMA --}}
                                 <td class="px-6 py-5">
-                                    <div class="flex items-center">
-                                        <div class="w-11 h-11 rounded-2xl
-                                                    bg-indigo-50/80
-                                                    text-indigo-700
-                                                    flex items-center justify-center
-                                                    font-black text-lg mr-3
-                                                    ring-1 ring-indigo-600/10 shadow-soft">
-
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-2xl
+                                                    bg-gradient-to-br from-[#004b8d] to-[#006fcf]
+                                                    text-white flex items-center justify-center
+                                                    font-black text-sm shadow-sm flex-shrink-0">
                                             {{ strtoupper(substr($r['nama'], 0, 1)) }}
-
                                         </div>
-
                                         <div>
-
-                                            <div class="font-black text-slate-800 dark:text-slate-100">
+                                            <div class="font-black text-slate-800 text-sm leading-tight">
                                                 {{ $r['nama'] }}
                                             </div>
-
-                                            <div class="text-[10px] text-slate-400 font-mono">
+                                            <div class="text-[10px] text-slate-400 font-mono mt-0.5">
                                                 {{ $r['nip'] }}
                                             </div>
-
                                         </div>
-
                                     </div>
-
                                 </td>
+
+                                {{-- UNIT --}}
                                 <td class="px-6 py-5">
-                                    <div class="text-sm font-medium text-slate-700 dark:text-slate-100">
+                                    <span class="text-sm font-medium text-slate-600">
                                         {{ $r['unit'] }}
+                                    </span>
+                                </td>
+
+                                {{-- TOTAL HARI KERJA --}}
+                                <td class="px-6 py-5 text-center">
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-black bg-slate-50 text-slate-700 ring-1 ring-slate-200">
+                                        {{ $r['total_hari'] }} hari
+                                    </span>
+                                </td>
+
+                                {{-- HADIR --}}
+                                <td class="px-6 py-5 text-center">
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-black bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
+                                        {{ $r['hadir'] }} hari
+                                    </span>
+                                </td>
+
+                                {{-- ALPHA --}}
+                                <td class="px-6 py-5 text-center">
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-black
+                                        {{ $r['alfa'] > 0 ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200' : 'bg-slate-50 text-slate-500 ring-1 ring-slate-200' }}">
+                                        {{ $r['alfa'] }} hari
+                                    </span>
+                                </td>
+
+                                {{-- % KEHADIRAN --}}
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-3 justify-center">
+                                        <div class="w-20 bg-slate-100 rounded-full h-2 overflow-hidden">
+                                            <div class="{{ $barColor }} h-2 rounded-full transition-all"
+                                                 style="width: {{ $persen }}%"></div>
+                                        </div>
+                                        <span class="text-xs font-black {{ $textColor }} w-10 text-right">
+                                            {{ $persen }}%
+                                        </span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-5 text-center">
-                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-xs font-black bg-slate-50 text-slate-700 ring-1 ring-slate-600/10">
-                                        {{ $r['total_hari'] }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-5 text-center">
-                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/10">
-                                        {{ $r['hadir'] }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-5 text-center">
-                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-xs font-black bg-rose-50 text-rose-700 ring-1 ring-rose-600/10">
-                                        {{ $r['alfa'] }}
-                                    </span>
-                                </td>
+
                             </tr>
+
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-20 text-center">
-
-                                    <div class="flex flex-col items-center text-slate-400">
-
-                                        <svg class="w-16 h-16 mb-4 opacity-50"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24">
-
-                                            <path stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M9 17v-2a4 4 0 014-4h4"/>
-                                        </svg>
-
-                                        <p class="font-medium">
-                                            Tidak ada data rekapitulasi untuk periode yang dipilih.
-                                        </p>
-
+                                <td colspan="6" class="px-6 py-20 text-center">
+                                    <div class="flex flex-col items-center gap-3 text-slate-400">
+                                        <div class="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center">
+                                            <svg class="w-8 h-8 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-black text-slate-600 text-sm">Tidak ada data</p>
+                                            <p class="text-xs text-slate-400 mt-0.5">
+                                                Tidak ada rekapitulasi untuk periode yang dipilih.
+                                            </p>
+                                        </div>
                                     </div>
-
                                 </td>
                             </tr>
                         @endforelse
+
                     </tbody>
                 </table>
             </div>
+
         </div>
+
     </div>
 </x-app-layout>
