@@ -56,10 +56,10 @@
                 required
             >
                 <option value="">-- Pilih Jenis Kelamin --</option>
-                <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>
+                <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>
                     L
                 </option>
-                <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>
+                <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>
                     P
                 </option>
             </select>

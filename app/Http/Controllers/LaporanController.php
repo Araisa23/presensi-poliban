@@ -24,17 +24,17 @@ class LaporanController extends Controller
 
     public function monitoring(Request $request)
     {
-        $tanggal = $request->get('tanggal', Carbon::today()->toDateString());
+        $tanggal  = $request->get('tanggal', Carbon::today()->toDateString());
         $presensi = Presensi::with('tenagaKependidikan.unitKerja')
             ->where('tanggal', $tanggal)
             ->get();
-            
+
         return view('presensi.monitoring', compact('presensi', 'tanggal'));
     }
 
     public function index(Request $request)
     {
-        $tanggal = $request->get('tanggal', Carbon::today()->toDateString());
+        $tanggal  = $request->get('tanggal', Carbon::today()->toDateString());
         $presensi = Presensi::with('tenagaKependidikan.unitKerja')
             ->where('tanggal', $tanggal)
             ->get();
@@ -44,11 +44,11 @@ class LaporanController extends Controller
 
     public function rekap(Request $request)
     {
-        $bulan = $request->query('bulan', Carbon::now()->month);
-        $tahun = $request->query('tahun', Carbon::now()->year);
-        $userId = $request->query('user_id');
+        $bulan      = $request->query('bulan', Carbon::now()->month);
+        $tahun      = $request->query('tahun', Carbon::now()->year);
+        $userId     = $request->query('user_id');
 
-        $rekap = $this->calculateRekap($bulan, $tahun, $userId);
+        $rekap       = $this->calculateRekap($bulan, $tahun, $userId);
         $pegawaiList = TenagaKependidikan::whereNotNull('user_id')->get();
 
         return view('presensi.rekap', compact('rekap', 'bulan', 'tahun', 'pegawaiList', 'userId'));
@@ -56,61 +56,86 @@ class LaporanController extends Controller
 
     public function exportExcel(Request $request)
     {
-        $bulan = $request->input('bulan', Carbon::now()->month);
-        $tahun = $request->input('tahun', Carbon::now()->year);
+        $bulan  = $request->input('bulan', Carbon::now()->month);
+        $tahun  = $request->input('tahun', Carbon::now()->year);
         $userId = $request->input('user_id');
 
         $rekap = $this->calculateRekap($bulan, $tahun, $userId);
-        return Excel::download(new PresensiExport($rekap), "rekap_presensi_{$bulan}_{$tahun}.xlsx");
+
+        return Excel::download(
+            new PresensiExport($rekap),
+            "rekap_presensi_{$bulan}_{$tahun}.xlsx"
+        );
     }
 
     public function exportPdf(Request $request)
     {
         set_time_limit(300);
-        $bulan = $request->input('bulan', Carbon::now()->month);
-        $tahun = $request->input('tahun', Carbon::now()->year);
-        $userId = $request->input('user_id');
 
-        $rekap = $this->calculateRekap($bulan, $tahun, $userId);
-        $namaBulan = Carbon::create()->month($bulan)->monthName;
+        $bulan     = $request->input('bulan', Carbon::now()->month);
+        $tahun     = $request->input('tahun', Carbon::now()->year);
+        $userId    = $request->input('user_id');
 
-        $pdf = Pdf::loadView('presensi.rekap_pdf', compact('rekap', 'bulan', 'tahun', 'namaBulan'));
+        $rekap     = $this->calculateRekap($bulan, $tahun, $userId);
+        $namaBulan = Carbon::create()->month($bulan)->translatedFormat('F');
+
+        $pdf = Pdf::loadView(
+            'presensi.rekap_pdf',
+            compact('rekap', 'bulan', 'tahun', 'namaBulan')
+        );
+
         return $pdf->download("rekap_presensi_{$bulan}_{$tahun}.pdf");
     }
 
+    /**
+     * Hitung rekapitulasi presensi per pegawai.
+     *
+     * Hari kerja = Senin–Jumat, exclude libur nasional (HariLibur & KalenderAkademik).
+     * Alpha      = total hari kerja - jumlah hadir (minimum 0).
+     */
     private function calculateRekap($bulan, $tahun, $userId = null)
     {
-        $workingDays = $this->presensiService->getWorkingDays($bulan, $tahun);
+        // ✅ Hari kerja sudah benar: Senin-Jumat, exclude libur
+        $workingDays      = $this->presensiService->getWorkingDays($bulan, $tahun);
         $totalWorkingDays = count($workingDays);
 
-        $query = TenagaKependidikan::with(['presensi' => function($q) use ($bulan, $tahun) {
-            $q->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
-        }, 'unitKerja'])
-        ->whereHas('presensi', function($q) use ($bulan, $tahun) {
-            $q->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
-        });
+        $query = TenagaKependidikan::with([
+            'presensi' => function ($q) use ($bulan, $tahun, $workingDays) {
+                $q->whereMonth('tanggal', $bulan)
+                  ->whereYear('tanggal', $tahun)
+                  // Hanya hitung presensi yang jatuh di hari kerja valid
+                  ->whereIn('tanggal', $workingDays);
+            },
+            'unitKerja',
+        ])
+        // Ambil semua pegawai yang punya user_id (bukan hanya yang sudah presensi)
+        ->whereNotNull('user_id');
 
         if ($userId) {
             $query->where('user_id', $userId);
         }
 
         $pegawai = $query->get();
-        $data = [];
+        $data    = [];
 
         foreach ($pegawai as $p) {
+            // Hanya hitung presensi di hari kerja valid (sudah difilter di query)
             $hadir = $p->presensi->count();
-            $alfa = $totalWorkingDays - $hadir;
+            $alfa  = max(0, $totalWorkingDays - $hadir);
 
             $data[] = [
-                'nip' => $p->nip,
-                'nama' => $p->nama,
-                'unit' => $p->unitKerja->nama_unit ?? '-',
-                'hadir' => $hadir,
-                'alfa' => $alfa > 0 ? $alfa : 0,
+                'nip'        => $p->nip,
+                'nama'       => $p->nama,
+                'unit'       => $p->unitKerja->nama_unit ?? '-',
+                'hadir'      => $hadir,
+                'alfa'       => $alfa,
                 'total_hari' => $totalWorkingDays,
-                'user_id' => $p->user_id,
+                'user_id'    => $p->user_id,
             ];
         }
+
+        // Urutkan: alpha terbanyak di atas (pegawai yang paling sering absen)
+        usort($data, fn($a, $b) => $b['alfa'] <=> $a['alfa']);
 
         return $data;
     }

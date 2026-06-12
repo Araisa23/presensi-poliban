@@ -62,14 +62,14 @@
                     >
                         <option value="">-- Pilih Jenis Kelamin --</option>
 
-                        <option value="Laki-laki"
-                            {{ old('jenis_kelamin', $pegawai->jenis_kelamin) == 'Laki-laki' ? 'selected' : '' }}>
-                            Laki-laki
+                        <option value="L"
+                            {{ old('jenis_kelamin', $pegawai->jenis_kelamin) == 'L' ? 'selected' : '' }}>
+                            L
                         </option>
 
-                        <option value="Perempuan"
-                            {{ old('jenis_kelamin', $pegawai->jenis_kelamin) == 'Perempuan' ? 'selected' : '' }}>
-                            Perempuan
+                        <option value="P"
+                            {{ old('jenis_kelamin', $pegawai->jenis_kelamin) == 'P' ? 'selected' : '' }}>
+                            P
                         </option>
                     </select>
 

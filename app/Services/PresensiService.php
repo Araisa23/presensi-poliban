@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\HariLibur;
-use App\Models\JadwalKerja;
+use App\Models\KalenderAkademik;
 use Carbon\Carbon;
 use Exception;
 
@@ -14,7 +14,7 @@ class PresensiService
      */
     public function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
-        $earth_radius = 6371000; // Radius bumi dalam meter
+        $earth_radius = 6371000;
 
         $dLat = deg2rad($lat2 - $lat1);
         $dLon = deg2rad($lon2 - $lon1);
@@ -24,33 +24,43 @@ class PresensiService
             sin($dLon / 2) * sin($dLon / 2);
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-        $distance = $earth_radius * $c;
 
-        return $distance; // dalam meter
+        return $earth_radius * $c; // dalam meter
     }
 
     /**
-     * Cek apakah tanggal tersebut adalah hari libur
+     * Cek apakah tanggal tersebut adalah hari libur (dari tabel HariLibur)
      */
     public function isHoliday($tanggal)
     {
-        $libur = HariLibur::whereDate(
-            'tanggal',
-            $tanggal
-        )->first();
+        $libur = HariLibur::whereDate('tanggal', $tanggal)->first();
 
         if ($libur) {
-
             return [
-                'status' => true,
-                'keterangan' => $libur->keterangan
+                'status'      => true,
+                'keterangan'  => $libur->keterangan,
             ];
         }
 
         return [
-            'status' => false,
-            'keterangan' => null
+            'status'     => false,
+            'keterangan' => null,
         ];
+    }
+
+    /**
+     * Cek apakah tanggal adalah libur nasional dari tabel kalender_akademiks
+     */
+    public function isNationalHoliday($tanggal)
+    {
+        $date = Carbon::parse($tanggal);
+
+        $libur = KalenderAkademik::where('jenis', 'nasional')
+            ->whereDate('tanggal_mulai', '<=', $date->toDateString())
+            ->whereDate('tanggal_selesai', '>=', $date->toDateString())
+            ->first();
+
+        return $libur !== null;
     }
 
     public function getIndonesianDayName($dayOfWeek)
@@ -64,6 +74,7 @@ class PresensiService
             5 => 'Jumat',
             6 => 'Sabtu',
         ];
+
         return $days[$dayOfWeek];
     }
 
@@ -75,16 +86,15 @@ class PresensiService
         $currentTime,
         $jamMasuk,
         $jamPulang,
-        $batasAwal = null,
+        $batasAwal  = null,
         $batasAkhir = null
     ) {
-        $now = Carbon::parse($currentTime);
-        $masuk = Carbon::parse($jamMasuk);
+        $now    = Carbon::parse($currentTime);
+        $masuk  = Carbon::parse($jamMasuk);
         $pulang = Carbon::parse($jamPulang);
 
         if ($type === 'masuk') {
-            // Default sesuai spesifikasi: dibuka 1 jam sebelum jam masuk, ditutup tepat di jam masuk
-            $windowStart = $batasAwal ? Carbon::parse($batasAwal) : $masuk->copy()->subHour();
+            $windowStart = $batasAwal  ? Carbon::parse($batasAwal)  : $masuk->copy()->subHour();
             $windowEnd   = $batasAkhir ? Carbon::parse($batasAkhir) : $masuk->copy();
 
             if ($now->lessThan($windowStart)) {
@@ -99,8 +109,7 @@ class PresensiService
         }
 
         if ($type === 'pulang') {
-            // Default sesuai spesifikasi: dibuka saat jam pulang, ditutup +1 jam setelah jam pulang
-            $windowStart = $batasAwal ? Carbon::parse($batasAwal) : $pulang->copy();
+            $windowStart = $batasAwal  ? Carbon::parse($batasAwal)  : $pulang->copy();
             $windowEnd   = $batasAkhir ? Carbon::parse($batasAkhir) : $pulang->copy()->addHour();
 
             if ($now->lessThan($windowStart)) {
@@ -114,20 +123,67 @@ class PresensiService
     }
 
     /**
-     * Hitung total hari kerja dalam satu bulan berdasarkan konfigurasi libur.
+     * Hitung total hari kerja dalam satu bulan.
+     * Aturan:
+     *   ✅ Hanya Senin–Jumat (isWeekday())
+     *   ✅ Exclude libur dari tabel HariLibur
+     *   ✅ Exclude libur nasional dari tabel KalenderAkademik (jenis = 'nasional')
      */
     public function getWorkingDays($bulan, $tahun)
     {
-        $startDate = Carbon::create($tahun, $bulan, 1);
-        $endDate = $startDate->copy()->endOfMonth();
-        $workingDaysArr = [];
+        $startDate = Carbon::create($tahun, $bulan, 1)->startOfDay();
+        $endDate   = $startDate->copy()->endOfMonth();
 
-        while ($startDate->lte($endDate)) {
-            $check = $this->isHoliday($startDate->toDateString());
-            if (!$check['status']) {
-                $workingDaysArr[] = $startDate->toDateString();
+        // Ambil semua libur nasional di bulan ini sekaligus (efisien, 1 query)
+        $liburNasional = KalenderAkademik::where('jenis', 'nasional')
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('tanggal_mulai', [$startDate->toDateString(), $endDate->toDateString()])
+                  ->orWhereBetween('tanggal_selesai', [$startDate->toDateString(), $endDate->toDateString()])
+                  ->orWhere(function ($q2) use ($startDate, $endDate) {
+                      $q2->where('tanggal_mulai', '<=', $startDate->toDateString())
+                         ->where('tanggal_selesai', '>=', $endDate->toDateString());
+                  });
+            })
+            ->get();
+
+        // Expand range libur nasional jadi array tanggal individual
+        $liburNasionalDates = [];
+        foreach ($liburNasional as $libur) {
+            $cur = Carbon::parse($libur->tanggal_mulai);
+            $end = Carbon::parse($libur->tanggal_selesai ?? $libur->tanggal_mulai);
+            while ($cur->lte($end)) {
+                $liburNasionalDates[] = $cur->toDateString();
+                $cur->addDay();
             }
-            $startDate->addDay();
+        }
+        $liburNasionalDates = array_unique($liburNasionalDates);
+
+        $workingDaysArr = [];
+        $current = $startDate->copy();
+
+        while ($current->lte($endDate)) {
+
+            // ✅ FIX: skip Sabtu (6) dan Minggu (0)
+            if ($current->isWeekend()) {
+                $current->addDay();
+                continue;
+            }
+
+            // Skip libur dari tabel HariLibur
+            $isHariLibur = $this->isHoliday($current->toDateString());
+            if ($isHariLibur['status']) {
+                $current->addDay();
+                continue;
+            }
+
+            // Skip libur nasional dari KalenderAkademik
+            if (in_array($current->toDateString(), $liburNasionalDates)) {
+                $current->addDay();
+                continue;
+            }
+
+            $workingDaysArr[] = $current->toDateString();
+            $current->addDay();
         }
 
         return $workingDaysArr;

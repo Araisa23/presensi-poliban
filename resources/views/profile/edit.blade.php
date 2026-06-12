@@ -96,7 +96,7 @@
                 class="text-xs text-slate-500 mb-3"
             ></p>
 
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols gap-2">
 
                 @if($user->foto)
                     <button
@@ -107,13 +107,6 @@
                         Lihat
                     </button>
                 @endif
-
-                <label
-                    for="foto"
-                    class="px-3 py-2 text-xs font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-1 cursor-pointer"
-                >
-                    Ganti
-                </label>
 
             </div>
 
