@@ -33,7 +33,7 @@
                                 <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">Hari</th>
                                 <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Jam Operasional</th>
                                 <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Status Kerja</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-right">Aksi</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
@@ -71,9 +71,9 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="px-8 py-5 text-right">
+                                    <td class="px-8 py-5 text-center">
 
-                                        <div class="flex items-center justify-end gap-3"
+                                        <div class="flex items-center justify-center gap-3"
                                             x-data="{ openDeleteModal: false }">
 
                                             {{-- EDIT --}}

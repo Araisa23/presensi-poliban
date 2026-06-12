@@ -15,9 +15,6 @@
             <div class="flex items-center gap-2">
 
                 <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200">
-                    <div class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                        Hari Ini
-                    </div>
 
                     <div
                         id="date-now"
@@ -98,7 +95,7 @@
                                         </div>
 
                                         <span class="text-xs text-slate-400 whitespace-nowrap">
-                                            {{ \Carbon\Carbon::parse($pengumuman->tanggal)->translatedFormat('d F Y') }}
+                                            {{ $pengumuman->created_at->translatedFormat('d F Y') }}
                                         </span>
 
                                     </div>

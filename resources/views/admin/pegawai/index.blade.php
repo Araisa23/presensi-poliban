@@ -64,93 +64,6 @@
         @endif
 
         {{-- FILTER --}}
-<<<<<<< HEAD
-    <form method="GET" class="mb-6">
-
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-                {{-- SEARCH --}}
-                <div class="md:col-span-2">
-
-                    <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                        Cari Agenda
-                    </label>
-
-                    <input
-                        type="text"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="Cari agenda atau keterangan..."
-                        class="mt-2 w-full rounded-2xl border border-slate-200
-                        bg-white px-4 py-3 text-sm font-medium
-                        text-slate-700
-                        focus:ring-2 focus:ring-[#006fcf]"
-                    >
-
-                </div>
-
-                {{-- FILTER JENIS --}}
-                <div>
-
-                    <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                        Jenis Kalender
-                    </label>
-
-                    <select
-                        name="jenis"
-                        class="mt-2 w-full rounded-2xl border border-slate-200
-                        bg-white px-4 py-3 text-sm font-medium
-                        text-slate-700
-                        focus:ring-2 focus:ring-[#006fcf]"
-                    >
-
-                        <option value="">Semua Jenis</option>
-
-                        <option value="akademik"
-                            {{ request('jenis') == 'akademik' ? 'selected' : '' }}>
-                            Agenda Akademik
-                        </option>
-
-                        <option value="nasional"
-                            {{ request('jenis') == 'nasional' ? 'selected' : '' }}>
-                            Libur Nasional
-                        </option>
-
-                    </select>
-
-                </div>
-
-                {{-- BUTTON --}}
-                <div class="flex items-end gap-2">
-
-                    <button
-                        type="submit"
-                        class="w-full inline-flex items-center justify-center
-                        px-5 py-3 rounded-2xl font-black text-xs
-                        uppercase tracking-[0.18em]
-                        bg-gradient-to-r from-[#004b8d] to-[#006fcf]
-                        text-white
-                        hover:scale-[1.01] transition">
-
-                        Filter
-
-                    </button>
-
-                    <a
-                        href="{{ route('admin.kalender-akademik.index') }}"
-                        class="inline-flex items-center justify-center
-                        px-5 py-3 rounded-2xl font-black text-xs
-                        uppercase tracking-[0.18em]
-                        bg-slate-100 text-slate-600
-                        hover:bg-slate-200 transition">
-
-                        Reset
-
-                    </a>
-
-=======
         <form method="GET" action="{{ route('admin.pegawai.index') }}" class="mb-6">
             <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100/70 dark:border-white/10 shadow-soft p-5">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -185,17 +98,9 @@
                             Reset
                         </a>
                     </div>
->>>>>>> 620f82bcabd279746bbf92a3da08520618b60111
                 </div>
             </div>
-<<<<<<< HEAD
-
-        </div>
-
-    </form>
-=======
         </form>
->>>>>>> 620f82bcabd279746bbf92a3da08520618b60111
 
         <!-- TABLE -->
         <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">

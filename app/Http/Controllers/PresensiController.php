@@ -24,6 +24,18 @@ class PresensiController extends Controller
 
     public function create()
     {
+        $tanggalHariIni = Carbon::today()->toDateString();
+
+        // Cek apakah hari ini adalah hari kerja
+        $checkWorkingDay = $this->presensiService->isWorkingDay($tanggalHariIni);
+
+        if (!$checkWorkingDay['status']) {
+            return redirect()->back()->with(
+                'error',
+                'Hari ini bukan hari kerja: ' . $checkWorkingDay['keterangan']
+            );
+        }
+
         $namaHari = $this->presensiService
             ->getIndonesianDayName(Carbon::today()->dayOfWeek);
 
@@ -96,15 +108,15 @@ class PresensiController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | CEK HARI LIBUR / PENGUMUMAN
+            | CEK HARI KERJA (Senin-Jumat, bukan hari libur)
             |--------------------------------------------------------------------------
             */
 
-            $checkLibur = $this->presensiService->isHoliday($tanggalHariIni);
+            $checkWorkingDay = $this->presensiService->isWorkingDay($tanggalHariIni);
 
-            if ($checkLibur['status']) {
+            if (!$checkWorkingDay['status']) {
                 return response()->json([
-                    'message' => 'Hari ini libur: ' . $checkLibur['keterangan']
+                    'message' => 'Hari ini bukan hari kerja: ' . $checkWorkingDay['keterangan']
                 ], 400);
             }
 
@@ -214,9 +226,8 @@ class PresensiController extends Controller
                 }
 
                 return response()->json([
-                    'message' => $jadwal->is_wfh
-                        ? 'Berhasil presensi masuk WFH.'
-                        : 'Berhasil presensi masuk.'
+                    'message' => 'Presensi masuk telah berhasil.',
+                    'type'    => 'masuk',
                 ]);
             }
 
@@ -270,9 +281,8 @@ class PresensiController extends Controller
             }
 
             return response()->json([
-                'message' => $jadwal->is_wfh
-                    ? 'Berhasil presensi pulang WFH.'
-                    : 'Berhasil presensi pulang.'
+                'message' => 'Presensi pulang telah berhasil.',
+                'type'    => 'pulang',
             ]);
 
         } catch (Exception $e) {

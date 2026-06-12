@@ -114,7 +114,39 @@ class PresensiService
     }
 
     /**
+     * Cek apakah tanggal tersebut adalah hari kerja (Senin-Jumat, bukan hari libur)
+     */
+    public function isWorkingDay($tanggal)
+    {
+        $date = Carbon::parse($tanggal);
+        $dayOfWeek = $date->dayOfWeek;
+
+        // Skip Sabtu (6) dan Minggu (0)
+        if ($dayOfWeek === 0 || $dayOfWeek === 6) {
+            return [
+                'status' => false,
+                'keterangan' => $this->getIndonesianDayName($dayOfWeek)
+            ];
+        }
+
+        // Cek hari libur
+        $checkLibur = $this->isHoliday($tanggal);
+        if ($checkLibur['status']) {
+            return [
+                'status' => false,
+                'keterangan' => $checkLibur['keterangan']
+            ];
+        }
+
+        return [
+            'status' => true,
+            'keterangan' => null
+        ];
+    }
+
+    /**
      * Hitung total hari kerja dalam satu bulan berdasarkan konfigurasi libur.
+     * Hari kerja = Senin-Jumat, kecuali hari libur/tanggal merah.
      */
     public function getWorkingDays($bulan, $tahun)
     {
@@ -123,8 +155,8 @@ class PresensiService
         $workingDaysArr = [];
 
         while ($startDate->lte($endDate)) {
-            $check = $this->isHoliday($startDate->toDateString());
-            if (!$check['status']) {
+            $check = $this->isWorkingDay($startDate->toDateString());
+            if ($check['status']) {
                 $workingDaysArr[] = $startDate->toDateString();
             }
             $startDate->addDay();
