@@ -25,11 +25,11 @@ class PresensiService
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
-        return $earth_radius * $c; // dalam meter
+        return $earth_radius * $c;
     }
 
     /**
-     * Cek apakah tanggal tersebut adalah hari libur (dari tabel HariLibur)
+     * Cek apakah tanggal tersebut adalah hari libur (dari tabel HariLibur lama)
      */
     public function isHoliday($tanggal)
     {
@@ -37,8 +37,8 @@ class PresensiService
 
         if ($libur) {
             return [
-                'status'      => true,
-                'keterangan'  => $libur->keterangan,
+                'status'     => true,
+                'keterangan' => $libur->keterangan,
             ];
         }
 
@@ -49,18 +49,39 @@ class PresensiService
     }
 
     /**
-     * Cek apakah tanggal adalah libur nasional dari tabel kalender_akademiks
+     * Cek apakah tanggal adalah hari libur dari KalenderAkademik.
+     *
+     * FIX: Gunakan is_libur = true, BUKAN jenis = 'nasional'
+     * Karena event akademik seperti Dies Natalis atau Minggu UAS
+     * bukan hari libur pegawai tetap wajib presensi.
+     */
+    public function isKalenderLibur($tanggal)
+    {
+        $date = Carbon::parse($tanggal)->toDateString();
+
+        $libur = KalenderAkademik::where('is_libur', true)
+            ->whereDate('tanggal_mulai', '<=', $date)
+            ->where(function ($q) use ($date) {
+                $q->whereDate('tanggal_selesai', '>=', $date)
+                  ->orWhere(function ($q2) use ($date) {
+                      $q2->whereNull('tanggal_selesai')
+                         ->whereDate('tanggal_mulai', $date);
+                  });
+            })
+            ->first();
+
+        return [
+            'status'     => $libur !== null,
+            'keterangan' => $libur?->judul ?? null,
+        ];
+    }
+
+    /**
+     * @deprecated Gunakan isKalenderLibur()
      */
     public function isNationalHoliday($tanggal)
     {
-        $date = Carbon::parse($tanggal);
-
-        $libur = KalenderAkademik::where('jenis', 'nasional')
-            ->whereDate('tanggal_mulai', '<=', $date->toDateString())
-            ->whereDate('tanggal_selesai', '>=', $date->toDateString())
-            ->first();
-
-        return $libur !== null;
+        return $this->isKalenderLibur($tanggal)['status'];
     }
 
     public function getIndonesianDayName($dayOfWeek)
@@ -123,48 +144,54 @@ class PresensiService
     }
 
     /**
-     * Cek apakah tanggal tersebut adalah hari kerja (Senin-Jumat, bukan hari libur)
+     * Cek apakah tanggal tersebut adalah hari kerja.
+     *
+     * Hari kerja = Senin-Jumat, BUKAN hari libur.
+     * Libur = HariLibur ATAU KalenderAkademik dengan is_libur = true
+     * Event akademik (is_libur = false) TIDAK dihitung libur.
      */
     public function isWorkingDay($tanggal)
     {
         $date = Carbon::parse($tanggal);
 
-        if ($date->dayOfWeek === 0 || $date->dayOfWeek === 6) {
+        // Weekend bukan hari kerja
+        if ($date->isWeekend()) {
             return [
-                'status' => false,
-                'keterangan' => $this->getIndonesianDayName($date->dayOfWeek)
+                'status'     => false,
+                'keterangan' => $this->getIndonesianDayName($date->dayOfWeek),
             ];
         }
 
-        $libur = $this->isHoliday($tanggal);
-
-        if ($libur['status']) {
+        // Cek HariLibur (tabel lama)
+        $hariLibur = $this->isHoliday($tanggal);
+        if ($hariLibur['status']) {
             return [
-                'status' => false,
-                'keterangan' => $libur['keterangan']
+                'status'     => false,
+                'keterangan' => $hariLibur['keterangan'],
             ];
         }
 
-        if ($this->isNationalHoliday($tanggal)) {
+        // FIX: Cek KalenderAkademik dengan is_libur = true saja
+        $kalenderLibur = $this->isKalenderLibur($tanggal);
+        if ($kalenderLibur['status']) {
             return [
-                'status' => false,
-                'keterangan' => 'Libur Nasional'
+                'status'     => false,
+                'keterangan' => $kalenderLibur['keterangan'],
             ];
         }
 
         return [
-            'status' => true,
-            'keterangan' => null
+            'status'     => true,
+            'keterangan' => null,
         ];
     }
 
     /**
      * Hitung total hari kerja dalam satu bulan.
-     * Aturan:
-     *   ✅ Hanya Senin–Jumat (isWeekday())
-     *   ✅ Exclude libur dari tabel HariLibur
-     *   ✅ Exclude libur nasional dari tabel KalenderAkademik (jenis = 'nasional')
-     * Hari kerja = Senin-Jumat, kecuali hari libur/tanggal merah.
+     * - Hanya Senin-Jumat
+     * - Exclude HariLibur
+     * - Exclude KalenderAkademik dengan is_libur = true
+     * - Event akademik (is_libur = false) TIDAK dikecualikan
      */
     public function getWorkingDays($bulan, $tahun)
     {
@@ -172,16 +199,16 @@ class PresensiService
         $endDate   = $startDate->copy()->endOfMonth();
 
         $workingDaysArr = [];
+        $current        = $startDate->copy();
 
-        while ($startDate->lte($endDate)) {
-
-            $check = $this->isWorkingDay($startDate->toDateString());
+        while ($current->lte($endDate)) {
+            $check = $this->isWorkingDay($current->toDateString());
 
             if ($check['status']) {
-                $workingDaysArr[] = $startDate->toDateString();
+                $workingDaysArr[] = $current->toDateString();
             }
 
-            $startDate->addDay();
+            $current->addDay();
         }
 
         return $workingDaysArr;

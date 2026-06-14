@@ -78,43 +78,76 @@
 
                     </div>
 
-                    {{-- INFORMASI OTOMATIS --}}
-                    <div class="rounded-3xl border border-blue-100 bg-blue-50 p-5">
+                {{-- INFORMASI SISTEM PRESENSI --}}
+                <div class="rounded-3xl border border-blue-100 bg-blue-50 p-5">
 
-                        <div class="flex gap-3">
+                    <div class="flex gap-3">
 
-                            <div class="w-10 h-10 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center">
-                                <svg class="w-5 h-5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24">
 
-                                    <path stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
 
-                                </svg>
-                            </div>
+                            </svg>
+                        </div>
 
-                            <div>
+                        <div class="flex-1">
 
-                                <p class="font-bold text-blue-900">
-                                    Pengaturan Presensi Otomatis
-                                </p>
+                            <h4 class="font-bold text-blue-900">
+                                Informasi Presensi Otomatis
+                            </h4>
 
-                                <ul class="mt-2 text-sm text-blue-700 list-disc list-inside space-y-1">
-                                    <li>Senin–Kamis : WFO + Lokasi + Selfie</li>
-                                    <li>Jumat : WFH + Selfie</li>
-                                    <li>Validasi lokasi otomatis aktif untuk jadwal WFO</li>
-                                    <li>Selfie wajib pada seluruh jadwal kerja</li>
-                                </ul>
+                            <p class="text-sm text-blue-700 mt-1">
+                                Sistem akan mengatur aturan presensi secara otomatis sesuai jadwal kerja.
+                            </p>
+
+                            <div class="grid md:grid-cols-2 gap-5 mt-4">
+
+                                {{-- BATAS WAKTU --}}
+                                <div>
+
+                                    <p class="text-xs font-black uppercase tracking-wider text-blue-900 mb-2">
+                                        Batas Waktu Presensi
+                                    </p>
+
+                                    <ul class="text-sm text-blue-700 space-y-1">
+                                        <li>• Masuk dimulai 1 jam sebelum jam masuk</li>
+                                        <li>• Terlambat maksimal 30 menit setelah jam masuk</li>
+                                        <li>• Pulang dimulai tepat jam pulang</li>
+                                        <li>• Batas pulang 1 jam setelah jam pulang</li>
+                                    </ul>
+
+                                </div>
+
+                                {{-- ATURAN PRESENSI --}}
+                                <div>
+
+                                    <p class="text-xs font-black uppercase tracking-wider text-blue-900 mb-2">
+                                        Aturan Presensi
+                                    </p>
+
+                                    <ul class="text-sm text-blue-700 space-y-1">
+                                        <li>• Senin–Kamis: WFO + Lokasi + Selfie</li>
+                                        <li>• Jumat: WFH + Selfie</li>
+                                        <li>• Validasi lokasi otomatis untuk jadwal WFO</li>
+                                        <li>• Selfie wajib pada seluruh jadwal kerja</li>
+                                    </ul>
+
+                                </div>
 
                             </div>
 
                         </div>
 
                     </div>
+
+                </div>
                 </div>
 
                 {{-- FOOTER --}}

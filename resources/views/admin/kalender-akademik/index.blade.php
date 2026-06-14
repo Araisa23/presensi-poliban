@@ -104,12 +104,14 @@
                             $maxYear = max($events->max(fn($e) => \Carbon\Carbon::parse($e->tanggal_mulai)->year) ?? now()->year, now()->year + 2);
                         @endphp
 
-                        <div id="monthDropdown"
-                             x-data="{
+                        {{-- DROPDOWN BULAN - pakai x-ref agar bisa dibaca antar komponen --}}
+                        <div x-data="{
                                  open: false,
                                  selectedIndex: {{ now()->month }},
                                  selectedLabel: '{{ $bulanList[now()->month] }}'
                              }"
+                             x-ref="monthDrop"
+                             id="monthDropdown"
                              class="relative">
                             <button @click="open = !open" type="button"
                                     class="flex items-center gap-2 px-4 py-2.5 bg-white
@@ -139,9 +141,9 @@
                                                 selectedIndex = {{ $num }};
                                                 selectedLabel = '{{ $nama }}';
                                                 open = false;
-                                                const yr = document.getElementById('yearDropdown').__x.$data.selected;
-                                                const mm = String({{ $num }}).padStart(2,'0');
-                                                window.calendar.gotoDate(yr + '-' + mm + '-01');
+                                                const yrData = Alpine.$data(document.getElementById('yearDropdown'));
+                                                const yr = yrData ? yrData.selected : '{{ now()->year }}';
+                                                window.calendar.gotoDate(yr + '-' + String({{ $num }}).padStart(2,'0') + '-01');
                                             "
                                             class="w-full text-left px-4 py-2.5 text-sm font-semibold
                                             text-slate-700 hover:bg-blue-50 hover:text-[#0b3c70] transition-colors"
@@ -153,8 +155,8 @@
                         </div>
 
                         {{-- DROPDOWN TAHUN --}}
-                        <div id="yearDropdown"
-                             x-data="{ open: false, selected: '{{ now()->year }}' }"
+                        <div x-data="{ open: false, selected: '{{ now()->year }}' }"
+                             id="yearDropdown"
                              class="relative">
                             <button @click="open = !open" type="button"
                                     class="flex items-center gap-2 px-4 py-2.5 bg-white
@@ -183,7 +185,8 @@
                                             @click="
                                                 selected = '{{ $year }}';
                                                 open = false;
-                                                const mm = String(document.getElementById('monthDropdown').__x.$data.selectedIndex).padStart(2,'0');
+                                                const moData = Alpine.$data(document.getElementById('monthDropdown'));
+                                                const mm = moData ? String(moData.selectedIndex).padStart(2,'0') : '01';
                                                 window.calendar.gotoDate('{{ $year }}-' + mm + '-01');
                                             "
                                             class="w-full text-left px-4 py-2.5 text-sm font-semibold
@@ -370,41 +373,105 @@
 
     <style>
     .fc { font-family: inherit; }
-    .fc-toolbar { margin-bottom: 1rem !important; }
-    .fc-toolbar-title { font-size: 1.4rem !important; font-weight: 900 !important; color: #0f172a; }
-    .fc .fc-button-group { gap: 8px; }
-    .fc-button {
-        background: #006fcf !important;
-        border: none !important;
-        border-radius: 12px !important;
-        font-weight: 700 !important;
-        font-size: 12px !important;
-        padding: .55rem .9rem !important;
-        box-shadow: none !important;
+
+    /* ===== TOOLBAR ===== */
+    .fc-toolbar { margin-bottom: 1.2rem !important; }
+    .fc-toolbar-title {
+        font-size: 1.25rem !important;
+        font-weight: 900 !important;
+        color: #0f172a;
+        letter-spacing: -0.02em;
     }
-    .fc-button:hover { background: #0b3c70 !important; }
+    .fc .fc-button-group { gap: 6px; }
+
+    /* PREV / NEXT buttons */
+    .fc-prev-button,
+    .fc-next-button {
+        background: white !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        color: #334155 !important;
+        font-weight: 700 !important;
+        font-size: 14px !important;
+        padding: .45rem .75rem !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,.06) !important;
+        transition: all .15s !important;
+    }
+    .fc-prev-button:hover,
+    .fc-next-button:hover {
+        background: #f8fafc !important;
+        border-color: #0b3c70 !important;
+        color: #0b3c70 !important;
+        box-shadow: 0 2px 8px rgba(11,60,112,.12) !important;
+    }
+    .fc-prev-button:focus,
+    .fc-next-button:focus { box-shadow: none !important; }
+
+    /* TODAY button */
     .fc-today-button {
         background: white !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 12px !important;
         color: #0b3c70 !important;
-        border: 1px solid #cbd5e1 !important;
+        font-weight: 800 !important;
+        font-size: 11px !important;
+        text-transform: uppercase !important;
+        letter-spacing: .1em !important;
+        padding: .45rem .9rem !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,.06) !important;
+        transition: all .15s !important;
     }
-    .fc-day-today { background: rgba(11,60,112,.05) !important; }
+    .fc-today-button:hover {
+        background: #eff6ff !important;
+        border-color: #0b3c70 !important;
+        box-shadow: 0 2px 8px rgba(11,60,112,.12) !important;
+    }
+    .fc-today-button:disabled {
+        opacity: 0.4 !important;
+        cursor: not-allowed !important;
+    }
+    .fc-today-button:focus { box-shadow: none !important; }
+
+    /* ===== GRID ===== */
+    .fc-day-today { background: rgba(11,60,112,.04) !important; }
     .fc-theme-standard td,
     .fc-theme-standard th,
     .fc-theme-standard .fc-scrollgrid { border-color: #e2e8f0 !important; }
-    .fc-col-header-cell { background: #f8fafc; padding: .7rem 0; }
-    .fc-daygrid-day-number { font-weight: 700; color: #334155; }
+    .fc-col-header-cell {
+        background: #f8fafc;
+        padding: .75rem 0;
+    }
+    .fc-col-header-cell-cushion {
+        font-size: 11px !important;
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        letter-spacing: .12em !important;
+        color: #94a3b8 !important;
+        text-decoration: none !important;
+    }
+    .fc-daygrid-day-number {
+        font-weight: 700;
+        font-size: 13px;
+        color: #334155;
+        text-decoration: none !important;
+        padding: 6px 8px !important;
+    }
+    .fc-daygrid-day-number:hover { color: #0b3c70; }
+
+    /* ===== EVENTS ===== */
     .fc-event {
         border: none !important;
         border-radius: 8px !important;
-        padding: 2px 6px !important;
+        padding: 2px 8px !important;
         font-size: 11px !important;
         font-weight: 700 !important;
         cursor: pointer;
+        letter-spacing: .01em;
     }
-    .fc-daygrid-day-frame { min-height: 65px !important; }
-    .fc-daygrid-body-natural .fc-daygrid-day-events { margin-bottom: 0 !important; }
-    .fc-header-toolbar { margin-bottom: 0.8rem !important; }
+    .fc-event:hover { opacity: .88; }
+    .fc-daygrid-day-frame { min-height: 70px !important; }
+    .fc-daygrid-body-natural .fc-daygrid-day-events { margin-bottom: 2px !important; }
+    .fc-header-toolbar { margin-bottom: 1rem !important; }
 
     /* ===== WEEKEND: Sabtu & Minggu ===== */
     .fc-col-header-cell.fc-day-sun .fc-col-header-cell-cushion,
@@ -417,17 +484,13 @@
     }
     .fc-day-sun:not(.fc-day-today),
     .fc-day-sat:not(.fc-day-today) {
-        background-color: rgba(255, 241, 242, 0.55) !important;
+        background-color: rgba(255, 241, 242, 0.5) !important;
     }
-    /* Jika hari ini jatuh di weekend, jangan override warna today */
     .fc-day-today.fc-day-sun .fc-daygrid-day-number,
     .fc-day-today.fc-day-sat .fc-daygrid-day-number {
         color: #0b3c70 !important;
     }
-    /* Tanggal di luar bulan aktif lebih samar */
-    .fc-day-other .fc-daygrid-day-number {
-        opacity: 0.3;
-    }
+    .fc-day-other .fc-daygrid-day-number { opacity: 0.28; }
 
     /* ===== TOOLTIP ===== */
     #fc-tooltip {
@@ -435,15 +498,15 @@
         z-index: 9999;
         background: #0f172a;
         color: white;
-        padding: 8px 14px;
-        border-radius: 12px;
+        padding: 10px 14px;
+        border-radius: 14px;
         font-size: 12px;
         font-weight: 600;
         pointer-events: none;
-        max-width: 220px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        max-width: 230px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.22);
         display: none;
-        line-height: 1.5;
+        line-height: 1.6;
     }
     </style>
 
@@ -500,6 +563,7 @@
             events: events,
 
             // Sync kedua dropdown saat navigasi prev/next/today
+            // Alpine v3: gunakan Alpine.$data(el) bukan el.__x.$data
             datesSet: function(dateInfo) {
                 const center = new Date((dateInfo.start.getTime() + dateInfo.end.getTime()) / 2);
                 const yr     = String(center.getFullYear());
@@ -508,12 +572,14 @@
                 const yearEl  = document.getElementById('yearDropdown');
                 const monthEl = document.getElementById('monthDropdown');
 
-                if (yearEl && yearEl.__x) {
-                    yearEl.__x.$data.selected = yr;
+                if (yearEl) {
+                    try { Alpine.$data(yearEl).selected = yr; } catch(e) {}
                 }
-                if (monthEl && monthEl.__x) {
-                    monthEl.__x.$data.selectedIndex = mo;
-                    monthEl.__x.$data.selectedLabel = bulanLabel[mo];
+                if (monthEl) {
+                    try {
+                        Alpine.$data(monthEl).selectedIndex = mo;
+                        Alpine.$data(monthEl).selectedLabel = bulanLabel[mo];
+                    } catch(e) {}
                 }
             },
 

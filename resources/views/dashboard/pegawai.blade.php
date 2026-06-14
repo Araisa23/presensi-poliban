@@ -12,26 +12,14 @@
                     Silahkan lakukan Presensi Harian Anda.
                 </p>
             </div>
-            {{-- RIGHT --}}
-            <div class="flex items-center gap-2">
 
-                <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200">
-
-                    <div
-                        id="date-now"
-                        class="mt-1 text-sm font-bold text-slate-800"
-                    >
-                        {{ now()->translatedFormat('l, d F Y') }}
-                    </div>
-
-                    <div
-                        id="clock"
-                        class="text-[#006fcf] font-black text-lg tabular-nums"
-                    >
-                        --:--:--
-                    </div>
+            {{-- CLOCK --}}
+            <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200 text-right">
+                <div class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Hari Ini</div>
+                <div id="date-now" class="mt-1 text-sm font-bold text-slate-800">
+                    {{ now()->translatedFormat('l, d F Y') }}
                 </div>
-
+                <div id="clock" class="text-[#006fcf] font-black text-lg tabular-nums">--:--:--</div>
             </div>
         </div>
     </x-slot>
@@ -41,6 +29,120 @@
 
             {{-- ===== LEFT ===== --}}
             <div class="lg:col-span-2 space-y-6">
+
+                {{-- MASUK & PULANG --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    {{-- MASUK --}}
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Masuk</p>
+                                <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
+                                    {{ $presensiHariIni ? \Carbon\Carbon::parse($presensiHariIni->jam_masuk)->format('H:i') : '--:--' }}
+                                </div>
+                                <div class="mt-1 text-xs font-bold {{ $presensiHariIni ? 'text-emerald-600' : 'text-slate-400' }}">
+                                    {{ $presensiHariIni ? 'Tercatat' : 'Belum presensi' }}
+                                </div>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center ring-1 ring-emerald-600/10">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- PULANG --}}
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Pulang</p>
+                                <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
+                                    {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? \Carbon\Carbon::parse($presensiHariIni->jam_pulang)->format('H:i') : '--:--' }}
+                                </div>
+                                <div class="mt-1 text-xs font-bold {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? 'text-amber-600' : 'text-slate-400' }}">
+                                    {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? 'Tercatat' : 'Belum presensi pulang' }}
+                                </div>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center ring-1 ring-amber-600/10">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- PINTASAN PRESENSI --}}
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                            Pintasan
+                        </p>
+                        {{-- Badge status hari ini --}}
+                        @php
+                            $isWeekend = now()->isWeekend();
+                        @endphp
+                        @if($isWeekend)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                                Akhir Pekan
+                            </span>
+                        @elseif($presensiHariIni && $presensiHariIni->jam_pulang)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                Presensi Lengkap
+                            </span>
+                        @elseif($presensiHariIni)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                                Belum Pulang
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse"></span>
+                                Belum Presensi
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+
+                        {{-- PRESENSI --}}
+                        <a href="{{ route('pegawai.presensi.create') }}"
+                           class="group flex flex-col items-center gap-2 p-4 rounded-2xl
+                           border-2 border-emerald-200 bg-emerald-50/50
+                           hover:bg-emerald-100/70 hover:border-emerald-300
+                           hover:shadow-md transition-all duration-200 text-center">
+                            <div class="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-700
+                                group-hover:bg-emerald-200 transition flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-black text-emerald-700 leading-tight">Presensi<br>Harian</span>
+                        </a>
+
+                        {{-- RIWAYAT PRESENSI --}}
+                        <a href="{{ route('pegawai.presensi.history') }}"
+                           class="group flex flex-col items-center gap-2 p-4 rounded-2xl
+                           border-2 border-blue-200 bg-blue-50/50
+                           hover:bg-blue-100/70 hover:border-blue-300
+                           hover:shadow-md transition-all duration-200 text-center">
+                            <div class="w-11 h-11 rounded-2xl bg-blue-100 text-[#006fcf]
+                                group-hover:bg-blue-200 transition flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-black text-[#006fcf] leading-tight">Riwayat<br>Presensi</span>
+                        </a>
+
+                    </div>
+                </div>
 
                 {{-- PENGUMUMAN --}}
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
@@ -60,25 +162,16 @@
                     <div class="space-y-3 max-h-[320px] overflow-y-auto pr-1"
                          x-data="{ openModal: false, selectedId: null }">
 
-                            @forelse($pengumumans as $pengumuman)
-
-                                <div class="p-4 rounded-2xl border border-slate-200 hover:border-blue-300 transition cursor-pointer"
-                                     @click="selectedPengumuman = {{ $pengumuman->id }}; openModal = true">
-
-                                    <div class="flex items-start justify-between gap-4">
-
-                                        <div>
-                                            <h4 class="font-bold text-slate-800 hover:text-blue-600 transition">
-                                                {{ $pengumuman->judul }}
-                                            </h4>
-                                        </div>
-
-                                        <span class="text-xs text-slate-400 whitespace-nowrap">
-                                            {{ $pengumuman->created_at->translatedFormat('d F Y') }}
-                                        </span>
-
-                                    </div>
-
+                        @forelse($pengumumans as $pengumuman)
+                            <div class="p-4 rounded-2xl border border-slate-200 hover:border-[#006fcf]/40 hover:bg-blue-50/30 transition cursor-pointer"
+                                 @click="selectedId = {{ $pengumuman->id }}; openModal = true">
+                                <div class="flex items-start justify-between gap-4">
+                                    <h4 class="font-bold text-slate-800 text-sm leading-snug">
+                                        {{ $pengumuman->judul }}
+                                    </h4>
+                                    <span class="text-[11px] text-slate-400 whitespace-nowrap flex-shrink-0">
+                                        {{ \Carbon\Carbon::parse($pengumuman->tanggal)->translatedFormat('d F Y') }}
+                                    </span>
                                 </div>
                             </div>
                         @empty
@@ -138,51 +231,6 @@
 
                 </div>
 
-                {{-- MASUK & PULANG --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                    {{-- MASUK --}}
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Masuk</p>
-                                <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
-                                    {{ $presensiHariIni ? \Carbon\Carbon::parse($presensiHariIni->jam_masuk)->format('H:i') : '--:--' }}
-                                </div>
-                                <div class="mt-1 text-xs font-bold {{ $presensiHariIni ? 'text-emerald-600' : 'text-slate-400' }}">
-                                    {{ $presensiHariIni ? 'Tercatat' : 'Belum presensi' }}
-                                </div>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center ring-1 ring-emerald-600/10">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- PULANG --}}
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Pulang</p>
-                                <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
-                                    {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? \Carbon\Carbon::parse($presensiHariIni->jam_pulang)->format('H:i') : '--:--' }}
-                                </div>
-                                <div class="mt-1 text-xs font-bold {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? 'text-amber-600' : 'text-slate-400' }}">
-                                    {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? 'Tercatat' : 'Belum presensi pulang' }}
-                                </div>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center ring-1 ring-amber-600/10">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
             </div>
 
             {{-- ===== RIGHT: KALENDER MINI ===== --}}
@@ -237,15 +285,13 @@
                     <div>Sab</div>
                 </div>
 
-                {{-- GRID TANGGAL + DOT (satu grid, dot absolute di dalam button) --}}
+                {{-- GRID TANGGAL + DOT --}}
                 <div class="grid grid-cols-7 gap-1">
 
-                    {{-- OFFSET --}}
                     <template x-for="_ in firstDayOffset" :key="'e-' + _">
                         <div></div>
                     </template>
 
-                    {{-- TANGGAL --}}
                     <template x-for="day in daysInMonth" :key="day">
                         <button
                             type="button"
@@ -260,7 +306,6 @@
                             }"
                         >
                             <span x-text="day"></span>
-                            {{-- DOT EVENT --}}
                             <template x-if="hasEvent(day)">
                                 <span class="absolute bottom-1 w-1 h-1 rounded-full"
                                       :class="isToday(day) ? 'bg-white/80' : 'bg-orange-400'">
@@ -320,18 +365,14 @@
         // ========================
         function miniCalendar() {
             return {
-                // Data events dari Laravel
                 events: @json($kalenders),
 
-                // State bulan & tahun yang sedang ditampilkan
                 currentYear:  {{ now()->year }},
-                currentMonth: {{ now()->month }}, // 1-12
+                currentMonth: {{ now()->month }},
 
-                // State tanggal dipilih
                 selected: null,
                 selectedEvents: [],
 
-                // Computed properties
                 get monthLabel() {
                     const date = new Date(this.currentYear, this.currentMonth - 1, 1);
                     return date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
@@ -342,14 +383,12 @@
                     return Array.from({ length: count }, (_, i) => i + 1);
                 },
 
-                // Offset: hari pertama bulan ini jatuh di kolom ke berapa (0=Min, 6=Sab)
                 get firstDayOffset() {
                     const offset = new Date(this.currentYear, this.currentMonth - 1, 1).getDay();
                     return Array.from({ length: offset }, (_, i) => i);
                 },
 
                 init() {
-                    // Otomatis pilih hari ini kalau bulan aktif = bulan sekarang
                     const now = new Date();
                     if (
                         this.currentMonth === now.getMonth() + 1 &&
@@ -381,7 +420,6 @@
                     this.selectedEvents = [];
                 },
 
-                // Format tanggal dari day integer ke 'YYYY-MM-DD'
                 toDateString(day) {
                     const mm = String(this.currentMonth).padStart(2, '0');
                     const dd = String(day).padStart(2, '0');
@@ -391,7 +429,7 @@
                 isToday(day) {
                     const now = new Date();
                     return (
-                        day              === now.getDate()      &&
+                        day               === now.getDate()      &&
                         this.currentMonth === now.getMonth() + 1 &&
                         this.currentYear  === now.getFullYear()
                     );
@@ -399,7 +437,7 @@
 
                 isWeekend(day) {
                     const d = new Date(this.currentYear, this.currentMonth - 1, day).getDay();
-                    return d === 0 || d === 6; // 0=Minggu, 6=Sabtu
+                    return d === 0 || d === 6;
                 },
 
                 hasEvent(day) {
