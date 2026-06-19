@@ -48,10 +48,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    // Admin routes
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
 
-        // IMPORT EXCEL
+        // IMPORT EXCEL USERS
         Route::get('users/import', [UserController::class, 'importForm'])
             ->name('users.import.form');
 
@@ -61,25 +60,37 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // USERS
         Route::resource('users', UserController::class);
 
-        Route::post('pegawai/import', [PegawaiController::class, 'import']) 
-        ->name('pegawai.import');
+        // PEGAWAI IMPORT
+        Route::post('pegawai/import', [PegawaiController::class, 'import'])
+            ->name('pegawai.import');
 
-        Route::get(
-            'pegawai/template/download', [PegawaiController::class, 'downloadTemplate']
-        )->name('pegawai.template.download');
+        Route::get('pegawai/template/download', [PegawaiController::class, 'downloadTemplate'])
+            ->name('pegawai.template.download');
 
         Route::resource('pegawai', PegawaiController::class);
+
+        // MASTER DATA
         Route::resource('unit-kerja', UnitKerjaController::class);
         Route::resource('jadwal-kerja', JadwalKerjaController::class);
         Route::resource('lokasi-kantor', LokasiKantorController::class);
         Route::resource('pengumuman', PengumumanController::class);
         Route::resource('kalender-akademik', KalenderAkademikController::class);
 
+        // PRESENSI ADMIN
         Route::get('presensi', [PresensiController::class, 'index'])
             ->name('presensi.index');
 
-        Route::get('/presensi/{id}', [PresensiController::class, 'show'])
+        Route::get('presensi/{id}', [PresensiController::class, 'show'])
             ->name('presensi.show');
+
+        // =========================
+        // EXPORT PRESENSI (FIX)
+        // =========================
+        Route::get('presensi/export/excel', [PresensiController::class, 'exportExcel'])
+            ->name('presensi.export.excel');
+
+        Route::get('presensi/export/pdf', [PresensiController::class, 'exportPdf'])
+            ->name('presensi.export.pdf');
 
     });
 

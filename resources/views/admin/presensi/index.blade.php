@@ -1,14 +1,48 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-                {{ __('Seluruh Data Presensi') }}
-            </h2>
 
-            <p class="mt-1 text-black-70 text-sm font-medium">
-                Pantau rekaman presensi masuk/pulang dan foto pendukung.
-            </p>
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+
+            <div>
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
+                    {{ __('Seluruh Data Presensi') }}
+                </h2>
+
+                <p class="mt-1 text-slate-500 text-sm font-medium">
+                    Pantau rekaman presensi masuk/pulang dan foto pendukung.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+
+                <a href="{{ route('admin.presensi.export.excel', [
+                    'tanggal' => request('tanggal') ?? now()->toDateString()
+                ]) }}"
+                    class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl
+                        bg-emerald-600 text-white text-xs font-black
+                        uppercase tracking-[0.18em]
+                        shadow-sm hover:bg-emerald-700
+                        hover:scale-[1.02] transition">
+
+                    Export Excel
+                </a>
+
+                <a href="{{ route('admin.presensi.export.pdf', [
+                    'tanggal' => request('tanggal') ?? now()->toDateString()
+                ]) }}"
+                    class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl
+                        bg-rose-600 text-white text-xs font-black
+                        uppercase tracking-[0.18em]
+                        shadow-sm hover:bg-rose-700
+                        hover:scale-[1.02] transition">
+
+                    Export PDF
+                </a>
+
+            </div>
+
         </div>
+
     </x-slot>
 
     <div class="max-w-7xl mx-auto">
@@ -39,7 +73,7 @@
 
                     <div class="md:col-span-3">
                         <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Pilih Tanggal Monitoring
+                            Pilih Tanggal
                         </label>
                         <input type="date" name="tanggal" value="{{ request('tanggal') ?? now()->toDateString() }}"
                             class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
