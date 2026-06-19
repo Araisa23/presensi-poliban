@@ -12,8 +12,8 @@
             </div>
 
             <a href="{{ route('admin.users.create') }}"
-                class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition min-w-[180px]">
-
+                class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] 
+                text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 hover:scale-[1.02] transition min-w-[180px]">  
                 + Tambah Administrator
             </a>
         </div>
@@ -131,7 +131,7 @@
                                 Role
                             </th>
 
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-right">
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">
                                 Aksi
                             </th>
 
@@ -210,9 +210,9 @@
                                 </td>
 
                                 {{-- AKSI --}}
-                                <td class="px-8 py-5 text-right">
+                                <td class="px-8 py-5 text-center">
 
-                                    <div class="flex items-center justify-end gap-3"
+                                    <div class="flex items-center justify-center gap-3"
                                         x-data="{ openDeleteModal: false }">
 
                                         {{-- EDIT --}}

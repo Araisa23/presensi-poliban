@@ -2,17 +2,8 @@
     <x-slot name="header">
         <div class="flex items-center gap-4">
 
-            <a href="{{ route('admin.kalender-akademik.index') }}"
-               class="w-10 h-10 rounded-2xl border border-slate-200 bg-white
-               flex items-center justify-center text-slate-500
-               hover:border-[#0b3c70] hover:text-[#0b3c70] shadow-sm transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-            </a>
-
             <div>
-                <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-slate-900">
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
                     Tambah Libur / Agenda
                 </h2>
                 <p class="mt-1 text-slate-500 text-sm font-medium">
@@ -24,7 +15,7 @@
     </x-slot>
 
     <div class="max-w-2xl mx-auto">
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-7 sm:p-9"
+        <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl p-6 sm:p-8 border border-slate-100/70 dark:border-white/10"
              x-data="{
                 jenis: '{{ old('jenis', 'akademik') }}',
                 isLibur: {{ old('is_libur', '0') === '1' ? 'true' : 'false' }},
@@ -44,7 +35,7 @@
 
                 {{-- VALIDATION ERRORS --}}
                 @if($errors->any())
-                    <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+                    <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 shadow-soft">
                         <p class="font-black mb-1">Terdapat kesalahan:</p>
                         <ul class="list-disc list-inside space-y-0.5">
                             @foreach($errors->all() as $error)
@@ -204,25 +195,27 @@
                 </div>
 
                 {{-- FOOTER --}}
-                <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
+                <div class="flex items-center justify-end gap-3 pt-6 ">
 
-                    <a href="{{ route('admin.kalender-akademik.index') }}"
-                       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl
-                       border border-slate-300 bg-white text-slate-700 text-sm font-bold
-                       hover:bg-slate-50 transition">
-                        Batal
-                    </a>
+                    <x-back-button href="{{ route('admin.kalender-akademik.index') }}">
+                        Kembali
+                    </x-back-button>
 
-                    <button type="submit"
-                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl
-                            font-black text-xs uppercase tracking-[0.18em]
-                            bg-gradient-to-r from-[#004b8d] to-[#006fcf]
-                            text-white shadow-sm hover:opacity-90 hover:scale-[1.01] transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    <x-primary-button class="gap-2">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M5 13l4 4L19 7" />
                         </svg>
-                        Simpan
-                    </button>
+                        Simpan Libur / Agenda
+                    </x-primary-button>
 
                 </div>
 

@@ -116,7 +116,7 @@
                                                 {{ $p->user->tenagaKependidikan->nama ?? ($p->user->name ?? '-') }}
                                             </div>
 
-                                            <div class="text-[10px] text-slate-400 font-mono">
+                                            <div class="text-[11px] text-slate-500 dark:text-slate-300"> 
                                                 {{ $p->user->tenagaKependidikan->nip ?? '-' }}
                                             </div>
                                         </div>

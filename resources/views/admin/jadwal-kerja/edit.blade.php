@@ -154,23 +154,9 @@
                 <div class="px-8 py-5 flex justify-end gap-3 border-t border-slate-200">
 
                     {{-- BACK BUTTON --}}
-                    <a href="{{ route('admin.jadwal-kerja.index') }}"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition">
-
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor">
-
-                            <path stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M15 19l-7-7 7-7" />
-                        </svg>
-
+                    <x-back-button href="{{ route('admin.jadwal-kerja.index') }}">
                         Kembali
-                    </a>
+                    </x-back-button>
 
                     {{-- SAVE BUTTON --}}
                     <x-primary-button class="gap-2">

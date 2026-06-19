@@ -7,7 +7,9 @@
                 </h2>
                 <p class="mt-1 text-black-70 text-sm font-medium">Atur struktur organisasi untuk pengelompokan pegawai.</p>
             </div>
-            <a href="{{ route('admin.unit-kerja.create') }}" class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 transition min-w-[180px]">
+            <a href="{{ route('admin.unit-kerja.create') }}" 
+                class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] 
+                text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 hover:scale-[1.02] transition min-w-[180px]">
                 + Tambah Unit
             </a>
         </div>

@@ -142,119 +142,64 @@
 
             </x-slot>
 
-            <x-slot name="content">
+        <x-slot name="content">
 
-                <div class="w-80 bg-white rounded-3xl overflow-hidden shadow-xl">
+            <div class="w-56 bg-white rounded-2xl overflow-hidden shadow-xl border border-slate-100">
 
-                    {{-- HEADER --}}
-                    <div class="p-5">
+                {{-- HEADER MINI --}}
+                <div class="px-4 py-3 border-b border-slate-100">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                        Navigasi Profil
+                    </p>
+                </div>
 
-                        <div class="flex items-center gap-3">
+                {{-- MENU --}}
+                <div class="py-1">
 
-                            <div class="w-14 h-14 rounded-2xl bg-slate-100 overflow-hidden flex items-center justify-center">
+                    <a href="{{ route('profile.edit') }}"
+                        class="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">
 
-                                @if(Auth::user()->foto)
-                                    <img
-                                        src="{{ asset('storage/' . Auth::user()->foto) }}"
-                                        alt="Profile"
-                                        class="w-full h-full object-cover">
-                                @else
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="w-8 h-8 text-slate-500"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5 text-slate-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.8"
+                                d="M15.75 6.75a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.118a7.5 7.5 0 0115 0A17.933 17.933 0 0112 21.75a17.933 17.933 0 01-7.5-1.632z" />
+                        </svg>
 
-                                        <path stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M5.121 17.804A9 9 0 1118.88 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        Profil Saya
 
-                                    </svg>
-                                @endif
-
-                            </div>
-
-                            <div>
-
-                                <h4 class="font-black text-slate-800">
-                                    {{ Auth::user()->name }}
-                                </h4>
-
-                                <p class="text-xs text-slate-400">
-                                    {{ Auth::user()->email }}
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    {{-- MENU --}}
-                    <div class="border-t border-slate-100 py-2">
-
-                        <a
-                            href="{{ route('profile.edit') }}"
-                            class="flex items-center gap-3 px-5 py-3
-                            text-slate-700 font-bold
-                            hover:bg-slate-50 transition">
-
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="w-5 h-5 text-[#006fcf]"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor">
-
-                                <path stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M5.121 17.804A9 9 0 1118.88 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-
-                            </svg>
-
-                            Pengaturan Akun
-
-                        </a>
-
-                    </div>
-
-                    {{-- LOGOUT --}}
-                    <div class="border-t border-slate-100 py-2">
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <button
-                                type="submit"
-                                class="w-full flex items-center gap-3 px-5 py-3
-                                text-rose-600 font-bold
-                                hover:bg-rose-50 transition">
-
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="w-5 h-5"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor">
-
-                                    <path stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M17 16l4-4m0 0l-4-4m4 4H7"/>
-
-                                </svg>
-
-                                Logout
-
-                            </button>
-
-                        </form>
-
-                    </div>
+                    </a>
 
                 </div>
 
-            </x-slot>
+                {{-- LOGOUT --}}
+                <div class="border-t border-slate-100 py-1">
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+
+                        <button type="submit"
+                            class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition">
+
+                                <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+
+                            Logout
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </x-slot>
 
         </x-dropdown>
     </div>
@@ -266,7 +211,7 @@
             <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 bg-slate-900/40 z-40 lg:hidden" x-transition></div>
 
             {{-- SIDEBAR (Hanya di Bawah Navbar) --}}
-            <aside class="fixed inset-y-0 left-0 lg:top-20 z-50 w-72 bg-white border-r border-slate-200 transform transition-transform lg:translate-x-0 lg:static lg:h-[calc(100vh-5rem)]"
+            <aside class="fixed inset-y-0 left-0 lg:top-16 z-50 w-[265px] bg-[#004b8d] border-r border-white/10 transform transition-transform lg:translate-x-0 lg:static lg:h-[calc(100vh-4rem)] flex flex-col overflow-hidden"            
                    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
                 @include('layouts.sidebar')
             </aside>

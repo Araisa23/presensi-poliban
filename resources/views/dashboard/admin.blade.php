@@ -141,7 +141,7 @@
         <!-- GRAFIK -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
 
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-4">
 
                     <h3 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight mb-1 text-slate-900">
                         Grafik Kehadiran Mingguan

@@ -86,7 +86,7 @@
                     </button>
                 </div>
                 <p id="passwordStatus" class="mt-2 text-xs text-slate-400">
-                    Minimal 8 karakter, huruf besar, huruf kecil, angka, dan simbol.
+                    Buat password sesuai dengan ketentuan.
                 </p>
                 <x-input-error class="mt-1 text-xs" :messages="$errors->get('password')" />
             </div>

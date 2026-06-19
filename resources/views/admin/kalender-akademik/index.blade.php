@@ -8,11 +8,8 @@
                 <p class="text-slate-500 text-sm mt-1">Kelola agenda akademik dan hari libur nasional.</p>
             </div>
             <a href="{{ route('admin.kalender-akademik.create') }}"
-               class="inline-flex items-center justify-center px-6 py-4
-               rounded-2xl font-black text-xs uppercase tracking-[0.2em]
-               bg-gradient-to-r from-[#004b8d] to-[#006fcf]
-               text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)]
-               ring-1 ring-[#0b3c70]/20 transition text-center min-w-[180px]">
+                class="inline-flex items-center justify-center px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] 
+                text-white shadow-[0_14px_30px_rgba(79,_70,_229,_0.30)] ring-1 ring-indigo-600/20 hover:scale-[1.02] transition min-w-[180px]">
                 + Tambah Hari Libur/Agenda
             </a>
         </div>
@@ -249,7 +246,7 @@
                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">Tanggal Mulai</th>
                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">Tanggal Selesai</th>
                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">Keterangan</th>
-                            <th class="px-6 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">Aksi</th>
+                            <th class="px-6 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="eventTableBody" class="divide-y divide-slate-100">

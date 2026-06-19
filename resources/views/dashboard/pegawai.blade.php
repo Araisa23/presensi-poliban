@@ -15,7 +15,6 @@
 
             {{-- CLOCK --}}
             <div class="bg-white rounded-2xl px-5 py-2 shadow-sm border border-slate-200 text-right">
-                <div class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Hari Ini</div>
                 <div id="date-now" class="mt-1 text-sm font-bold text-slate-800">
                     {{ now()->translatedFormat('l, d F Y') }}
                 </div>
@@ -29,51 +28,6 @@
 
             {{-- ===== LEFT ===== --}}
             <div class="lg:col-span-2 space-y-6">
-
-                {{-- MASUK & PULANG --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                    {{-- MASUK --}}
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Masuk</p>
-                                <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
-                                    {{ $presensiHariIni ? \Carbon\Carbon::parse($presensiHariIni->jam_masuk)->format('H:i') : '--:--' }}
-                                </div>
-                                <div class="mt-1 text-xs font-bold {{ $presensiHariIni ? 'text-emerald-600' : 'text-slate-400' }}">
-                                    {{ $presensiHariIni ? 'Tercatat' : 'Belum presensi' }}
-                                </div>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center ring-1 ring-emerald-600/10">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- PULANG --}}
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Pulang</p>
-                                <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
-                                    {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? \Carbon\Carbon::parse($presensiHariIni->jam_pulang)->format('H:i') : '--:--' }}
-                                </div>
-                                <div class="mt-1 text-xs font-bold {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? 'text-amber-600' : 'text-slate-400' }}">
-                                    {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? 'Tercatat' : 'Belum presensi pulang' }}
-                                </div>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center ring-1 ring-amber-600/10">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
 
                 {{-- PINTASAN PRESENSI --}}
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
@@ -144,6 +98,51 @@
                     </div>
                 </div>
 
+                {{-- MASUK & PULANG --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    {{-- MASUK --}}
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Masuk</p>
+                                <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
+                                    {{ $presensiHariIni ? \Carbon\Carbon::parse($presensiHariIni->jam_masuk)->format('H:i') : '--:--' }}
+                                </div>
+                                <div class="mt-1 text-xs font-bold {{ $presensiHariIni ? 'text-emerald-600' : 'text-slate-400' }}">
+                                    {{ $presensiHariIni ? 'Tercatat' : 'Belum presensi' }}
+                                </div>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center ring-1 ring-emerald-600/10">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- PULANG --}}
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Pulang</p>
+                                <div class="mt-2 text-4xl font-black tabular-nums text-slate-900">
+                                    {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? \Carbon\Carbon::parse($presensiHariIni->jam_pulang)->format('H:i') : '--:--' }}
+                                </div>
+                                <div class="mt-1 text-xs font-bold {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? 'text-amber-600' : 'text-slate-400' }}">
+                                    {{ ($presensiHariIni && $presensiHariIni->jam_pulang) ? 'Tercatat' : 'Belum presensi pulang' }}
+                                </div>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center ring-1 ring-amber-600/10">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
                 {{-- PENGUMUMAN --}}
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
 
@@ -170,7 +169,7 @@
                                         {{ $pengumuman->judul }}
                                     </h4>
                                     <span class="text-[11px] text-slate-400 whitespace-nowrap flex-shrink-0">
-                                        {{ \Carbon\Carbon::parse($pengumuman->tanggal)->translatedFormat('d F Y') }}
+                                        {{ \Carbon\Carbon::parse($pengumuman->created_at)->translatedFormat('d F Y') }}
                                     </span>
                                 </div>
                             </div>

@@ -40,84 +40,6 @@
 
     <div class="max-w-7xl mx-auto space-y-6">
 
-        {{-- STAT CARDS --}}
-        @php
-            $totalPegawai  = count($rekap);
-            $totalHariKerja = $rekap[0]['total_hari'] ?? 0;
-            $rataHadir     = $totalPegawai > 0
-                ? round(collect($rekap)->avg('hadir'), 1)
-                : 0;
-            $totalAlfa     = collect($rekap)->sum('alfa');
-        @endphp
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-            {{-- Total Pegawai --}}
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Total Pegawai</p>
-                        <h3 class="mt-1.5 text-3xl font-black text-slate-900">{{ $totalPegawai }}</h3>
-                        <p class="mt-1 text-xs font-bold text-slate-500">Bulan ini</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-[#006fcf]">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Hari Kerja --}}
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Hari Kerja</p>
-                        <h3 class="mt-1.5 text-3xl font-black text-slate-900">{{ $totalHariKerja }}</h3>
-                        <p class="mt-1 text-xs font-bold text-slate-500">Senin – Jumat</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Rata-rata Hadir --}}
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Rata Hadir</p>
-                        <h3 class="mt-1.5 text-3xl font-black text-slate-900">{{ $rataHadir }}</h3>
-                        <p class="mt-1 text-xs font-bold text-slate-500">Hari / pegawai</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Total Alpha --}}
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Total Alpha</p>
-                        <h3 class="mt-1.5 text-3xl font-black text-slate-900">{{ $totalAlfa }}</h3>
-                        <p class="mt-1 text-xs font-bold text-slate-500">Semua pegawai</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
         {{-- FILTER --}}
         <form action="{{ route('pimpinan.rekap') }}" method="GET">
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5">
@@ -369,6 +291,13 @@
                     </tbody>
                 </table>
             </div>
+
+            {{-- PAGINATION --}}
+            @if($rekap->hasPages())
+                <div class="px-6 py-5 border-t border-slate-100 bg-slate-50/40">
+                    {{ $rekap->withQueryString()->links() }}
+                </div>
+            @endif
 
         </div>
 

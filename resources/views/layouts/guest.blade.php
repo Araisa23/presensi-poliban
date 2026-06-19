@@ -28,43 +28,43 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-[3px]"></div>
 
     <!-- Main Card -->
-    <div class="relative z-10 w-full max-w-5xl bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[35px] overflow-hidden shadow-2xl grid lg:grid-cols-2">
+    <div class="relative z-10 w-full max-w-3xl bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[35px] overflow-hidden shadow-2xl grid lg:grid-cols-2">
 
         <!-- LEFT SIDE -->
-        <div class="hidden lg:flex flex-col justify-between p-10 relative">
+        <div class="hidden lg:flex flex-col justify-between p-8 relative">
 
             <div>
                 <p class="uppercase tracking-[0.35em] text-white/80 text-sm font-semibold">
                     PRESENSI
                 </p>
 
-                <h1 class="mt-6 text-5xl font-extrabold leading-tight text-white">
+                <h1 class="mt-4 text-3xl font-extrabold leading-tight text-white">
                     Sistem Presensi
                     <span class="block text-white/80">
                         Tenaga Kependidikan
                     </span>
                 </h1>
 
-                <p class="mt-5 text-white/80 text-lg leading-relaxed max-w-md">
+                <p class="mt-4 text-white/80 text-sm leading-relaxed max-w-md">
                     Sistem presensi modern berbasis website dengan fitur lokasi dan kamera untuk lingkungan Politeknik Negeri Banjarmasin.
                 </p>
             </div>
 
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-lg flex items-center justify-center border border-white/20">
+                <div class="w-11 h-11 rounded-2xl bg-white/10 backdrop-blur-lg flex items-center justify-center border border-white/20">
                     <img 
                         src="{{ asset('images/poliban.png') }}"
                         alt="Poliban"
-                        class="w-10 h-10 object-contain"
+                        class="w-8 h-8 object-contain"
                     >
                 </div>
 
                 <div>
-                    <p class="text-white font-semibold">
+                    <p class="text-white font-semibold text-sm">
                         Politeknik Negeri Banjarmasin
                     </p>
 
-                    <p class="text-white/60 text-sm">
+                    <p class="text-white/60 text-xs">
                         Presensi © {{ date('Y') }}
                     </p>
                 </div>
@@ -72,24 +72,24 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
         </div>
 
         <!-- RIGHT SIDE -->
-        <div class="bg-white px-8 py-10 sm:px-12 flex items-center">
+        <div class="bg-white px-6 py-7 sm:px-8 flex items-center">
 
             <div class="w-full">
 
                 <!-- Logo -->
                 <div class="flex justify-center">
-                    <div class="bg-blue-50 shadow-lg p-4 rounded-3xl">
+                    <div class="bg-blue-50 shadow-lg p-3 rounded-3xl">
                         <img 
                             src="{{ asset('images/poliban.png') }}"
                             alt="Logo"
-                            class="w-20 h-20 object-contain"
+                            class="w-14 h-14 object-contain"
                         >
                     </div>
                 </div>
 
                 <!-- Heading -->
-                <div class="text-center mt-6">
-                    <h2 class="text-3xl font-extrabold text-slate-800">
+                <div class="text-center mt-5">
+                    <h2 class="text-2xl font-extrabold text-slate-800">
                         Selamat Datang
                     </h2>
 
@@ -100,13 +100,13 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
 
                 <!-- ERROR -->
                 @if ($errors->any())
-                    <div class="mt-5 bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-2xl text-sm">
+                    <div class="mt-4 bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-2xl text-sm">
                         {{ $errors->first() }}
                     </div>
                 @endif
 
                 <!-- FORM -->
-                <form method="POST" action="{{ route('login') }}" class="mt-8 space-y-5">
+                <form method="POST" action="{{ route('login') }}" class="mt-6 space-y-4">
 
                     @csrf
 
@@ -123,7 +123,7 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
                             placeholder="Masukkan Email atau NIP"
                             required
                             autofocus
-                            class="w-full rounded-2xl border border-slate-200 px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                            class="w-full rounded-2xl border border-slate-200 px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                         >
                     </div>
 
@@ -145,7 +145,7 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
                                 name="password"
                                 placeholder="••••••••"
                                 required
-                                class="w-full rounded-2xl border border-slate-200 px-5 py-3.5 pr-14 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                class="w-full rounded-2xl border border-slate-200 px-5 py-3 pr-14 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                             >
 
                             <!-- BUTTON EYE -->
@@ -218,7 +218,7 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
                         >
 
                         <p class="text-sm text-slate-600">
-                            Remember me
+                            Ingat Saya
                         </p>
 
                     </div>
@@ -226,7 +226,7 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
                     <!-- BUTTON -->
                     <button
                         type="submit"
-                        class="w-full bg-gradient-to-r from-[#0f2f57] to-[#2f6aa8] hover:opacity-90 text-white font-bold py-3.5 rounded-2xl shadow-lg transition duration-300">
+                        class="w-full bg-gradient-to-r from-[#0f2f57] to-[#2f6aa8] hover:opacity-90 text-white font-bold py-3 rounded-2xl shadow-lg transition duration-300">
 
                         Login
 

@@ -132,7 +132,7 @@
                                 Unit Kerja
                             </th>
 
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b text-right">
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b text-center">
                                 Aksi
                             </th>
 

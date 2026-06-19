@@ -130,13 +130,12 @@
                 {{-- DELETE --}}
                 <div x-data="{ openDeleteModal: false }">
 
-                    <button
+                    <x-danger-button
                         type="button"
                         @click="openDeleteModal = true"
-                        class="px-5 py-3 rounded-2xl bg-rose-50 text-rose-700 font-bold hover:bg-rose-100 transition"
                     >
                         Hapus Lokasi
-                    </button>
+                    </x-danger-button>
 
                     {{-- MODAL DELETE --}}
                     <div
@@ -208,7 +207,7 @@
                                     >
                                         Batal
                                     </button>
-</form>
+                                
                                     {{-- DELETE FORM --}}
                                     <form
                                         action="{{ route('admin.lokasi-kantor.destroy', $lokasiKantor->id) }}"
@@ -235,27 +234,21 @@
                 </div>
 
                 {{-- SAVE BUTTON --}}
-                <button
-                    type="submit"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl
-                    bg-[#1D4ED8] hover:bg-[#1E40AF]
-                    text-white font-semibold shadow-lg hover:scale-[1.02] transition"
-                >
+                    <x-primary-button class="gap-2">
 
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
 
-                        <path stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M5 13l4 4L19 7" />
-                    </svg>
-
-                    Simpan Radius
-                </button>
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M5 13l4 4L19 7" />
+                        </svg>
+                        Simpan Radius
+                    </x-primary-button>   
 
             </div>
 

@@ -11,6 +11,7 @@ use App\Exports\PresensiExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Carbon\Carbon;
 
 class LaporanController extends Controller
@@ -44,14 +45,42 @@ class LaporanController extends Controller
 
     public function rekap(Request $request)
     {
-        $bulan      = $request->query('bulan', Carbon::now()->month);
-        $tahun      = $request->query('tahun', Carbon::now()->year);
-        $userId     = $request->query('user_id');
+        $bulan  = $request->query('bulan', Carbon::now()->month);
+        $tahun  = $request->query('tahun', Carbon::now()->year);
+        $userId = $request->query('user_id');
 
-        $rekap       = $this->calculateRekap($bulan, $tahun, $userId);
+        $result         = $this->calculateRekap($bulan, $tahun, $userId);
+        $rekapAll       = $result['data'];
+        $totalHariKerja = $result['total_hari_kerja'];
+        $totalPegawai   = count($rekapAll);
+
+        // ===== PAGINATION MANUAL UNTUK ARRAY =====
+        $perPage    = 10;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage('page');
+        $itemsForCurrentPage = array_slice($rekapAll, ($currentPage - 1) * $perPage, $perPage);
+
+        $rekap = new LengthAwarePaginator(
+            $itemsForCurrentPage,
+            count($rekapAll),
+            $perPage,
+            $currentPage,
+            [
+                'path'  => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
+
         $pegawaiList = TenagaKependidikan::whereNotNull('user_id')->get();
 
-        return view('presensi.rekap', compact('rekap', 'bulan', 'tahun', 'pegawaiList', 'userId'));
+        return view('presensi.rekap', compact(
+            'rekap',
+            'bulan',
+            'tahun',
+            'pegawaiList',
+            'userId',
+            'totalHariKerja',
+            'totalPegawai'
+        ));
     }
 
     public function exportExcel(Request $request)
@@ -60,10 +89,10 @@ class LaporanController extends Controller
         $tahun  = $request->input('tahun', Carbon::now()->year);
         $userId = $request->input('user_id');
 
-        $rekap = $this->calculateRekap($bulan, $tahun, $userId);
+        $result = $this->calculateRekap($bulan, $tahun, $userId);
 
         return Excel::download(
-            new PresensiExport($rekap),
+            new PresensiExport($result['data']),
             "rekap_presensi_{$bulan}_{$tahun}.xlsx"
         );
     }
@@ -72,11 +101,12 @@ class LaporanController extends Controller
     {
         set_time_limit(300);
 
-        $bulan     = $request->input('bulan', Carbon::now()->month);
-        $tahun     = $request->input('tahun', Carbon::now()->year);
-        $userId    = $request->input('user_id');
+        $bulan  = $request->input('bulan', Carbon::now()->month);
+        $tahun  = $request->input('tahun', Carbon::now()->year);
+        $userId = $request->input('user_id');
 
-        $rekap     = $this->calculateRekap($bulan, $tahun, $userId);
+        $result    = $this->calculateRekap($bulan, $tahun, $userId);
+        $rekap     = $result['data'];
         $namaBulan = Carbon::create()->month($bulan)->translatedFormat('F');
 
         $pdf = Pdf::loadView(
@@ -92,8 +122,10 @@ class LaporanController extends Controller
      *
      * Hari kerja = Senin–Jumat, exclude libur nasional (HariLibur & KalenderAkademik).
      * Alpha      = total hari kerja - jumlah hadir (minimum 0).
+     *
+     * @return array{data: array, total_hari_kerja: int}
      */
-    private function calculateRekap($bulan, $tahun, $userId = null)
+    private function calculateRekap($bulan, $tahun, $userId = null): array
     {
         // ✅ Hari kerja sudah benar: Senin-Jumat, exclude libur
         $workingDays      = $this->presensiService->getWorkingDays($bulan, $tahun);
@@ -137,6 +169,9 @@ class LaporanController extends Controller
         // Urutkan: alpha terbanyak di atas (pegawai yang paling sering absen)
         usort($data, fn($a, $b) => $b['alfa'] <=> $a['alfa']);
 
-        return $data;
+        return [
+            'data'             => $data,
+            'total_hari_kerja' => $totalWorkingDays,
+        ];
     }
 }

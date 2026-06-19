@@ -102,7 +102,7 @@
             </div>
     </div>
 
-    {{-- POPUP SUKSES PRESENSI --}}
+    {{-- MODAL SUKSES PRESENSI --}}
     <div id="success-modal"
          class="hidden fixed inset-0 z-50 items-center justify-center p-4"
          role="dialog"
@@ -136,7 +136,7 @@
                 </div>
 
                 <h3 id="success-modal-title" class="text-xl font-black text-slate-900 dark:text-white mb-2">
-                    Berhasil!
+                    Presensi Berhasil!
                 </h3>
 
                 <p id="success-modal-message" class="text-sm font-medium text-slate-600 dark:text-slate-300"></p>
