@@ -12,6 +12,9 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 use App\Models\PresensiFoto;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PresensiHarianExport;
 
 class PresensiController extends Controller
 {
@@ -81,6 +84,37 @@ class PresensiController extends Controller
         ])->findOrFail($id);
 
         return view('admin.presensi.show', compact('presensi'));
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $tanggal = $request->tanggal ?? now()->toDateString();
+
+        return Excel::download(
+            new PresensiHarianExport($tanggal),
+            "presensi_{$tanggal}.xlsx"
+        );
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $tanggal = $request->tanggal ?? now()->toDateString();
+
+        $presensi = Presensi::with([
+            'user.tenagaKependidikan',
+            'foto'
+        ])
+        ->whereDate('tanggal', $tanggal)
+        ->get();
+
+        $pdf = Pdf::loadView(
+            'admin.presensi.presensi_pdf',
+            compact('presensi', 'tanggal')
+        );
+
+        return $pdf->download(
+            "presensi_{$tanggal}.pdf"
+        );
     }
 
     public function store(StorePresensiRequest $request)

@@ -78,6 +78,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('presensi', [PresensiController::class, 'index'])
             ->name('presensi.index');
 
+        Route::get('presensi/export/excel', [PresensiController::class, 'exportExcel'])
+            ->name('presensi.export.excel');
+
+        Route::get('presensi/export/pdf', [PresensiController::class, 'exportPdf'])
+            ->name('presensi.export.pdf');
+
         Route::get('/presensi/{id}', [PresensiController::class, 'show'])
             ->name('presensi.show');
 
