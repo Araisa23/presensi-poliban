@@ -21,14 +21,24 @@
 </head>
 
 <body
-class="min-h-screen flex items-center justify-center px-4 py-8 bg-cover bg-center bg-no-repeat relative overflow-hidden"
+class="min-h-screen flex justify-center px-4 items-start items-center py-6 bg-cover bg-center bg-no-repeat relative overflow-y-auto"
 style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
 
     <!-- Overlay -->
     <div class="absolute inset-0 bg-black/50 backdrop-blur-[3px]"></div>
 
     <!-- Main Card -->
-    <div class="relative z-10 w-full max-w-3xl bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[35px] overflow-hidden shadow-2xl grid lg:grid-cols-2">
+    <div class="relative z-10
+            w-[95%]
+            md:w-full
+            max-w-3xl mx-4 my-4
+            bg-white/10
+            backdrop-blur-2xl
+            border border-white/20
+            rounded-[30px]
+            overflow-hidden
+            shadow-2xl
+            grid lg:grid-cols-2">
 
         <!-- LEFT SIDE -->
         <div class="hidden lg:flex flex-col justify-between p-8 relative">
@@ -72,7 +82,7 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
         </div>
 
         <!-- RIGHT SIDE -->
-        <div class="bg-white px-6 py-7 sm:px-8 flex items-center">
+        <div class="bg-white px-5 py-6 sm:px-8 flex items-start md:items-center">
 
             <div class="w-full">
 
@@ -82,7 +92,7 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
                         <img 
                             src="{{ asset('images/poliban.png') }}"
                             alt="Logo"
-                            class="w-14 h-14 object-contain"
+                            class="w-12 h-12 object-contain"
                         >
                     </div>
                 </div>
@@ -267,5 +277,29 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
 
     </script>
 
+    <script>
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('focus', () => {
+            setTimeout(() => {
+                input.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 300);
+        });
+    });
+    </script>
+    <style>
+    html{
+        scroll-behavior:smooth;
+    }
+
+    @media (max-width: 768px){
+        body{
+            min-height: auto;
+        }
+    }
+    </style>
+    
 </body>
 </html>
