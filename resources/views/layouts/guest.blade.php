@@ -21,8 +21,19 @@
 </head>
 
 <body
-class="min-h-screen flex justify-center px-4 items-start items-center py-6 bg-cover bg-center bg-no-repeat relative overflow-y-auto"
-style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
+    class="min-h-screen
+    flex
+    items-start
+    md:items-center
+    justify-center
+    px-4
+    py-8
+    overflow-y-auto
+    bg-cover
+    bg-center
+    bg-no-repeat
+    relative"
+    style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
 
     <!-- Overlay -->
     <div class="absolute inset-0 bg-black/50 backdrop-blur-[3px]"></div>
@@ -127,6 +138,7 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
                         </label>
 
                         <input
+                            id="login"
                             type="text"
                             name="login"
                             value="{{ old('login') }}"
@@ -278,17 +290,20 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
     </script>
 
     <script>
-    document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('focus', () => {
-            setTimeout(() => {
-                input.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }, 300);
-        });
+    document.addEventListener('focusin', function (e) {
+
+        if (!e.target.matches('input')) return;
+
+        setTimeout(() => {
+            e.target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }, 450);
+
     });
     </script>
+
     <style>
     html{
         scroll-behavior:smooth;
@@ -300,6 +315,6 @@ style="background-image: url('{{ asset('images/bg-poliban.jpg') }}');">
         }
     }
     </style>
-    
+
 </body>
 </html>
