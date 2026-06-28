@@ -6,72 +6,139 @@ use App\Models\User;
 use App\Models\UnitKerja;
 use App\Models\TenagaKependidikan;
 use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class PegawaiImport implements ToCollection
+class PegawaiImport implements ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows)
     {
+        $requiredHeaders = [
+            'nip',
+            'nama',
+            'jenis_kelamin',
+            'unit_kerja'
+        ];
+
+        if ($rows->isEmpty()) {
+            
+            throw ValidationException::withMessages([
+                'file' => 'File Excel kosong.'
+            ]);
+        }
+
         foreach ($rows as $index => $row) {
 
-            // skip header
-            if ($index == 0) {
-                continue;
+        // ============================
+        // SKIP BARIS KOSONG
+        // ============================
+
+        if (
+            collect($row)
+                ->filter(fn($value) => trim((string)$value) !== '')
+                ->isEmpty()
+        ) {
+            continue;
+        }
+
+            // ============================
+            // VALIDASI FIELD WAJIB
+            // ============================
+
+            foreach ($requiredHeaders as $header) {
+
+                if (!isset($row[$header]) || trim($row[$header]) == '') {
+
+                    throw ValidationException::withMessages([
+                        'file' => "Baris ".($index+2)." : Kolom '{$header}' wajib diisi."
+                    ]);
+
+                }
+
             }
 
-            // skip kalau nip kosong
-            if (empty($row[0])) {
-                continue;
+            // ============================
+            // VALIDASI DUPLIKAT NIP
+            // ============================
+
+            if (User::where('nip', trim($row['nip']))->exists()) {
+
+                throw ValidationException::withMessages([
+                    'file' => "NIP {$row['nip']} sudah terdaftar."
+                ]);
+
             }
 
-            // cek user sudah ada
-            $existingUser = User::where('nip', $row[0])->first();
+            // ============================
+            // VALIDASI JENIS KELAMIN
+            // ============================
 
-            if ($existingUser) {
-                continue;
+            $jk = strtoupper(trim($row['jenis_kelamin']));
+
+            if (in_array($jk, ['LAKI-LAKI', 'LAKI LAKI'])) {
+                $jk = 'L';
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | AUTO CREATE UNIT KERJA
-            |--------------------------------------------------------------------------
-            */
+            if ($jk == 'PEREMPUAN') {
+                $jk = 'P';
+            }
 
-            $unitKerja = UnitKerja::firstOrCreate([
-                'nama_unit' => trim($row[4])
-            ]);
+            if (!in_array($jk, ['L', 'P'])) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | CREATE USER
-            |--------------------------------------------------------------------------
-            */
+                throw ValidationException::withMessages([
+                    'file' => "Jenis Kelamin pada NIP {$row['nip']} harus L atau P."
+                ]);
+
+            }
+
+            // ============================
+            // VALIDASI UNIT KERJA
+            // ============================
+
+            $unitKerja = UnitKerja::where(
+                'nama_unit',
+                trim($row['unit_kerja'])
+            )->first();
+
+            if (!$unitKerja) {
+
+                throw ValidationException::withMessages([
+                    'file' => "Unit Kerja '{$row['unit_kerja']}' belum terdaftar di sistem."
+                ]);
+
+            }
+
+            // ============================
+            // CREATE USER
+            // ============================
 
             $user = User::create([
-                'nip' => $row[0],
-                'name' => $row[1],
-                'jenis_kelamin' => $row[2],
-                'pangkat' => $row[3] ?? null,
-                'unit_kerja_id' => $unitKerja->id,
-                'password' => Hash::make($row[0]),
+
+                'nip' => trim($row['nip']),
+                'name' => trim($row['nama']),
+                'password' => Hash::make(trim($row['nip'])),
                 'role_id' => 2,
                 'is_first_login' => true,
+
             ]);
 
-            /*
-            |--------------------------------------------------------------------------
-            | CREATE TENAGA KEPENDIDIKAN
-            |--------------------------------------------------------------------------
-            */
+            // ============================
+            // CREATE PEGAWAI
+            // ============================
 
             TenagaKependidikan::create([
+
                 'user_id' => $user->id,
-                'nip' => $row[0],
-                'nama' => $row[1],
-                'jenis_kelamin' => $row[2],
-                'pangkat' => $row[3] ?? null,
+                'nip' => trim($row['nip']),
+                'nama' => trim($row['nama']),
+                'jenis_kelamin' => $jk,
+                'pangkat' => !empty($row['pangkat'])
+                    ? trim($row['pangkat'])
+                    : null,
                 'unit_kerja_id' => $unitKerja->id,
+
             ]);
         }
     }

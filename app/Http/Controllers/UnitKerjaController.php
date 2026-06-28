@@ -51,9 +51,22 @@ class UnitKerjaController extends Controller
             ->with('success', 'Unit kerja berhasil diperbarui.');
     }
 
-    public function destroy(UnitKerja $unitKerja)
+    public function destroy($id)
     {
+        $unitKerja = UnitKerja::findOrFail($id);
+
+        if ($unitKerja->tenagaKependidikans()->exists()) {
+            return back()->with(
+                'error',
+                'Unit kerja tidak dapat dihapus karena masih digunakan oleh data pegawai.'
+            );
+        }
+
         $unitKerja->delete();
-        return redirect()->route('admin.unit-kerja.index')->with('success', 'Unit kerja berhasil dihapus.');
+
+        return back()->with(
+            'success',
+            'Unit kerja berhasil dihapus.'
+        );
     }
 }
