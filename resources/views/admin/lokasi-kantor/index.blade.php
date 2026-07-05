@@ -14,7 +14,7 @@
         </div>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto" x-data="{ openDeleteModal: false }">
 
         {{-- SUCCESS --}}
         @if(session('success'))
@@ -23,7 +23,10 @@
             </div>
         @endif
 
-        {{-- FORM --}}
+        {{-- ============================================= --}}
+        {{-- FORM UPDATE RADIUS — HANYA INPUT + TOMBOL SIMPAN --}}
+        {{-- TIDAK ADA <form> LAIN DI DALAM SINI              --}}
+        {{-- ============================================= --}}
         <form
             action="{{ route('admin.lokasi-kantor.update', $lokasiKantor->id) }}"
             method="POST"
@@ -124,12 +127,10 @@
                     value="{{ $lokasiKantor->nama_lokasi }}"
                 >
 
-            {{-- BUTTON --}}
-            <div class="mt-8 flex items-center justify-between">
+                {{-- BUTTON --}}
+                <div class="mt-8 flex items-center justify-between">
 
-                {{-- DELETE --}}
-                <div x-data="{ openDeleteModal: false }">
-
+                    {{-- Tombol ini HANYA membuka modal, type="button" jadi tidak ikut submit form update --}}
                     <x-danger-button
                         type="button"
                         @click="openDeleteModal = true"
@@ -137,103 +138,7 @@
                         Hapus Lokasi
                     </x-danger-button>
 
-                    {{-- MODAL DELETE --}}
-                    <div
-                        x-show="openDeleteModal"
-                        x-transition.opacity
-                        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-                        style="display: none;"
-                    >
-
-                        {{-- OVERLAY --}}
-                        <div
-                            class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-                            @click="openDeleteModal = false"
-                        ></div>
-
-                        {{-- CONTENT --}}
-                        <div
-                            x-transition.scale
-                            class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
-                        >
-
-                            <div class="p-8">
-
-                                {{-- ICON --}}
-                                <div class="w-16 h-16 mx-auto rounded-3xl bg-rose-100 text-rose-600 flex items-center justify-center">
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="w-8 h-8"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7"
-                                        />
-                                    </svg>
-
-                                </div>
-
-                                {{-- TEXT --}}
-                                <div class="mt-6 text-center">
-
-                                    <h3 class="text-2xl font-black text-slate-900">
-                                        Hapus Lokasi?
-                                    </h3>
-
-                                    <p class="mt-2 text-sm text-slate-500 leading-relaxed">
-                                        Lokasi kantor
-                                        <span class="font-bold text-rose-600">
-                                            {{ $lokasiKantor->nama_lokasi }}
-                                        </span>
-                                        akan dihapus permanen.
-                                    </p>
-
-                                </div>
-
-                                {{-- BUTTON --}}
-                                <div class="mt-8 flex items-center justify-center gap-3">
-
-                                    {{-- CANCEL --}}
-                                    <button
-                                        type="button"
-                                        @click="openDeleteModal = false"
-                                        class="px-5 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition"
-                                    >
-                                        Batal
-                                    </button>
-                                
-                                    {{-- DELETE FORM --}}
-                                    <form
-                                        action="{{ route('admin.lokasi-kantor.destroy', $lokasiKantor->id) }}"
-                                        method="POST"
-                                    >
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button
-                                            type="submit"
-                                            class="px-5 py-2.5 rounded-2xl bg-rose-600 text-white font-semibold hover:bg-rose-700 transition"
-                                        >
-                                            Ya, Hapus
-                                        </button>
-                                    </form>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
-
-                {{-- SAVE BUTTON --}}
+                    {{-- SAVE BUTTON --}}
                     <x-primary-button class="gap-2">
 
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -248,13 +153,114 @@
                                 d="M5 13l4 4L19 7" />
                         </svg>
                         Simpan Radius
-                    </x-primary-button>   
+                    </x-primary-button>
 
-            </div>
+                </div>
 
             </div>
 
         </form>
+        {{-- ⬆️ FORM UPDATE DITUTUP DI SINI. TIDAK ADA FORM LAIN DI DALAMNYA. --}}
+
+
+        {{-- ============================================= --}}
+        {{-- MODAL DELETE — SIBLING DARI FORM UPDATE, BUKAN NESTED --}}
+        {{-- masih di dalam scope x-data yang sama (dibungkus div paling luar) --}}
+        {{-- jadi openDeleteModal tetap bisa dibaca dari sini --}}
+        {{-- ============================================= --}}
+        <div
+            x-show="openDeleteModal"
+            x-transition.opacity
+            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style="display: none;"
+        >
+
+            {{-- OVERLAY --}}
+            <div
+                class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                @click="openDeleteModal = false"
+            ></div>
+
+            {{-- CONTENT --}}
+            <div
+                x-transition.scale
+                class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+            >
+
+                <div class="p-8">
+
+                    {{-- ICON --}}
+                    <div class="w-16 h-16 mx-auto rounded-3xl bg-rose-100 text-rose-600 flex items-center justify-center">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-8 h-8"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7"
+                            />
+                        </svg>
+
+                    </div>
+
+                    {{-- TEXT --}}
+                    <div class="mt-6 text-center">
+
+                        <h3 class="text-2xl font-black text-slate-900">
+                            Hapus Lokasi?
+                        </h3>
+
+                        <p class="mt-2 text-sm text-slate-500 leading-relaxed">
+                            Lokasi kantor
+                            <span class="font-bold text-rose-600">
+                                {{ $lokasiKantor->nama_lokasi }}
+                            </span>
+                            akan dihapus permanen.
+                        </p>
+
+                    </div>
+
+                    {{-- BUTTON --}}
+                    <div class="mt-8 flex items-center justify-center gap-3">
+
+                        {{-- CANCEL --}}
+                        <button
+                            type="button"
+                            @click="openDeleteModal = false"
+                            class="px-5 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-100 transition"
+                        >
+                            Batal
+                        </button>
+
+                        {{-- DELETE FORM — sekarang berdiri sendiri (sibling), bukan nested di dalam form update --}}
+                        <form
+                            action="{{ route('admin.lokasi-kantor.destroy', $lokasiKantor->id) }}"
+                            method="POST"
+                        >
+                            @csrf
+                            @method('DELETE')
+
+                            <button
+                                type="submit"
+                                class="px-5 py-2.5 rounded-2xl bg-rose-600 text-white font-semibold hover:bg-rose-700 transition"
+                            >
+                                Ya, Hapus
+                            </button>
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 

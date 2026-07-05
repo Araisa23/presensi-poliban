@@ -139,6 +139,8 @@ class PegawaiController extends Controller
             'file' => 'required|mimes:xlsx,xls'
         ]);
 
+    try {
+
         Excel::import(
             new PegawaiImport,
             $request->file('file')
@@ -147,6 +149,14 @@ class PegawaiController extends Controller
         return redirect()
             ->route('admin.pegawai.index')
             ->with('success', 'Data pegawai berhasil diimport.');
+
+        } catch (\Exception $e) {
+
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+
+        }
     }
 
     public function downloadTemplate()

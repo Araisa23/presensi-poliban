@@ -6,202 +6,158 @@
 
     <style>
         @page {
-            margin: 25px;
+            margin: 20px;
         }
 
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 11px;
+            font-size: 10.5px;
             color: #333;
-            line-height: 1.4;
         }
 
         .header {
             text-align: center;
-            border-bottom: 2px solid #0b2c52;
-            padding-bottom: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            text-transform: uppercase;
         }
 
         .header h2 {
-            margin: 4px 0;
-            font-size: 14px;
+            margin: 3px 0;
+            font-size: 12px;
             font-weight: normal;
         }
 
         .header h3 {
-            margin: 10px 0 0;
-            font-size: 15px;
+            margin-top: 8px;
+            font-size: 13px;
             font-weight: bold;
-            color: #0b2c52;
+        }
+
+        .line {
+            border-top: 1px solid #000;
+            margin: 10px 0 15px;
         }
 
         .info {
-            width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 11px;
         }
 
-        .info td {
-            padding: 3px 0;
-        }
-
-        .summary {
-            margin-bottom: 15px;
-            padding: 10px;
-            border: 1px solid #dbe4f0;
-            background: #f8fafc;
-        }
-
-        .summary table {
-            width: 100%;
-        }
-
-        .summary td {
-            padding: 3px 0;
-        }
-
+        /* 🔥 penting: bikin tabel lebih rapi */
         .table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed; /* BIAR KOLOM TIDAK ACAK */
         }
 
         .table th,
         .table td {
-            border: 1px solid #cbd5e1;
-            padding: 8px;
+            border: 1px solid #bfc7d1;
+            padding: 6px;
+            font-size: 10px;
+            word-wrap: break-word;
         }
 
         .table th {
-            background: #e8edf5;
-            color: #0b2c52;
-            font-size: 10px;
+            background: #e9eef5;
             text-transform: uppercase;
-            font-weight: bold;
             text-align: center;
+            font-size: 10px;
         }
 
-        .table tbody tr:nth-child(even) {
-            background: #fafafa;
+        .table td {
+            vertical-align: middle;
+        }
+
+        /* 🔥 penting: cegah teks turun baris aneh */
+        .nowrap {
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .text-center {
             text-align: center;
         }
 
-        .footer {
-            margin-top: 40px;
-            width: 100%;
-        }
+        /* 🔥 kolom lebih presisi seperti di foto */
+        th.no { width: 10px; }
+        th.nama { width: 200px; }
+        th.nip { width: 170px; }
+        th.tanggal { width: 110px; }
+        th.masuk { width: 100px; }
+        th.pulang { width: 100px; }
 
-        .print-info {
-            font-size: 9px;
-            color: #666;
-        }
-
-        .signature {
-            width: 250px;
-            float: right;
-            text-align: center;
-        }
-
-        .signature-name {
-            margin-top: 70px;
-            font-weight: bold;
-            text-decoration: underline;
-        }
     </style>
 </head>
+
 <body>
 
-<!-- HEADER -->
-<div class="header">
-    <h1>POLITEKNIK NEGERI BANJARMASIN</h1>
-    <h2>Sistem Informasi Presensi Tenaga Kependidikan</h2>
-    <h3>Laporan Presensi Harian</h3>
-</div>
-
-<!-- INFO -->
-<table class="info">
-    <tr>
-        <td width="100">Tanggal</td>
-        <td width="10">:</td>
-        <td><strong>{{ now()->translatedFormat('d F Y') }}</strong></td>
-    </tr>
-</table>
-
-<!-- TABLE -->
-<table class="table">
-    <thead>
-        <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>NIP</th>
-            <th>Tanggal</th>
-            <th>Jam Masuk</th>
-            <th>Jam Pulang</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach($presensi as $index => $p)
-        <tr>
-            <td class="text-center">{{ $index + 1 }}</td>
-
-            <td>
-                {{ $p->user->tenagaKependidikan->nama ?? '-' }}
-            </td>
-
-            <td>
-                {{ $p->user->tenagaKependidikan->nip ?? '-' }}
-            </td>
-
-            <td class="text-center">
-                {{ $p->tanggal }}
-            </td>
-
-            <td class="text-center">
-                {{ $p->jam_masuk ?? '-' }}
-            </td>
-
-            <td class="text-center">
-                {{ $p->jam_pulang ?? '-' }}
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-
-<!-- FOOTER -->
-<div class="footer">
-
-    <p class="print-info">
-        Dicetak pada:
-        {{ \Carbon\Carbon::now()->format('d/m/Y H:i:s') }}
-    </p>
-
-    <div class="signature">
-        <p>
-            Banjarmasin,
-            {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
-        </p>
-
-        <p><strong>Pimpinan</strong></p>
-
-        <div class="signature-name">
-            (........................................)
-        </div>
-
-        <p>NIP. ........................................</p>
+    <!-- HEADER -->
+    <div class="header">
+        <h1>POLITEKNIK NEGERI BANJARMASIN</h1>
+        <h2>Sistem Informasi Presensi Tenaga Kependidikan</h2>
+        <h3>Laporan Presensi Harian</h3>
     </div>
 
-</div>
+    <div class="line"></div>
+
+    <!-- INFO -->
+    <div class="info">
+        Tanggal: <strong>{{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</strong>
+    </div>
+
+    <!-- TABLE -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="no">NO</th>
+                <th class="nama">NAMA</th>
+                <th class="nip">NIP</th>
+                <th class="tanggal">TANGGAL</th>
+                <th class="masuk">JAM MASUK</th>
+                <th class="pulang">JAM PULANG</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @forelse($presensi as $index => $p)
+                <tr>
+                    <td class="text-center">{{ $index + 1 }}</td>
+
+                    <td class="nowrap">
+                        {{ $p->user->tenagaKependidikan->nama ?? '-' }}
+                    </td>
+
+                    <td class="nowrap">
+                        {{ $p->user->tenagaKependidikan->nip ?? '-' }}
+                    </td>
+
+                    <td class="text-center">
+                        {{ $p->tanggal }}
+                    </td>
+
+                    <td class="text-center">
+                        {{ $p->jam_masuk ?? '-' }}
+                    </td>
+
+                    <td class="text-center">
+                        {{ $p->jam_pulang ?? '-' }}
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center">
+                        Tidak ada data presensi
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
 
 </body>
 </html>

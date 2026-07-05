@@ -167,6 +167,15 @@ class PresensiController extends Controller
 
     public function exportExcel(Request $request)
     {
+        if (!$request->has('bulan') && !$request->has('tahun')) {
+            $tanggal = $request->tanggal ?? now()->toDateString();
+
+            return Excel::download(
+                new PresensiHarianExport($tanggal),
+                "presensi_{$tanggal}.xlsx"
+            );
+        }
+
         $bulan  = $request->input('bulan', Carbon::now()->month);
         $tahun  = $request->input('tahun', Carbon::now()->year);
         $userId = $request->input('user_id');
@@ -225,6 +234,24 @@ class PresensiController extends Controller
 
     public function exportPdf(Request $request)
     {
+        if (!$request->has('bulan') && !$request->has('tahun')) {
+            $tanggal = $request->tanggal ?? now()->toDateString();
+
+            $presensi = Presensi::with([
+                'user.tenagaKependidikan',
+                'foto'
+            ])
+            ->whereDate('tanggal', $tanggal)
+            ->get();
+
+            $pdf = Pdf::loadView(
+                'admin.presensi.presensi_pdf',
+                compact('presensi', 'tanggal')
+            );
+
+            return $pdf->download("presensi_{$tanggal}.pdf");
+        }
+
         set_time_limit(300);
 
         $bulan  = $request->input('bulan', Carbon::now()->month);

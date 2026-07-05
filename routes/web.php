@@ -83,17 +83,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('presensi/rekap', [PresensiController::class, 'rekap'])
             ->name('presensi.rekap');
 
-        Route::get('presensi/{id}', [PresensiController::class, 'show'])
-            ->name('presensi.show');
-
-        // =========================
-        // EXPORT PRESENSI (FIX)
-        // =========================
         Route::get('presensi/export/excel', [PresensiController::class, 'exportExcel'])
             ->name('presensi.export.excel');
 
         Route::get('presensi/export/pdf', [PresensiController::class, 'exportPdf'])
             ->name('presensi.export.pdf');
+
+        Route::get('presensi/{id}', [PresensiController::class, 'show'])
+            ->name('presensi.show');
 
     });
 

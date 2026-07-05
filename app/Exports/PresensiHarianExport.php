@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use Illuminate\Support\Collection;
+use App\Models\Presensi;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -11,16 +11,18 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class PresensiHarianExport implements FromCollection, WithHeadings, WithMapping, WithColumnFormatting
 {
-    protected $presensi;
+    protected $tanggal;
 
-    public function __construct($presensi)
+    public function __construct($tanggal)
     {
-        $this->presensi = $presensi;
+        $this->tanggal = $tanggal;
     }
 
     public function collection()
     {
-        return $this->presensi;
+        return Presensi::with(['user.tenagaKependidikan'])
+            ->whereDate('tanggal', $this->tanggal)
+            ->get();
     }
 
     public function map($p): array
@@ -31,7 +33,6 @@ class PresensiHarianExport implements FromCollection, WithHeadings, WithMapping,
             $p->tanggal,
             $p->jam_masuk ?? '-',
             $p->jam_pulang ?? '-',
-            $p->foto->count() ?? 0,
         ];
     }
 
@@ -43,14 +44,13 @@ class PresensiHarianExport implements FromCollection, WithHeadings, WithMapping,
             'Tanggal',
             'Masuk',
             'Pulang',
-            'Jumlah Foto',
         ];
     }
 
     public function columnFormats(): array
     {
         return [
-            'A' => NumberFormat::FORMAT_TEXT, // NIP biar tidak E+17
+            'A' => NumberFormat::FORMAT_TEXT,
         ];
     }
 }
