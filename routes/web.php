@@ -80,6 +80,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('presensi', [PresensiController::class, 'index'])
             ->name('presensi.index');
 
+        Route::get('presensi/rekap', [PresensiController::class, 'rekap'])
+            ->name('presensi.rekap');
+
         Route::get('presensi/{id}', [PresensiController::class, 'show'])
             ->name('presensi.show');
 
@@ -129,17 +132,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('monitoring', [LaporanController::class, 'monitoring'])
                 ->name('monitoring');
 
-            Route::get('laporan', [LaporanController::class, 'index'])
-                ->name('laporan.index');
-
-            Route::get('rekap', [LaporanController::class, 'rekap'])
-                ->name('rekap');
-
-            Route::get('rekap/excel', [LaporanController::class, 'exportExcel'])
-                ->name('rekap.excel');
-
-            Route::get('rekap/pdf', [LaporanController::class, 'exportPdf'])
-                ->name('rekap.pdf');
+            Route::get('presensi/{id}', [LaporanController::class, 'showPresensi'])
+                ->name('presensi.show');
         });
 
 });

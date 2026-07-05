@@ -4,43 +4,59 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\HariLibur;
+use Illuminate\Support\Facades\Http;
 
 class SyncHariLibur extends Command
 {
-    protected $signature = 'hari-libur:sync';
+    protected $signature = 'hari-libur:sync {year?}';
 
-    protected $description = 'Sinkronisasi hari libur nasional Indonesia';
+    protected $description = 'Sinkronisasi hari libur nasional Indonesia menggunakan API (otomatis)';
 
     public function handle()
     {
-        $year = now()->year;
+        $year = $this->argument('year') ?? now()->year;
 
-        $path = storage_path("app/holidays/{$year}.json");
+        $this->info("Mengambil hari libur nasional Indonesia untuk tahun {$year}...");
 
-        if (!file_exists($path)) {
+        try {
+            // Gunakan API Nager.at (gratis dan reliable)
+            $response = Http::timeout(30)->get("https://date.nager.at/Api/v3/PublicHolidays/{$year}/ID");
 
-            $this->error("File holidays {$year}.json tidak ditemukan.");
+            if (!$response->successful()) {
+                $this->error("Gagal mengambil data dari API. Status: " . $response->status());
+                $this->error("Pastikan koneksi internet aktif.");
+                return 1;
+            }
 
-            return;
+            $data = $response->json();
+
+            if (!is_array($data)) {
+                $this->error("Format data API tidak valid.");
+                return 1;
+            }
+
+            $count = 0;
+            foreach ($data as $holiday) {
+                HariLibur::updateOrCreate(
+                    [
+                        'tanggal' => $holiday['date']
+                    ],
+                    [
+                        'keterangan' => $holiday['name'] ?? $holiday['localName'] ?? 'Hari Libur',
+                        'is_nasional' => true,
+                    ]
+                );
+                $count++;
+            }
+
+            $this->info("Berhasil menyinkronkan {$count} hari libur nasional untuk tahun {$year}.");
+            $this->info('Hari kerja: Senin-Jumat (kecuali hari libur nasional).');
+
+        } catch (\Exception $e) {
+            $this->error("Gagal menyinkronkan hari libur: " . $e->getMessage());
+            return 1;
         }
 
-        $json = file_get_contents($path);
-
-        $holidays = json_decode($json, true);
-
-        foreach ($holidays as $holiday) {
-
-            HariLibur::updateOrCreate(
-                [
-                    'tanggal' => $holiday['tanggal']
-                ],
-                [
-                    'keterangan' => $holiday['keterangan'],
-                    'is_nasional' => true,
-                ]
-            );
-        }
-
-        $this->info('Hari libur nasional berhasil disinkronkan.');
+        return 0;
     }
 }

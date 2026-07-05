@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Laporan Presensi Harian - {{ $tanggal }}</title>
+    <title>Laporan Presensi Harian</title>
 
     <style>
         @page {
@@ -132,7 +132,7 @@
     <tr>
         <td width="100">Tanggal</td>
         <td width="10">:</td>
-        <td><strong>{{ $tanggal }}</strong></td>
+        <td><strong>{{ now()->translatedFormat('d F Y') }}</strong></td>
     </tr>
 </table>
 

@@ -31,7 +31,9 @@ class DashboardController extends Controller
             $hadirHariIni = Presensi::whereDate('tanggal', $hariIni)
                 ->count();
 
-            $totalAlfa = $totalPegawai - $hadirHariIni;
+            // Hitung alfa hanya untuk pegawai yang sudah bergabung sebelum/saat hari ini
+            $pegawaiAktif = TenagaKependidikan::whereDate('created_at', '<=', $hariIni)->count();
+            $totalAlfa = $pegawaiAktif - $hadirHariIni;
 
             $presensiHariIni = Presensi::with([
                     'tenagaKependidikan.unitKerja'
@@ -42,6 +44,7 @@ class DashboardController extends Controller
 
 
             $grafikKehadiran = [];
+            $grafikAlfa = [];
             $labelHari = [];
 
             for ($i = 6; $i >= 0; $i--) {
@@ -50,12 +53,17 @@ class DashboardController extends Controller
 
                 $labelHari[] = $tanggal->translatedFormat('D');
 
-                $grafikKehadiran[] = Presensi::whereDate(
+                $hadir = Presensi::whereDate(
                     'tanggal',
                     $tanggal
                 )
                 ->whereNotNull('jam_masuk')
                 ->count();
+
+                // Hitung pegawai aktif per tanggal tersebut
+                $pegawaiAktifTanggal = TenagaKependidikan::whereDate('created_at', '<=', $tanggal->toDateString())->count();
+                $grafikKehadiran[] = $hadir;
+                $grafikAlfa[] = $pegawaiAktifTanggal - $hadir;
             }
             return view('dashboard.admin', compact(
                 'totalPegawai',
@@ -64,6 +72,7 @@ class DashboardController extends Controller
                 'totalAlfa',
                 'presensiHariIni',
                 'grafikKehadiran',
+                'grafikAlfa',
                 'labelHari'
             ));
         }
@@ -81,7 +90,7 @@ class DashboardController extends Controller
                 ->whereDate('tanggal', '>=', now())
                 ->latest()
                 ->get();
-                
+
             $kalenders = KalenderAkademik::whereMonth('tanggal_mulai', now()->month)
                 ->whereYear('tanggal_mulai', now()->year)
                 ->get();
@@ -103,9 +112,12 @@ class DashboardController extends Controller
         $hadirHariIni = Presensi::whereDate('tanggal', $hariIni)
             ->count();
 
-        $tidakHadir = $totalPegawai - $hadirHariIni;
+        // Hitung tidak hadir hanya untuk pegawai yang sudah bergabung sebelum/saat hari ini
+        $pegawaiAktif = TenagaKependidikan::whereDate('created_at', '<=', $hariIni)->count();
+        $tidakHadir = $pegawaiAktif - $hadirHariIni;
 
         $grafikKehadiran = [];
+        $grafikAlfa = [];
         $labelHari = [];
 
         for ($i = 6; $i >= 0; $i--) {
@@ -114,12 +126,17 @@ class DashboardController extends Controller
 
             $labelHari[] = $tanggal->translatedFormat('D');
 
-            $grafikKehadiran[] = Presensi::whereDate(
+            $hadir = Presensi::whereDate(
                 'tanggal',
                 $tanggal
             )
             ->whereNotNull('jam_masuk')
             ->count();
+
+            // Hitung pegawai aktif per tanggal tersebut
+            $pegawaiAktifTanggal = TenagaKependidikan::whereDate('created_at', '<=', $tanggal->toDateString())->count();
+            $grafikKehadiran[] = $hadir;
+            $grafikAlfa[] = $pegawaiAktifTanggal - $hadir;
         }
 
         return view('dashboard.pimpinan', compact(
@@ -127,6 +144,7 @@ class DashboardController extends Controller
             'hadirHariIni',
             'tidakHadir',
             'grafikKehadiran',
+            'grafikAlfa',
             'labelHari'
         ));
     }

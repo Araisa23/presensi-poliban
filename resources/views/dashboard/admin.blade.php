@@ -168,10 +168,16 @@
                     }
                 },
 
-                series: [{
-                    name: 'Jumlah Hadir',
-                    data: @json($grafikKehadiran)
-                }],
+                series: [
+                    {
+                        name: 'Hadir',
+                        data: @json($grafikKehadiran)
+                    },
+                    {
+                        name: 'Alfa',
+                        data: @json($grafikAlfa)
+                    }
+                ],
 
                 xaxis: {
                     categories: @json($labelHari)
@@ -186,8 +192,8 @@
                     enabled: false
                 },
 
-                colors: ['#0B3C70'],
-
+                colors: ['#009f25', '#ef4444'],
+                
                 fill: {
                     type: 'gradient',
                     gradient: {

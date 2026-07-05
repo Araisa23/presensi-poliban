@@ -4,35 +4,12 @@
 
             <div>
                 <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-                    {{ __('Monitoring Kehadiran Realtime') }}
+                    {{ __('Monitoring Kehadiran') }}
                 </h2>
                 <p class="mt-1 text-slate-500 text-sm font-medium">
-                    Pantau presensi per tanggal dengan ringkasan jam masuk/pulang.
+                    Pantau rekaman presensi masuk/pulang dan foto pendukung.
                 </p>
             </div>
-
-            <button
-                type="button"
-                onclick="window.print()"
-                class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl
-                    bg-white text-[#0b3c70]
-                    font-bold shadow-lg
-                    hover:scale-[1.02] transition print:hidden"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-12 0h12v4H6v-4z"/>
-                </svg>
-
-                Cetak Laporan
-            </button>
 
         </div>
     </x-slot>
@@ -43,12 +20,12 @@
         <form method="GET" action="{{ route('pimpinan.monitoring') }}" class="mb-6">
             <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100/70 dark:border-white/10 shadow-soft p-5">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    
+
                     <div class="md:col-span-3">
                         <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
                             Pilih Tanggal Monitoring
                         </label>
-                        <input type="date" name="tanggal" value="{{ $tanggal }}" 
+                        <input type="date" name="tanggal" value="{{ request('tanggal') }}"
                             class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
                     </div>
 
@@ -67,10 +44,12 @@
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="bg-slate-50/70 dark:bg-white/5">
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">Pegawai</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Jam Masuk</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Jam Pulang</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Status</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10">Pegawai</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Tanggal</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Jam Masuk</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Jam Pulang</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Foto</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100/70 dark:divide-white/10">
@@ -79,57 +58,89 @@
                                 {{-- PEGAWAI --}}
                                 <td class="px-8 py-5">
                                     <div class="flex items-center">
-                                        <div class="w-11 h-11 rounded-2xl bg-indigo-50/80 text-indigo-700 flex items-center justify-center font-black text-lg mr-3 ring-1 ring-indigo-600/10 shadow-soft">
-                                            {{ strtoupper(substr($p->tenagaKependidikan->nama ?? ($p->user->name ?? 'P'), 0, 1)) }}
+                                        <div class="w-11 h-11 rounded-2xl bg-indigo-50/80 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-200 flex items-center justify-center font-black text-lg mr-3 ring-1 ring-indigo-600/10 shadow-soft group-hover:scale-110 transition-transform">
+                                            {{ strtoupper(substr($p->user->tenagaKependidikan->nama ?? 'P', 0, 1)) }}
                                         </div>
                                         <div>
                                             <div class="font-black text-slate-800 dark:text-slate-100">
-                                                {{ $p->tenagaKependidikan->nama ?? ($p->user->name ?? '-') }}
+                                                {{ $p->user->tenagaKependidikan->nama ?? ($p->user->name ?? '-') }}
                                             </div>
-                                            <div class="text-[10px] text-slate-400 font-mono">
-                                                {{ $p->tenagaKependidikan->nip ?? '-' }}
+                                            <div class="text-[11px] text-slate-500 dark:text-slate-300">
+                                                {{ $p->user->tenagaKependidikan->nip ?? '-' }}
                                             </div>
                                         </div>
                                     </div>
                                 </td>
 
+                                {{-- TANGGAL --}}
+                                <td class="px-8 py-5 text-center">
+                                    <span class="inline-flex items-center px-4 py-2 bg-slate-50/70 dark:bg-white/5 rounded-2xl border border-slate-100/70 dark:border-white/10 shadow-soft text-xs font-black text-slate-700 dark:text-slate-200">
+                                        {{ \Carbon\Carbon::parse($p->tanggal)->isoFormat('DD MMM YYYY') }}
+                                    </span>
+                                </td>
+
                                 {{-- MASUK --}}
                                 <td class="px-8 py-5 text-center">
-                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/10">
+                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-xs font-black bg-emerald-50/80 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200 ring-1 ring-emerald-600/10">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
                                         {{ $p->jam_masuk ?? '--:--' }}
                                     </span>
                                 </td>
 
                                 {{-- PULANG --}}
                                 <td class="px-8 py-5 text-center">
-                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-xs font-black bg-amber-50 text-amber-700 ring-1 ring-amber-600/10">
+                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-xs font-black bg-amber-50/80 text-amber-700 dark:bg-amber-500/10 dark:text-amber-200 ring-1 ring-amber-600/10">
+                                        <span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span>
                                         {{ $p->jam_pulang ?? '--:--' }}
                                     </span>
                                 </td>
 
-                                {{-- STATUS --}}
-                                <td class="px-6 py-4 text-center">
-                                    @if($p->jam_masuk)
-                                        <span class="px-3 py-1.5 bg-emerald-50/80 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-200 rounded-full text-[10px] font-black uppercase tracking-[0.2em] ring-1 ring-emerald-600/10">Hadir</span>
+                                {{-- FOTO --}}
+                                <td class="px-8 py-5 text-center">
+                                    @if($p->foto->count() > 0)
+                                        <div class="flex justify-center -space-x-2">
+                                            @foreach($p->foto as $f)
+                                                <img
+                                                    src="{{ asset('storage/presensi/' . $f->foto) }}"
+                                                    class="w-11 h-11 rounded-full border-2 border-white dark:border-gray-800 object-cover shadow-sm hover:scale-150 hover:z-10 transition-transform cursor-pointer"
+                                                    title="Foto Presensi"
+                                                >
+                                            @endforeach
+                                        </div>
                                     @else
-                                        <span class="px-3 py-1.5 bg-rose-50/80 dark:bg-rose-500/10 text-rose-700 dark:text-rose-200 rounded-full text-[10px] font-black uppercase tracking-[0.2em] ring-1 ring-rose-600/10">Alpha</span>
+                                        <span class="text-gray-300 dark:text-gray-600 text-[10px] font-bold italic uppercase">
+                                            No Photo
+                                        </span>
                                     @endif
+                                </td>
+
+                                {{-- AKSI --}}
+                                <td class="px-8 py-5 text-center">
+                                    <a href="{{ route('pimpinan.presensi.show', $p->id) }}"
+                                        class="inline-flex items-center px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-200 bg-indigo-50/80 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition ring-1 ring-indigo-600/10">
+
+                                        Detail
+                                    </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-8 py-20 text-center">
+                                <td colspan="6" class="px-8 py-20 text-center">
                                     <div class="flex flex-col items-center text-slate-400">
                                         <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
                                         </svg>
-                                        <p class="font-medium">Belum ada pegawai yang hadir pada tanggal ini.</p>
+                                        <p class="font-medium">Belum ada rekaman presensi.</p>
                                     </div>
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <div class="p-6 bg-slate-50/60 dark:bg-white/5 border-t border-slate-100/70 dark:border-white/10">
+                {{ $presensi->appends(request()->except('page'))->links() }}
             </div>
         </div>
     </div>

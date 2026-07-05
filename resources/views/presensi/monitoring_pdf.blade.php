@@ -2,16 +2,16 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Rekap Presensi - {{ $namaBulan }} {{ $tahun }}</title>
+    <title>Laporan Presensi Harian - {{ $tanggal }}</title>
 
     <style>
         @page {
-            margin: 15px;
+            margin: 25px;
         }
 
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 10px;
+            font-size: 11px;
             color: #333;
             line-height: 1.4;
         }
@@ -31,14 +31,15 @@
         }
 
         .header h2 {
-            margin: 5px 0;
-            font-size: 13px;
+            margin: 4px 0;
+            font-size: 14px;
             font-weight: normal;
         }
 
         .header h3 {
-            margin-top: 12px;
+            margin: 10px 0 0;
             font-size: 15px;
+            font-weight: bold;
             color: #0b2c52;
         }
 
@@ -48,14 +49,14 @@
         }
 
         .info td {
-            padding: 4px 0;
+            padding: 3px 0;
         }
 
         .summary {
+            margin-bottom: 15px;
+            padding: 10px;
             border: 1px solid #dbe4f0;
             background: #f8fafc;
-            padding: 10px;
-            margin-bottom: 15px;
         }
 
         .summary table {
@@ -63,56 +64,46 @@
         }
 
         .summary td {
-            padding: 4px 0;
+            padding: 2px 0;
         }
 
         .table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;
+            margin-top: 10px;
         }
 
         .table th,
         .table td {
             border: 1px solid #cbd5e1;
-            padding: 6px;
+            padding: 6px 8px;
             vertical-align: middle;
-            word-wrap: break-word;
         }
 
         .table th {
             background: #e8edf5;
             color: #0b2c52;
-            text-align: center;
             font-size: 10px;
-            font-weight: bold;
             text-transform: uppercase;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .table td {
+            font-size: 10px;
         }
 
         .table tbody tr:nth-child(even) {
-            background: #fafafa;
+            background: #f8fafc;
         }
 
         .text-center {
             text-align: center;
         }
 
-        .text-right {
-            text-align: right;
-        }
-
-        .alfa {
-            color: red;
-            font-weight: bold;
-        }
-
-        tfoot th {
-            background: #e8edf5;
-            font-weight: bold;
-        }
-
         .footer {
             margin-top: 40px;
+            width: 100%;
         }
 
         .print-info {
@@ -133,21 +124,26 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- HEADER -->
     <div class="header">
         <h1>POLITEKNIK NEGERI BANJARMASIN</h1>
         <h2>Sistem Informasi Presensi Tenaga Kependidikan</h2>
-        <h3>Laporan Rekapitulasi Presensi Bulanan</h3>
+        <h3>Laporan Presensi Harian</h3>
     </div>
 
     <!-- INFORMASI -->
     <table class="info">
         <tr>
-            <td width="80">Periode</td>
+            <td width="100">Tanggal</td>
             <td width="10">:</td>
-            <td><strong>{{ $namaBulan }} {{ $tahun }}</strong></td>
+            <td>
+                <strong>
+                    {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}
+                </strong>
+            </td>
         </tr>
     </table>
 
@@ -155,18 +151,12 @@
     <div class="summary">
         <table>
             <tr>
-                <td width="180">Total Pegawai</td>
-                <td>: <strong>{{ count($rekap) }}</strong></td>
-            </tr>
-
-            <tr>
-                <td>Total Kehadiran</td>
-                <td>: <strong>{{ collect($rekap)->sum('hadir') }}</strong></td>
-            </tr>
-
-            <tr>
-                <td>Total Alfa</td>
-                <td>: <strong>{{ collect($rekap)->sum('alfa') }}</strong></td>
+                <td width="200">
+                    Total Pegawai Hadir
+                </td>
+                <td>
+                    : <strong>{{ count($presensi) }}</strong>
+                </td>
             </tr>
         </table>
     </div>
@@ -176,70 +166,49 @@
         <thead>
             <tr>
                 <th width="5%">No</th>
-                <th width="24%">NIP</th>
-                <th width="22%">Nama Pegawai</th>
-                <th width="23%">Unit Kerja</th>
-                <th width="8%">Hadir</th>
-                <th width="8%">Alfa</th>
-                <th width="10%">Total Hari</th>
+                <th width="30%">Nama Pegawai</th>
+                <th width="20%">NIP</th>
+                <th width="15%">Tanggal</th>
+                <th width="15%">Jam Masuk</th>
+                <th width="15%">Jam Pulang</th>
             </tr>
         </thead>
 
         <tbody>
-            @foreach($rekap as $index => $r)
+            @forelse($presensi as $index => $p)
                 <tr>
                     <td class="text-center">
                         {{ $index + 1 }}
                     </td>
 
                     <td>
-                        {{ $r['nip'] }}
+                        {{ $p->tenagaKependidikan->nama ?? '-' }}
                     </td>
 
                     <td>
-                        {{ $r['nama'] }}
-                    </td>
-
-                    <td>
-                        {{ $r['unit_kerja'] }}
+                        {{ $p->tenagaKependidikan->nip ?? '-' }}
                     </td>
 
                     <td class="text-center">
-                        {{ $r['hadir'] }}
+                        {{ \Carbon\Carbon::parse($p->tanggal)->format('d/m/Y') }}
                     </td>
 
                     <td class="text-center">
-                        <span class="{{ $r['alfa'] > 0 ? 'alfa' : '' }}">
-                            {{ $r['alfa'] }}
-                        </span>
+                        {{ $p->jam_masuk ?? '-' }}
                     </td>
 
                     <td class="text-center">
-                        {{ $r['total_hari'] }}
+                        {{ $p->jam_pulang ?? '-' }}
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center">
+                        Tidak ada data presensi pada tanggal ini.
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
-
-        <tfoot>
-            <tr>
-                <th colspan="4" class="text-right">
-                    TOTAL
-                </th>
-
-                <th>
-                    {{ collect($rekap)->sum('hadir') }}
-                </th>
-
-                <th>
-                    {{ collect($rekap)->sum('alfa') }}
-                </th>
-
-                <th>
-                    {{ collect($rekap)->sum('total_hari') }}
-                </th>
-            </tr>
-        </tfoot>
     </table>
 
     <!-- FOOTER -->
