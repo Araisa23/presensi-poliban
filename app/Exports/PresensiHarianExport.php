@@ -50,7 +50,7 @@ class PresensiHarianExport implements FromCollection, WithHeadings, WithMapping,
     public function columnFormats(): array
     {
         return [
-            'A' => NumberFormat::FORMAT_TEXT, // biar NIP tidak jadi E+17
+            'A' => NumberFormat::FORMAT_TEXT,
         ];
     }
 }

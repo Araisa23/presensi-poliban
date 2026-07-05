@@ -25,12 +25,44 @@ class LaporanController extends Controller
 
     public function monitoring(Request $request)
     {
-        $tanggal  = $request->get('tanggal', Carbon::today()->toDateString());
+        $query = Presensi::with(['user.tenagaKependidikan', 'foto']);
+
+        if ($request->tanggal) {
+            $query->whereDate('tanggal', $request->tanggal);
+        }
+
+        $presensi = $query->latest()->paginate(10);
+
+        return view('presensi.monitoring', compact('presensi'));
+    }
+
+    public function showPresensi($id)
+    {
+        $presensi = Presensi::with([
+            'user.tenagaKependidikan',
+            'foto'
+        ])->findOrFail($id);
+
+        return view('presensi.show', compact('presensi'));
+    }
+
+    public function exportMonitoringPdf(Request $request)
+    {
+        $tanggal = $request->get(
+            'tanggal',
+            Carbon::today()->toDateString()
+        );
+
         $presensi = Presensi::with('tenagaKependidikan.unitKerja')
             ->where('tanggal', $tanggal)
             ->get();
 
-        return view('presensi.monitoring', compact('presensi', 'tanggal'));
+        $pdf = Pdf::loadView(
+            'presensi.monitoring_pdf',
+            compact('presensi', 'tanggal')
+        );
+
+        return $pdf->download("monitoring_{$tanggal}.pdf");
     }
 
     public function index(Request $request)
@@ -121,7 +153,10 @@ class LaporanController extends Controller
      * Hitung rekapitulasi presensi per pegawai.
      *
      * Hari kerja = Senin–Jumat, exclude libur nasional (HariLibur & KalenderAkademik).
-     * Alpha      = total hari kerja - jumlah hadir (minimum 0).
+     * Alpha      = hari kerja dari tanggal bergabung - jumlah hadir (minimum 0).
+     *
+     * Perubahan: Alfa hanya dihitung dari tanggal pegawai dibuat/bergabung ke sistem,
+     * bukan dari awal bulan. Pegawai baru tidak akan dihitung alfa untuk hari sebelum bergabung.
      *
      * @return array{data: array, total_hari_kerja: int}
      */
@@ -153,7 +188,24 @@ class LaporanController extends Controller
         foreach ($pegawai as $p) {
             // Hanya hitung presensi di hari kerja valid (sudah difilter di query)
             $hadir = $p->presensi->count();
-            $alfa  = max(0, $totalWorkingDays - $hadir);
+
+            // Hitung hari kerja hanya dari tanggal pegawai dibuat/bergabung
+            $tanggalBergabung = Carbon::parse($p->created_at)->toDateString();
+            $awalBulan = Carbon::create($tahun, $bulan, 1)->toDateString();
+            $akhirBulan = Carbon::create($tahun, $bulan, 1)->endOfMonth()->toDateString();
+
+            // Jika pegawai dibuat setelah awal bulan, gunakan tanggal bergabung
+            $tanggalMulaiHitung = $tanggalBergabung > $awalBulan ? $tanggalBergabung : $awalBulan;
+
+            // Filter hari kerja hanya dari tanggal mulai hitung
+            $workingDaysPegawai = array_filter($workingDays, function($hari) use ($tanggalMulaiHitung, $akhirBulan) {
+                return $hari >= $tanggalMulaiHitung && $hari <= $akhirBulan;
+            });
+
+            $totalHariKerjaPegawai = count($workingDaysPegawai);
+
+            // Alfa = hari kerja dari tanggal bergabung - jumlah hadir
+            $alfa = max(0, $totalHariKerjaPegawai - $hadir);
 
             $data[] = [
                 'nip'        => $p->nip,
@@ -161,8 +213,9 @@ class LaporanController extends Controller
                 'unit'       => $p->unitKerja->nama_unit ?? '-',
                 'hadir'      => $hadir,
                 'alfa'       => $alfa,
-                'total_hari' => $totalWorkingDays,
+                'total_hari' => $totalHariKerjaPegawai,
                 'user_id'    => $p->user_id,
+                'tanggal_bergabung' => $tanggalBergabung,
             ];
         }
 

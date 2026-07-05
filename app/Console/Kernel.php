@@ -14,6 +14,12 @@ class Kernel extends ConsoleKernel
     {
         // Jalankan setiap hari untuk memperbarui rekap bulanan
         $schedule->command('rekap:presensi')->daily();
+
+        // Sync hari libur nasional otomatis setiap tanggal 1 Januari untuk tahun berjalan
+        $schedule->command('hari-libur:sync')->yearly()->at('00:00');
+
+        // Sync hari libur untuk tahun depan setiap tanggal 1 Desember
+        $schedule->command('hari-libur:sync ' . (now()->year + 1))->yearly()->month(12)->day(1)->at('00:00');
     }
 
     /**

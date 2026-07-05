@@ -37,7 +37,7 @@ class PresensiExport implements FromCollection, WithHeadings, WithMapping
         return [
             $row['nip'],
             $row['nama'],
-            $row['unit'],
+            $row['unit_kerja'],
             $row['hadir'],
             $row['alfa'],
             $row['total_hari'],

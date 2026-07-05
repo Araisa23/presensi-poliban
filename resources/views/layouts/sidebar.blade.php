@@ -128,11 +128,19 @@
     </a>
 
     <a href="{{ route('admin.presensi.index') }}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {{ request()->routeIs('admin.presensi.*') ? 'bg-white/15 text-white ring-1 ring-white/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {{ request()->routeIs('admin.presensi.index') ? 'bg-white/15 text-white ring-1 ring-white/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
         <span class="w-8 h-8 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center">
-            <svg class="w-4 h-4 {{ request()->routeIs('admin.presensi.*') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6"/></svg>
+            <svg class="w-4 h-4 {{ request()->routeIs('admin.presensi.index') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6"/></svg>
         </span>
         Data Presensi
+    </a>
+
+    <a href="{{ route('admin.presensi.rekap') }}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {{ request()->routeIs('admin.presensi.rekap') ? 'bg-white/15 text-white ring-1 ring-white/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+        <span class="w-8 h-8 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center">
+            <svg class="w-4 h-4 {{ request()->routeIs('admin.presensi.rekap') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6M3 7h18M3 12h18M3 17h18"/></svg>
+        </span>
+        Rekapitulasi Bulanan
     </a>
 
     @endif
@@ -162,14 +170,6 @@
                 <svg class="w-4 h-4 {{ request()->routeIs('pimpinan.monitoring') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
             </span>
             Monitoring
-        </a>
-
-        <a href="{{ route('pimpinan.rekap') }}"
-           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {{ request()->routeIs('pimpinan.rekap') ? 'bg-white/15 text-white ring-1 ring-white/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
-            <span class="w-8 h-8 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center">
-                <svg class="w-4 h-4 {{ request()->routeIs('pimpinan.rekap') ? 'text-white' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10"/></svg>
-            </span>
-            Rekapitulasi
         </a>
     @endif
 </nav>

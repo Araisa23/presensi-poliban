@@ -43,6 +43,7 @@
 
         </div>
 
+
     </x-slot>
 
     <div class="max-w-7xl mx-auto">
@@ -71,22 +72,78 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
-                    <div class="md:col-span-3">
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Pilih Tanggal Monitoring
+                    {{-- BULAN --}}
+                    <div>
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 block mb-2">
+                            Bulan
                         </label>
-                        <input type="date" name="tanggal" value="{{ request('tanggal') ?? now()->toDateString() }}"
-                            class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
+                        <select name="bulan"
+                                class="w-full rounded-2xl border-slate-200 dark:border-white/10
+                                       bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium
+                                       text-slate-700 dark:text-slate-100 shadow-sm
+                                       focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            @for($i = 1; $i <= 12; $i++)
+                                <option value="{{ $i }}" {{ (request('bulan') ?? now()->month) == $i ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
+                                </option>
+                            @endfor
+                        </select>
                     </div>
 
-                    <div class="flex gap-2">
-                        <button type="submit" class="flex-1 inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)] hover:scale-[1.01] transition">
+                    {{-- TAHUN --}}
+                    <div>
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 block mb-2">
+                            Tahun
+                        </label>
+                        <select name="tahun"
+                                class="w-full rounded-2xl border-slate-200 dark:border-white/10
+                                       bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium
+                                       text-slate-700 dark:text-slate-100 shadow-sm
+                                       focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            @for($i = 2024; $i <= now()->year + 1; $i++)
+                                <option value="{{ $i }}" {{ (request('tahun') ?? now()->year) == $i ? 'selected' : '' }}>
+                                    {{ $i }}
+                                </option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    {{-- PEGAWAI --}}
+                    <div>
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 block mb-2">
+                            Pegawai
+                        </label>
+                        <select name="user_id"
+                                class="w-full rounded-2xl border-slate-200 dark:border-white/10
+                                       bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium
+                                       text-slate-700 dark:text-slate-100 shadow-sm
+                                       focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="">Semua Pegawai</option>
+                            @foreach(\App\Models\TenagaKependidikan::all() as $pegawai)
+                                <option value="{{ $pegawai->user_id }}"
+                                    {{ request('user_id') == $pegawai->user_id ? 'selected' : '' }}>
+                                    {{ $pegawai->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- SUBMIT --}}
+                    <div>
+                        <button type="submit"
+                                class="w-full inline-flex items-center justify-center gap-2
+                                       px-5 py-3 rounded-2xl font-black text-xs
+                                       uppercase tracking-[0.18em]
+                                       bg-gradient-to-r from-[#004b8d] to-[#006fcf]
+                                       text-white shadow-sm
+                                       hover:opacity-90 hover:scale-[1.01] transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                            </svg>
                             Filter
                         </button>
-                        <a href="{{ route('admin.presensi.index') }}" class="inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10 transition">
-                            Reset
-                        </a>
                     </div>
+
                 </div>
             </div>
 
@@ -110,11 +167,11 @@
                             </th>
 
                             <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">
-                                Masuk
+                                Jam Masuk
                             </th>
 
                             <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">
-                                Pulang
+                                Jam Pulang
                             </th>
 
                             <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100/70 dark:border-white/10 text-center">
@@ -150,7 +207,7 @@
                                                 {{ $p->user->tenagaKependidikan->nama ?? ($p->user->name ?? '-') }}
                                             </div>
 
-                                            <div class="text-[11px] text-slate-500 dark:text-slate-300"> 
+                                            <div class="text-[11px] text-slate-500 dark:text-slate-300">
                                                 {{ $p->user->tenagaKependidikan->nip ?? '-' }}
                                             </div>
                                         </div>
@@ -277,7 +334,7 @@
 
             <div class="p-6 bg-slate-50/60 dark:bg-white/5 border-t border-slate-100/70 dark:border-white/10">
 
-                {{ $presensi->links() }}
+                {{ $presensi->appends(request()->except('page'))->links() }}
 
             </div>
 

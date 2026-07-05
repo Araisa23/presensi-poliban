@@ -85,9 +85,6 @@
                     Tren Kehadiran Mingguan
                 </h3>
 
-                <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
-                    Realtime
-                </span>
             </div>
 
             <div id="attendanceChart"></div>
@@ -135,10 +132,16 @@
                 }
             },
 
-            series: [{
-                name: 'Jumlah Hadir',
-                data: @json($grafikKehadiran)
-            }],
+            series: [
+                {
+                    name: 'Hadir',
+                    data: @json($grafikKehadiran)
+                },
+                {
+                    name: 'Alfa',
+                    data: @json($grafikAlfa)
+                }
+            ],
 
             xaxis: {
                 categories: @json($labelHari)
@@ -153,7 +156,7 @@
                 enabled: false
             },
 
-            colors: ['#006fcf'],
+            colors: ['#009f25', '#ef4444'],
 
             fill: {
                 type: 'gradient',
