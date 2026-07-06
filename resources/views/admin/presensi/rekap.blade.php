@@ -16,6 +16,7 @@
             <div class="flex flex-wrap gap-2">
 
                 <a href="{{ route('admin.presensi.export.excel', [
+                    'export' => 'rekap',
                     'bulan' => request('bulan') ?? now()->month,
                     'tahun' => request('tahun') ?? now()->year,
                     'user_id' => request('user_id')
@@ -30,6 +31,7 @@
                 </a>
 
                 <a href="{{ route('admin.presensi.export.pdf', [
+                    'export' => 'rekap',
                     'bulan' => request('bulan') ?? now()->month,
                     'tahun' => request('tahun') ?? now()->year,
                     'user_id' => request('user_id')

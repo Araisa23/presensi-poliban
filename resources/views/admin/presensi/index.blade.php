@@ -16,7 +16,9 @@
             <div class="flex flex-wrap gap-2">
 
                 <a href="{{ route('admin.presensi.export.excel', [
-                    'tanggal' => request('tanggal') ?? now()->toDateString()
+                    'bulan' => request('bulan') ?? now()->month,
+                    'tahun' => request('tahun') ?? now()->year,
+                    'user_id' => request('user_id'),
                 ]) }}"
                     class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl
                         bg-emerald-600 text-white text-xs font-black
@@ -28,7 +30,9 @@
                 </a>
 
                 <a href="{{ route('admin.presensi.export.pdf', [
-                    'tanggal' => request('tanggal') ?? now()->toDateString()
+                    'bulan' => request('bulan') ?? now()->month,
+                    'tahun' => request('tahun') ?? now()->year,
+                    'user_id' => request('user_id'),
                 ]) }}"
                     class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl
                         bg-rose-600 text-white text-xs font-black

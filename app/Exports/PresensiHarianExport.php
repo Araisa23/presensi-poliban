@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Presensi;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -11,15 +12,26 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class PresensiHarianExport implements FromCollection, WithHeadings, WithMapping, WithColumnFormatting
 {
-    protected $tanggal;
+    protected ?string $tanggal = null;
 
-    public function __construct($tanggal)
+    protected ?Collection $presensi = null;
+
+    public function __construct(string|Collection $source)
     {
-        $this->tanggal = $tanggal;
+        if ($source instanceof Collection) {
+            $this->presensi = $source;
+            return;
+        }
+
+        $this->tanggal = $source;
     }
 
     public function collection()
     {
+        if ($this->presensi !== null) {
+            return $this->presensi;
+        }
+
         return Presensi::with(['user.tenagaKependidikan'])
             ->whereDate('tanggal', $this->tanggal)
             ->get();
