@@ -54,64 +54,81 @@
     <div class="max-w-7xl mx-auto">
 
         {{-- FILTER --}}
-        <form method="GET" action="{{ route('admin.presensi.rekap') }}" class="mb-6">
-            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100/70 dark:border-white/10 shadow-soft p-5">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+<form method="GET" action="{{ route('admin.presensi.rekap') }}" class="mb-6">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100/70 dark:border-white/10 shadow-soft p-5">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
-                    {{-- BULAN --}}
-                    <div>
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Bulan
-                        </label>
-                        <select name="bulan" 
-                            class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
-                            @for($i = 1; $i <= 12; $i++)
-                                <option value="{{ $i }}" {{ request('bulan') == $i ? 'selected' : '' }}>
-                                    {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
-                                </option>
-                            @endfor
-                        </select>
-                    </div>
+            {{-- BULAN --}}
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                    Bulan
+                </label>
+                <select
+                    name="bulan"
+                    class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
 
-                    {{-- TAHUN --}}
-                    <div>
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Tahun
-                        </label>
-                        <select name="tahun" 
-                            class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
-                            @for($i = 2024; $i <= 2030; $i++)
-                                <option value="{{ $i }}" {{ request('tahun') == $i ? 'selected' : '' }}>
-                                    {{ $i }}
-                                </option>
-                            @endfor
-                        </select>
-                    </div>
+                    @for($i = 1; $i <= 12; $i++)
+                        <option value="{{ $i }}"
+                            {{ request('bulan', now()->month) == $i ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
+                        </option>
+                    @endfor
 
-                    {{-- PEGAWAI --}}
-                    <div>
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Pegawai
-                        </label>
-                        <select name="user_id" 
-                            class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
-                            <option value="">Semua Pegawai</option>
-                            @foreach($pegawaiList as $pegawai)
-                                <option value="{{ $pegawai->user_id }}" {{ request('user_id') == $pegawai->user_id ? 'selected' : '' }}>
-                                    {{ $pegawai->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button type="submit" class="flex-1 inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)] hover:scale-[1.01] transition">
-                            Filter
-                        </button>
-                    </div>
-                </div>
+                </select>
             </div>
-        </form>
+
+            {{-- TAHUN --}}
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                    Tahun
+                </label>
+                <select
+                    name="tahun"
+                    class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
+
+                    @for($i = 2024; $i <= 2030; $i++)
+                        <option value="{{ $i }}"
+                            {{ request('tahun', now()->year) == $i ? 'selected' : '' }}>
+                            {{ $i }}
+                        </option>
+                    @endfor
+
+                </select>
+            </div>
+
+            {{-- PEGAWAI --}}
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                    Pegawai
+                </label>
+                <select
+                    name="user_id"
+                    class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
+
+                    <option value="">Semua Pegawai</option>
+
+                    @foreach($pegawaiList as $pegawai)
+                        <option value="{{ $pegawai->user_id }}"
+                            {{ request('user_id') == $pegawai->user_id ? 'selected' : '' }}>
+                            {{ $pegawai->nama }}
+                        </option>
+                    @endforeach
+
+                </select>
+            </div>
+
+            {{-- BUTTON --}}
+            <div class="flex gap-2">
+                <button
+                    type="submit"
+                    class="flex-1 inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)] hover:scale-[1.01] transition">
+                    Filter
+                </button>
+            </div>
+
+        </div>
+    </div>
+</form>
 
         {{-- TABLE --}}
         <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden">

@@ -58,16 +58,21 @@ class PresensiController extends Controller
     {
         $query = Presensi::with(['user.tenagaKependidikan', 'foto']);
 
-        if ($request->tanggal) {
+        // Default tanggal hari ini jika tidak ada filter
+        if ($request->filled('tanggal')) {
+
             $query->whereDate('tanggal', $request->tanggal);
+
+        } else {
+
+            $bulan = $request->input('bulan', now()->month);
+            $tahun = $request->input('tahun', now()->year);
+
+            $query->whereMonth('tanggal', $bulan)
+                ->whereYear('tanggal', $tahun);
         }
 
-        if ($request->bulan && $request->tahun) {
-            $query->whereYear('tanggal', $request->tahun)
-                  ->whereMonth('tanggal', $request->bulan);
-        }
-
-        if ($request->user_id) {
+        if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
 
@@ -75,7 +80,12 @@ class PresensiController extends Controller
 
         $pegawaiList = TenagaKependidikan::with('unitKerja')->get();
 
-        return view('admin.presensi.index', compact('presensi', 'pegawaiList'));
+        return view('admin.presensi.index', compact(
+            'presensi',
+            'pegawaiList',
+            'bulan',
+            'tahun'
+        ));
     }
 
     public function history()
@@ -101,8 +111,8 @@ class PresensiController extends Controller
 
     public function rekap(Request $request)
     {
-        $bulan  = (int) $request->input('bulan', Carbon::now()->month);
-        $tahun  = (int) $request->input('tahun', Carbon::now()->year);
+        $bulan = (int) $request->input('bulan', now()->month);
+        $tahun = (int) $request->input('tahun', now()->year);
         $userId = $request->input('user_id');
 
         $result = $this->calculateRekap($bulan, $tahun, $userId);
