@@ -17,6 +17,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PresensiHarianExport;
 use App\Exports\PresensiExport;
+
 class PresensiController extends Controller
 {
     protected $presensiService;
@@ -55,36 +56,24 @@ class PresensiController extends Controller
 
     public function index(Request $request)
     {
-        $query = Presensi::with(['user.tenagaKependidikan', 'foto']);
+        // Filter per tanggal, default hari ini
+        $tanggal = $request->tanggal ?? now()->toDateString();
 
-        // Default tanggal hari ini jika tidak ada filter
-        if ($request->filled('tanggal')) {
+        $query = Presensi::with([
+            'user.tenagaKependidikan',
+            'foto'
+        ]);
 
-            $query->whereDate('tanggal', $request->tanggal);
+        $query->whereDate('tanggal', $tanggal);
 
-        } else {
-
-            $bulan = $request->input('bulan', now()->month);
-            $tahun = $request->input('tahun', now()->year);
-
-            $query->whereMonth('tanggal', $bulan)
-                ->whereYear('tanggal', $tahun);
-        }
-
+        // Filter user tertentu (jika ada)
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
 
         $presensi = $query->latest()->paginate(10);
 
-        $pegawaiList = TenagaKependidikan::with('unitKerja')->get();
-
-        return view('admin.presensi.index', compact(
-            'presensi',
-            'pegawaiList',
-            'bulan',
-            'tahun'
-        ));
+        return view('admin.presensi.index', compact('presensi', 'tanggal'));
     }
 
     public function history()
@@ -108,207 +97,165 @@ class PresensiController extends Controller
         return view('admin.presensi.show', compact('presensi'));
     }
 
+    /**
+     * Halaman Rekapitulasi Presensi Bulanan.
+     *
+     * NOTE (asumsi model, sesuaikan jika beda di project kamu):
+     * - Model TenagaKependidikan punya kolom: nip, nama, user_id, unit_kerja_id
+     * - Ada relasi TenagaKependidikan::unitKerja() ke model UnitKerja (kolom: nama)
+     */
     public function rekap(Request $request)
     {
-        $bulan = (int) $request->input('bulan', now()->month);
-        $tahun = (int) $request->input('tahun', now()->year);
-        $userId = $request->input('user_id');
+        $bulan = $request->bulan ?? now()->month;
+        $tahun = $request->tahun ?? now()->year;
 
-        $result = $this->calculateRekap($bulan, $tahun, $userId);
-
-        $pegawaiList = TenagaKependidikan::whereNotNull('user_id')
-            ->with('unitKerja')
+        // Untuk dropdown filter pegawai
+        $pegawaiList = TenagaKependidikan::select('user_id', 'nama')
+            ->orderBy('nama')
             ->get();
 
-        return view('admin.presensi.rekap', [
-            'rekap'          => $result['data'],
-            'bulan'          => $bulan,
-            'tahun'          => $tahun,
-            'userId'         => $userId,
-            'pegawaiList'    => $pegawaiList,
-            'totalHariKerja' => $result['total_hari_kerja'],
-            'totalPegawai'   => count($result['data']),
-        ]);
+        $namaBulan = Carbon::create($tahun, $bulan, 1)
+            ->translatedFormat('F');
+
+        $rekap = $this->buildRekapData($bulan, $tahun, $request->user_id);
+
+        $totalPegawai = count($rekap);
+
+        return view('admin.presensi.rekap', compact(
+            'rekap',
+            'bulan',
+            'tahun',
+            'namaBulan',
+            'totalPegawai',
+            'pegawaiList'
+        ));
     }
 
     public function exportExcel(Request $request)
     {
-        if ($this->isRekapExport($request)) {
-            $bulan  = (int) $request->input('bulan', Carbon::now()->month);
-            $tahun  = (int) $request->input('tahun', Carbon::now()->year);
-            $userId = $request->input('user_id');
+        // Mode rekap bulanan
+        if ($request->export === 'rekap') {
 
-            $result = $this->calculateRekap($bulan, $tahun, $userId);
+            $bulan = $request->bulan ?? now()->month;
+            $tahun = $request->tahun ?? now()->year;
+
+            $rekap = $this->buildRekapData($bulan, $tahun, $request->user_id);
 
             return Excel::download(
-                new PresensiExport($result['data']),
-                "rekap_presensi_{$bulan}_{$tahun}.xlsx"
+                new PresensiExport($rekap),
+                "rekap_presensi_{$tahun}-{$bulan}.xlsx"
             );
         }
 
-        $presensi = $this->buildPresensiExportQuery($request)->get();
-        $filename = $this->buildPresensiExportFilename($request, 'xlsx');
+        // Mode harian (default, per tanggal)
+        $tanggal = $request->tanggal ?? now()->toDateString();
+
+        $presensi = Presensi::with(['user.tenagaKependidikan'])
+            ->whereDate('tanggal', $tanggal)
+            ->when($request->filled('user_id'), function ($q) use ($request) {
+                $q->where('user_id', $request->user_id);
+            })
+            ->get();
 
         return Excel::download(
             new PresensiHarianExport($presensi),
-            $filename
+            "presensi_{$tanggal}.xlsx"
         );
     }
 
     public function exportPdf(Request $request)
     {
-        if ($this->isRekapExport($request)) {
-            set_time_limit(300);
+        // Mode rekap bulanan
+        if ($request->export === 'rekap') {
 
-            $bulan  = (int) $request->input('bulan', Carbon::now()->month);
-            $tahun  = (int) $request->input('tahun', Carbon::now()->year);
-            $userId = $request->input('user_id');
+            $bulan = $request->bulan ?? now()->month;
+            $tahun = $request->tahun ?? now()->year;
 
-            $result    = $this->calculateRekap($bulan, $tahun, $userId);
-            $rekap     = $result['data'];
-            $namaBulan = Carbon::create()->month($bulan)->translatedFormat('F');
+            $namaBulan = Carbon::create($tahun, $bulan, 1)
+                ->translatedFormat('F');
+
+            $rekap = $this->buildRekapData($bulan, $tahun, $request->user_id);
 
             $pdf = Pdf::loadView(
-                'presensi.rekap_pdf',
+                'admin.presensi.rekap_pdf',
                 compact('rekap', 'bulan', 'tahun', 'namaBulan')
             );
 
-            return $pdf->download("rekap_presensi_{$bulan}_{$tahun}.pdf");
+            return $pdf->download("rekap_presensi_{$tahun}-{$bulan}.pdf");
         }
 
-        $presensi = $this->buildPresensiExportQuery($request)->get();
-        $meta     = $this->buildPresensiExportMeta($request);
+        // Mode harian (default, per tanggal)
+        $tanggal = $request->tanggal ?? now()->toDateString();
+
+        $presensi = Presensi::with([
+            'user.tenagaKependidikan',
+            'foto'
+        ])
+            ->whereDate('tanggal', $tanggal)
+            ->when($request->filled('user_id'), function ($q) use ($request) {
+                $q->where('user_id', $request->user_id);
+            })
+            ->get();
 
         $pdf = Pdf::loadView(
             'admin.presensi.presensi_pdf',
-            [
-                'presensi' => $presensi,
-                'tanggal'  => $meta['tanggal'],
-                'periode'  => $meta['periode'],
-            ]
+            compact('presensi', 'tanggal')
         );
 
-        return $pdf->download($this->buildPresensiExportFilename($request, 'pdf'));
+        return $pdf->download(
+            "presensi_{$tanggal}.pdf"
+        );
     }
 
-    private function isRekapExport(Request $request): bool
+    /**
+     * Hitung data rekap per pegawai untuk satu bulan.
+     * Dipakai bareng oleh rekap(), exportExcel(), dan exportPdf().
+     */
+    private function buildRekapData($bulan, $tahun, $userId = null): array
     {
-        return $request->get('export') === 'rekap';
-    }
+        $tenagaQuery = TenagaKependidikan::with(['unitKerja']);
 
-    private function buildPresensiExportQuery(Request $request)
-    {
-        $query = Presensi::with(['user.tenagaKependidikan'])->latest();
-
-        if ($request->filled('tanggal')) {
-            $query->whereDate('tanggal', $request->tanggal);
-        } elseif ($request->filled('bulan') && $request->filled('tahun')) {
-            $query->whereYear('tanggal', $request->tahun)
-                  ->whereMonth('tanggal', $request->bulan);
-        } else {
-            $query->whereDate('tanggal', now()->toDateString());
+        if (!empty($userId)) {
+            $tenagaQuery->where('user_id', $userId);
         }
 
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+        $tenagaKependidikan = $tenagaQuery->orderBy('nama')->get();
+
+        // Hitung total hari kerja dalam bulan tsb berdasarkan JadwalKerja
+        $totalHariKerja = 0;
+        $startDate = Carbon::create($tahun, $bulan, 1);
+        $endDate   = $startDate->copy()->endOfMonth();
+
+        for ($tgl = $startDate->copy(); $tgl->lte($endDate); $tgl->addDay()) {
+            $cek = $this->presensiService->isWorkingDay($tgl->toDateString());
+
+            if ($cek['status']) {
+                $totalHariKerja++;
+            }
         }
 
-        return $query;
-    }
+        $rekap = [];
 
-    private function buildPresensiExportMeta(Request $request): array
-    {
-        if ($request->filled('tanggal')) {
-            $tanggal = $request->tanggal;
+        foreach ($tenagaKependidikan as $pegawai) {
 
-            return [
-                'tanggal' => $tanggal,
-                'periode' => Carbon::parse($tanggal)->translatedFormat('d F Y'),
-            ];
-        }
+            $hadir = Presensi::where('tenaga_kependidikan_id', $pegawai->id)
+                ->whereMonth('tanggal', $bulan)
+                ->whereYear('tanggal', $tahun)
+                ->count();
 
-        if ($request->filled('bulan') && $request->filled('tahun')) {
-            $bulan = (int) $request->bulan;
-            $tahun = (int) $request->tahun;
+            $alfa = max($totalHariKerja - $hadir, 0);
 
-            return [
-                'tanggal' => Carbon::create($tahun, $bulan, 1)->toDateString(),
-                'periode' => Carbon::create($tahun, $bulan, 1)->translatedFormat('F Y'),
-            ];
-        }
-
-        $tanggal = now()->toDateString();
-
-        return [
-            'tanggal' => $tanggal,
-            'periode' => Carbon::parse($tanggal)->translatedFormat('d F Y'),
-        ];
-    }
-
-    private function buildPresensiExportFilename(Request $request, string $extension): string
-    {
-        if ($request->filled('tanggal')) {
-            return "presensi_{$request->tanggal}.{$extension}";
-        }
-
-        if ($request->filled('bulan') && $request->filled('tahun')) {
-            return "presensi_{$request->bulan}_{$request->tahun}.{$extension}";
-        }
-
-        return 'presensi_' . now()->toDateString() . ".{$extension}";
-    }
-
-    private function calculateRekap(int $bulan, int $tahun, $userId = null): array
-    {
-        $workingDays      = $this->presensiService->getWorkingDays($bulan, $tahun);
-        $totalWorkingDays = count($workingDays);
-
-        $query = TenagaKependidikan::with([
-            'presensi' => function ($q) use ($bulan, $tahun, $workingDays) {
-                $q->whereMonth('tanggal', $bulan)
-                  ->whereYear('tanggal', $tahun)
-                  ->whereIn('tanggal', $workingDays);
-            },
-            'unitKerja',
-        ])->whereNotNull('user_id');
-
-        if ($userId) {
-            $query->where('user_id', $userId);
-        }
-
-        $pegawai = $query->get();
-        $data    = [];
-
-        foreach ($pegawai as $p) {
-            $hadir = $p->presensi->count();
-            $tanggalBergabung = Carbon::parse($p->created_at)->toDateString();
-            $awalBulan = Carbon::create($tahun, $bulan, 1)->toDateString();
-            $akhirBulan = Carbon::create($tahun, $bulan, 1)->endOfMonth()->toDateString();
-            $tanggalMulaiHitung = $tanggalBergabung > $awalBulan ? $tanggalBergabung : $awalBulan;
-
-            $workingDaysPegawai = array_filter($workingDays, function ($hari) use ($tanggalMulaiHitung, $akhirBulan) {
-                return $hari >= $tanggalMulaiHitung && $hari <= $akhirBulan;
-            });
-
-            $totalHariKerjaPegawai = count($workingDaysPegawai);
-            $alfa = max(0, $totalHariKerjaPegawai - $hadir);
-
-            $data[] = [
-                'nip'        => $p->nip,
-                'nama'       => $p->nama,
-                'unit_kerja' => $p->unitKerja->nama_unit ?? '-',
+            $rekap[] = [
+                'nama'       => $pegawai->nama,
+                'nip'        => $pegawai->nip,
+                'unit_kerja' => $pegawai->unitKerja->nama ?? '-',
                 'hadir'      => $hadir,
                 'alfa'       => $alfa,
-                'total_hari' => $totalHariKerjaPegawai,
+                'total_hari' => $totalHariKerja,
             ];
         }
 
-        usort($data, fn ($a, $b) => $b['alfa'] <=> $a['alfa']);
-
-        return [
-            'data'             => $data,
-            'total_hari_kerja' => $totalWorkingDays,
-        ];
+        return $rekap;
     }
 
     public function store(StorePresensiRequest $request)
@@ -366,21 +313,15 @@ class PresensiController extends Controller
 
             $lokasi = LokasiKantor::first();
 
-            if (!$jadwal) {
+            if (!$jadwal || !$lokasi) {
                 return response()->json([
-                    'message' => 'Jadwal kerja belum diatur admin.'
-                ], 400);
-            }
-
-            if ($jadwal->use_location && !$lokasi) {
-                return response()->json([
-                    'message' => 'Lokasi kantor belum diatur admin.'
+                    'message' => 'Jadwal kerja atau lokasi kantor belum diatur admin.'
                 ], 400);
             }
 
             /*
             |--------------------------------------------------------------------------
-            | VALIDASI LOKASI
+            | VALIDASI LOKASI (selain Jumat)
             |--------------------------------------------------------------------------
             */
 

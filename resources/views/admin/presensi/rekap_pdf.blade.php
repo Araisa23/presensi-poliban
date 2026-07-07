@@ -9,7 +9,7 @@
             margin: 15px;
         }
 
-        body {
+        body {  
             font-family: DejaVu Sans, sans-serif;
             font-size: 10px;
             color: #333;

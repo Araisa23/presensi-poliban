@@ -2,99 +2,137 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Laporan Presensi Harian</title>
+    <title>Presensi Harian - {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</title>
 
     <style>
         @page {
-            margin: 20px;
+            margin: 15px;
         }
 
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 10.5px;
+            font-size: 10px;
             color: #333;
+            line-height: 1.4;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 10px;
+            border-bottom: 2px solid #0b2c52;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
+            text-transform: uppercase;
         }
 
         .header h2 {
-            margin: 3px 0;
-            font-size: 12px;
+            margin: 5px 0;
+            font-size: 13px;
             font-weight: normal;
         }
 
         .header h3 {
-            margin-top: 8px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .line {
-            border-top: 1px solid #000;
-            margin: 10px 0 15px;
+            margin-top: 12px;
+            font-size: 15px;
+            color: #0b2c52;
         }
 
         .info {
-            margin-bottom: 10px;
-            font-size: 11px;
+            width: 100%;
+            margin-bottom: 15px;
         }
 
-        /* 🔥 penting: bikin tabel lebih rapi */
+        .info td {
+            padding: 4px 0;
+        }
+
+        .summary {
+            border: 1px solid #dbe4f0;
+            background: #f8fafc;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .summary table {
+            width: 100%;
+        }
+
+        .summary td {
+            padding: 4px 0;
+        }
+
         .table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* BIAR KOLOM TIDAK ACAK */
+            table-layout: fixed;
         }
 
         .table th,
         .table td {
-            border: 1px solid #bfc7d1;
+            border: 1px solid #cbd5e1;
             padding: 6px;
-            font-size: 10px;
+            vertical-align: middle;
             word-wrap: break-word;
         }
 
         .table th {
-            background: #e9eef5;
-            text-transform: uppercase;
+            background: #e8edf5;
+            color: #0b2c52;
             text-align: center;
             font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
-        .table td {
-            vertical-align: middle;
-        }
-
-        /* 🔥 penting: cegah teks turun baris aneh */
-        .nowrap {
-            white-space: nowrap;
-            overflow: hidden;
+        .table tbody tr:nth-child(even) {
+            background: #fafafa;
         }
 
         .text-center {
             text-align: center;
         }
 
-        /* 🔥 kolom lebih presisi seperti di foto */
-        th.no { width: 10px; }
-        th.nama { width: 200px; }
-        th.nip { width: 170px; }
-        th.tanggal { width: 110px; }
-        th.masuk { width: 100px; }
-        th.pulang { width: 100px; }
+        .text-right {
+            text-align: right;
+        }
 
+        .kosong {
+            color: red;
+            font-weight: bold;
+        }
+
+        tfoot th {
+            background: #e8edf5;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 40px;
+        }
+
+        .print-info {
+            font-size: 9px;
+            color: #666;
+        }
+
+        .signature {
+            width: 250px;
+            float: right;
+            text-align: center;
+        }
+
+        .signature-name {
+            margin-top: 70px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
     </style>
 </head>
-
 <body>
 
     <!-- HEADER -->
@@ -104,41 +142,65 @@
         <h3>Laporan Presensi Harian</h3>
     </div>
 
-    <div class="line"></div>
+    <!-- INFORMASI -->
+    <table class="info">
+        <tr>
+            <td width="80">Periode</td>
+            <td width="10">:</td>
+            <td><strong>{{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</strong></td>
+        </tr>
+    </table>
 
-    <!-- INFO -->
-    <div class="info">
-        Periode: <strong>{{ $periode ?? \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</strong>
+    <!-- RINGKASAN -->
+    <div class="summary">
+        <table>
+            <tr>
+                <td width="180">Total Pegawai Presensi</td>
+                <td>: <strong>{{ count($presensi) }}</strong></td>
+            </tr>
+
+            <tr>
+                <td>Sudah Presensi Pulang</td>
+                <td>: <strong>{{ collect($presensi)->whereNotNull('jam_pulang')->count() }}</strong></td>
+            </tr>
+
+            <tr>
+                <td>Belum Presensi Pulang</td>
+                <td>: <strong>{{ collect($presensi)->whereNull('jam_pulang')->count() }}</strong></td>
+            </tr>
+        </table>
     </div>
 
-    <!-- TABLE -->
+    <!-- TABEL -->
     <table class="table">
         <thead>
             <tr>
-                <th class="no">NO</th>
-                <th class="nama">NAMA</th>
-                <th class="nip">NIP</th>
-                <th class="tanggal">TANGGAL</th>
-                <th class="masuk">JAM MASUK</th>
-                <th class="pulang">JAM PULANG</th>
+                <th width="5%">No</th>
+                <th width="20%">NIP</th>
+                <th width="25%">Nama Pegawai</th>
+                <th width="17%">Tanggal</th>
+                <th width="16%">Jam Masuk</th>
+                <th width="17%">Jam Pulang</th>
             </tr>
         </thead>
 
         <tbody>
             @forelse($presensi as $index => $p)
                 <tr>
-                    <td class="text-center">{{ $index + 1 }}</td>
-
-                    <td class="nowrap">
-                        {{ $p->user->tenagaKependidikan->nama ?? '-' }}
+                    <td class="text-center">
+                        {{ $index + 1 }}
                     </td>
 
-                    <td class="nowrap">
+                    <td>
                         {{ $p->user->tenagaKependidikan->nip ?? '-' }}
                     </td>
 
+                    <td>
+                        {{ $p->user->tenagaKependidikan->nama ?? '-' }}
+                    </td>
+
                     <td class="text-center">
-                        {{ $p->tanggal }}
+                        {{ \Carbon\Carbon::parse($p->tanggal)->translatedFormat('d M Y') }}
                     </td>
 
                     <td class="text-center">
@@ -146,7 +208,9 @@
                     </td>
 
                     <td class="text-center">
-                        {{ $p->jam_pulang ?? '-' }}
+                        <span class="{{ !$p->jam_pulang ? 'kosong' : '' }}">
+                            {{ $p->jam_pulang ?? '-' }}
+                        </span>
                     </td>
                 </tr>
             @empty
@@ -158,6 +222,33 @@
             @endforelse
         </tbody>
     </table>
+
+    <!-- FOOTER -->
+    <div class="footer">
+
+        <p class="print-info">
+            Dicetak pada:
+            {{ \Carbon\Carbon::now()->format('d/m/Y H:i:s') }}
+        </p>
+
+        <div class="signature">
+            <p>
+                Banjarmasin,
+                {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
+            </p>
+
+            <p><strong>Pimpinan</strong></p>
+
+            <div class="signature-name">
+                (........................................)
+            </div>
+
+            <p>
+                NIP. ........................................
+            </p>
+        </div>
+
+    </div>
 
 </body>
 </html>
