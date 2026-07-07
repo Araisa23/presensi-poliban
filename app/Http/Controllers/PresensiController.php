@@ -248,7 +248,7 @@ class PresensiController extends Controller
             $rekap[] = [
                 'nama'       => $pegawai->nama,
                 'nip'        => $pegawai->nip,
-                'unit_kerja' => $pegawai->unitKerja->nama ?? '-',
+                'unit_kerja' => $pegawai->unitKerja->nama_unit ?? '-',
                 'hadir'      => $hadir,
                 'alfa'       => $alfa,
                 'total_hari' => $totalHariKerja,
