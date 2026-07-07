@@ -62,6 +62,9 @@ class PresensiController extends Controller
 
             $query->whereDate('tanggal', $request->tanggal);
 
+            $bulan = now()->month;
+            $tahun = now()->year;
+
         } else {
 
             $bulan = $request->input('bulan', now()->month);
