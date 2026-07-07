@@ -64,6 +64,11 @@ class PresensiController extends Controller
             'foto'
         ]);
 
+        // Filter tanggal
+        if ($request->filled('tanggal')) {
+            $query->whereDate('tanggal', $request->tanggal);
+        }
+
         // Filter user tertentu (jika ada)
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
