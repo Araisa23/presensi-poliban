@@ -23,7 +23,6 @@
 
                         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if($jadwal?->use_location)
-
                         <div class="rounded-3xl border border-slate-100/70 dark:border-white/10 bg-slate-50/60 dark:bg-white/5 p-5">
                             <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Lokasi</h3>
 
