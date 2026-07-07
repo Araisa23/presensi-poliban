@@ -64,89 +64,25 @@
         @endif
 
         {{-- FILTER --}}
-        <form method="GET" class="mb-6">
-
-            <div class="bg-white dark:bg-slate-900 rounded-3xl
-                border border-slate-100/70 dark:border-white/10
-                shadow-soft p-5">
-
+        <form method="GET" action="{{ route('admin.presensi.index') }}" class="mb-6">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100/70 dark:border-white/10 shadow-soft p-5">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
-                    {{-- BULAN --}}
-                    <div>
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 block mb-2">
-                            Bulan
+                    <div class="md:col-span-3">
+                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                            Pilih Tanggal Presensi
                         </label>
-                        <select name="bulan"
-                                class="w-full rounded-2xl border-slate-200 dark:border-white/10
-                                       bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium
-                                       text-slate-700 dark:text-slate-100 shadow-sm
-                                       focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            @for($i = 1; $i <= 12; $i++)
-                                <option value="{{ $i }}" {{ (request('bulan') ?? now()->month) == $i ? 'selected' : '' }}>
-                                    {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
-                                </option>
-                            @endfor
-                        </select>
+                        <input type="date" name="tanggal" value="{{ request('tanggal') }}"
+                            class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
                     </div>
 
-                    {{-- TAHUN --}}
-                    <div>
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 block mb-2">
-                            Tahun
-                        </label>
-                        <select name="tahun"
-                                class="w-full rounded-2xl border-slate-200 dark:border-white/10
-                                       bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium
-                                       text-slate-700 dark:text-slate-100 shadow-sm
-                                       focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            @for($i = 2024; $i <= now()->year + 1; $i++)
-                                <option value="{{ $i }}" {{ (request('tahun') ?? now()->year) == $i ? 'selected' : '' }}>
-                                    {{ $i }}
-                                </option>
-                            @endfor
-                        </select>
-                    </div>
-
-                    {{-- PEGAWAI --}}
-                    <div>
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 block mb-2">
-                            Pegawai
-                        </label>
-                        <select name="user_id"
-                                class="w-full rounded-2xl border-slate-200 dark:border-white/10
-                                       bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium
-                                       text-slate-700 dark:text-slate-100 shadow-sm
-                                       focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <option value="">Semua Pegawai</option>
-                            @foreach(\App\Models\TenagaKependidikan::all() as $pegawai)
-                                <option value="{{ $pegawai->user_id }}"
-                                    {{ request('user_id') == $pegawai->user_id ? 'selected' : '' }}>
-                                    {{ $pegawai->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    {{-- SUBMIT --}}
-                    <div>
-                        <button type="submit"
-                                class="w-full inline-flex items-center justify-center gap-2
-                                       px-5 py-3 rounded-2xl font-black text-xs
-                                       uppercase tracking-[0.18em]
-                                       bg-gradient-to-r from-[#004b8d] to-[#006fcf]
-                                       text-white shadow-sm
-                                       hover:opacity-90 hover:scale-[1.01] transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
-                            </svg>
+                    <div class="flex gap-2">
+                        <button type="submit" class="flex-1 inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)] hover:scale-[1.01] transition">
                             Filter
                         </button>
                     </div>
-
                 </div>
             </div>
-
         </form>
 
         <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">

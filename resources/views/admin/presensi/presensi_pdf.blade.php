@@ -108,7 +108,7 @@
 
     <!-- INFO -->
     <div class="info">
-        Tanggal: <strong>{{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</strong>
+        Periode: <strong>{{ $periode ?? \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}</strong>
     </div>
 
     <!-- TABLE -->

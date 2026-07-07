@@ -31,6 +31,6 @@ class TenagaKependidikan extends Model
 
     public function presensi()
     {
-        return $this->hasMany(Presensi::class);
+        return $this->hasMany(Presensi::class, 'tenaga_kependidikan_id');
     }
 }
