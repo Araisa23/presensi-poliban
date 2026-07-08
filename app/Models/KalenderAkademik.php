@@ -23,4 +23,10 @@ class KalenderAkademik extends Model
 
         'keterangan',
     ];
+
+    protected $casts = [
+        'is_libur'        => 'boolean',
+        'tanggal_mulai'   => 'date',
+        'tanggal_selesai' => 'date',
+    ];
 }

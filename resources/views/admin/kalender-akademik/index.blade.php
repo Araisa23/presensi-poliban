@@ -41,8 +41,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Hari Libur</p>
-                        <h3 class="mt-2 text-4xl font-black text-slate-900">{{ $events->where('jenis', 'nasional')->count() }}</h3>
-                        <p class="mt-1 text-xs font-bold text-slate-500">Libur Nasional</p>
+                        <h3 class="mt-2 text-4xl font-black text-slate-900">{{ $events->where('is_libur', true)->count() }}</h3>
+                        <p class="mt-1 text-xs font-bold text-slate-500">Hari Libur</p>
                     </div>
                     <div class="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600">🏖️</div>
                 </div>
@@ -242,6 +242,7 @@
                     <thead>
                         <tr class="bg-slate-50/70">
                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">Agenda / Hari Libur</th>
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black text-center border-b border-slate-100">Status Libur</th>
                             <th class="px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-black text-center border-b border-slate-100">Jenis</th>
                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">Tanggal Mulai</th>
                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-100">Tanggal Selesai</th>
@@ -259,11 +260,27 @@
                                     <div class="font-semibold text-slate-800">{{ $event->judul }}</div>
                                 </td>
 
-                                <td class="px-6 py-5 text-center">
-                                    @if($event->jenis == 'nasional')
-                                        <span class="px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-bold">Libur Nasional</span>
+                                <td class="px-6 py-5 text-center whitespace-nowrap">
+                                    @if($event->is_libur)
+                                        <span class="inline-flex items-center whitespace-nowrap px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-bold">
+                                            Libur
+                                        </span>
                                     @else
-                                        <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">Akademik</span>
+                                        <span class="inline-flex items-center whitespace-nowrap px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">
+                                            Bukan Libur
+                                        </span>
+                                    @endif
+                                </td>
+
+                                <td class="px-6 py-5 text-center whitespace-nowrap">
+                                    @if($event->jenis == 'nasional')
+                                        <span class="inline-flex items-center whitespace-nowrap px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-bold">
+                                            Libur Nasional
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center whitespace-nowrap px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
+                                            Akademik
+                                        </span>
                                     @endif
                                 </td>
 
@@ -348,14 +365,14 @@
                             </tr>
                         @empty
                             <tr id="emptyOriginal">
-                                <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+                                <td colspan="7" class="px-6 py-10 text-center text-slate-400">
                                     Belum ada data kalender.
                                 </td>
                             </tr>
                         @endforelse
 
                         <tr id="emptyFilter" style="display:none;">
-                            <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+                            <td colspan="7" class="px-6 py-10 text-center text-slate-400">
                                 Tidak ada data yang sesuai dengan filter.
                             </td>
                         </tr>
@@ -527,9 +544,10 @@
                     'end'   => $e->tanggal_selesai
                                 ? \Carbon\Carbon::parse($e->tanggal_selesai)->addDay()->format('Y-m-d')
                                 : \Carbon\Carbon::parse($e->tanggal_mulai)->addDay()->format('Y-m-d'),
-                    'color' => $e->jenis === 'nasional' ? '#ef4444' : '#0b3c70',
+                    'color' => $e->is_libur ? '#ef4444' : '#0b3c70',
                     'extendedProps' => [
                         'jenis'           => $e->jenis,
+                        'is_libur'        => (bool) $e->is_libur,
                         'keterangan'      => $e->keterangan ?? '-',
                         'tanggal_mulai'   => \Carbon\Carbon::parse($e->tanggal_mulai)->translatedFormat('d F Y'),
                         'tanggal_selesai' => $e->tanggal_selesai
@@ -583,7 +601,7 @@
             // Tooltip hover
             eventMouseEnter: function(info) {
                 const props = info.event.extendedProps;
-                const jenis = props.jenis === 'nasional' ? '🏖️ Libur Nasional' : '📅 Akademik';
+                const jenis = props.is_libur ? '🚫 Hari Libur' : '📅 Bukan Libur';
                 let html = `<div style="font-size:13px;font-weight:800;margin-bottom:4px">${info.event.title}</div>`;
                 html += `<div style="opacity:.8;margin-bottom:2px">${jenis}</div>`;
                 html += `<div style="opacity:.7">${props.tanggal_mulai}`;

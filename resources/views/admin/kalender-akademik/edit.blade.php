@@ -1,5 +1,3 @@
-{{-- resources/views/admin/kalender-akademik/edit.blade.php --}}
-
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-4">
@@ -22,19 +20,26 @@
     <div
         class="bg-white rounded-3xl border border-slate-200 shadow-sm p-7 sm:p-9"
         x-data="{
-            jenis: '{{ old('jenis', $kalenderAkademik->jenis) }}',
+            jenis: '{{ old('jenis', $kalenderAkademik->jenis === 'nasional' ? 'nasional' : 'akademik') }}',
             isLibur: {{ old('is_libur', $kalenderAkademik->is_libur) ? 'true' : 'false' }},
 
-            onJenisChange() {
-                if (this.jenis === 'nasional') {
-                    this.isLibur = true;
+            syncIsLiburInput() {
+                if (this.$refs.isLiburInput) {
+                    this.$refs.isLiburInput.value = this.isLibur ? '1' : '0';
                 }
+            },
+
+            toggleLibur() {
+                this.isLibur = !this.isLibur;
+                this.syncIsLiburInput();
             }
         }"
+        x-init="syncIsLiburInput()"
     >
 
         <form action="{{ route('admin.kalender-akademik.update', $kalenderAkademik->id) }}"
-              method="POST">
+              method="POST"
+              @submit="syncIsLiburInput()">
 
             @csrf
             @method('PUT')
@@ -61,7 +66,6 @@
                 <select
                     name="jenis"
                     x-model="jenis"
-                    @change="onJenisChange()"
                     class="w-full rounded-2xl border border-slate-300 bg-white
                     px-4 py-3 text-sm font-medium text-slate-700 shadow-sm
                     focus:ring-2 focus:ring-[#0b3c70] focus:border-[#0b3c70] focus:outline-none">
@@ -110,7 +114,7 @@
                     <input
                         type="date"
                         name="tanggal_mulai"
-                        value="{{ old('tanggal_mulai', $kalenderAkademik->tanggal_mulai) }}"
+                        value="{{ old('tanggal_mulai', optional($kalenderAkademik->tanggal_mulai)->format('Y-m-d')) }}"
                         required
                         class="w-full rounded-2xl border border-slate-300 bg-white
                         px-4 py-3 text-sm font-medium text-slate-700 shadow-sm
@@ -127,7 +131,7 @@
                     <input
                         type="date"
                         name="tanggal_selesai"
-                        value="{{ old('tanggal_selesai', $kalenderAkademik->tanggal_selesai) }}"
+                        value="{{ old('tanggal_selesai', optional($kalenderAkademik->tanggal_selesai)->format('Y-m-d')) }}"
                         class="w-full rounded-2xl border border-slate-300 bg-white
                         px-4 py-3 text-sm font-medium text-slate-700 shadow-sm
                         focus:ring-2 focus:ring-[#0b3c70] focus:border-[#0b3c70] focus:outline-none"
@@ -170,7 +174,7 @@
 
                     <button
                         type="button"
-                        @click="isLibur = !isLibur"
+                        @click="toggleLibur()"
                         class="relative inline-flex h-7 w-12 items-center rounded-full"
                         :class="isLibur ? 'bg-rose-500' : 'bg-slate-300'">
 
@@ -184,7 +188,8 @@
                     <input
                         type="hidden"
                         name="is_libur"
-                        :value="isLibur ? '1' : '0'"
+                        x-ref="isLiburInput"
+                        value="{{ old('is_libur', $kalenderAkademik->is_libur) ? '1' : '0' }}"
                     >
 
                 </div>

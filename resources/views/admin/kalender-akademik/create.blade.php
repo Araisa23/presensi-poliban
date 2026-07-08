@@ -20,17 +20,20 @@
                 jenis: '{{ old('jenis', 'akademik') }}',
                 isLibur: {{ old('is_libur', '0') === '1' ? 'true' : 'false' }},
 
-                // Saat jenis berubah: nasional otomatis libur, akademik default tidak libur
-                onJenisChange() {
-                    if (this.jenis === 'nasional') {
-                        this.isLibur = true;
-                    } else {
-                        this.isLibur = false;
+                syncIsLiburInput() {
+                    if (this.$refs.isLiburInput) {
+                        this.$refs.isLiburInput.value = this.isLibur ? '1' : '0';
                     }
-                }
-             }">
+                },
 
-            <form action="{{ route('admin.kalender-akademik.store') }}" method="POST">
+                toggleLibur() {
+                    this.isLibur = !this.isLibur;
+                    this.syncIsLiburInput();
+                }
+             }"
+             x-init="syncIsLiburInput()">
+
+            <form action="{{ route('admin.kalender-akademik.store') }}" method="POST" @submit="syncIsLiburInput()">
                 @csrf
 
                 {{-- VALIDATION ERRORS --}}
@@ -52,7 +55,6 @@
                     </label>
                     <select name="jenis"
                             x-model="jenis"
-                            @change="onJenisChange()"
                             class="w-full rounded-2xl border border-slate-300 bg-white
                             px-4 py-3 text-sm font-medium text-slate-700 shadow-sm
                             focus:ring-2 focus:ring-[#0b3c70] focus:border-[#0b3c70] focus:outline-none">
@@ -140,7 +142,7 @@
                         {{-- TOGGLE SWITCH --}}
                         <button
                             type="button"
-                            @click="isLibur = !isLibur"
+                            @click="toggleLibur()"
                             class="relative inline-flex h-7 w-12 items-center rounded-full
                             transition-colors duration-200 focus:outline-none flex-shrink-0 mt-0.5"
                             :class="isLibur ? 'bg-rose-500' : 'bg-slate-300'"
@@ -152,8 +154,10 @@
                             ></span>
                         </button>
 
-                        {{-- Hidden input --}}
-                        <input type="hidden" name="is_libur" :value="isLibur ? '1' : '0'">
+                        <input type="hidden"
+                               name="is_libur"
+                               x-ref="isLiburInput"
+                               value="{{ old('is_libur', '0') === '1' ? '1' : '0' }}">
 
                     </div>
 
