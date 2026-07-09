@@ -54,30 +54,38 @@ class PresensiController extends Controller
         return view('presensi.create', compact('jadwal'));
     }
 
-    public function index(Request $request)
-    {
-        // Filter per tanggal, default hari ini
-        $tanggal = $request->tanggal ?? now()->toDateString();
+public function index(Request $request)
+{
+    // Default: bulan & tahun berjalan
+    $bulan = $request->bulan ?? now()->month;
+    $tahun = $request->tahun ?? now()->year;
 
-        $query = Presensi::with([
-            'user.tenagaKependidikan',
-            'foto'
-        ]);
+    $query = Presensi::with([
+        'user.tenagaKependidikan',
+        'foto'
+    ])
+        ->whereMonth('tanggal', $bulan)
+        ->whereYear('tanggal', $tahun);
 
-        // Filter tanggal
-        if ($request->filled('tanggal')) {
-            $query->whereDate('tanggal', $request->tanggal);
-        }
-
-        // Filter user tertentu (jika ada)
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
-        }
-
-        $presensi = $query->latest()->paginate(10);
-
-        return view('admin.presensi.index', compact('presensi', 'tanggal'));
+    // Filter pegawai tertentu (jika dipilih)
+    if ($request->filled('user_id')) {
+        $query->where('user_id', $request->user_id);
     }
+
+    $presensi = $query->latest()->paginate(10)->withQueryString();
+
+    // Untuk dropdown filter pegawai
+    $pegawaiList = TenagaKependidikan::select('user_id', 'nama')
+        ->orderBy('nama')
+        ->get();
+
+    return view('admin.presensi.index', compact(
+        'presensi',
+        'bulan',
+        'tahun',
+        'pegawaiList'
+    ));
+}
 
     public function history()
     {

@@ -64,29 +64,85 @@
         @endif
 
         {{-- FILTER --}}
-        <form method="GET" action="{{ route('admin.presensi.index') }}" class="mb-6">
-            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100/70 dark:border-white/10 shadow-soft p-5">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+<form method="GET" action="{{ route('admin.presensi.index') }}" class="mb-6">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100/70 dark:border-white/10 shadow-soft p-5">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
-                    <div class="md:col-span-3">
-                        <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-                            Pilih Tanggal Presensi
-                        </label>
-                        <input type="date" name="tanggal" value="{{ request('tanggal') }}"
-                            class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
-                    </div>
+            {{-- BULAN --}}
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                    Bulan
+                </label>
+                <select
+                    name="bulan"
+                    class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
 
-                    <div class="flex gap-2">
-                        <button type="submit" class="flex-1 inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)] hover:scale-[1.01] transition">
-                            Filter
-                        </button>
-                        <a href="{{ route('admin.presensi.index') }}" class="inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10 transition">
+                    @for($i = 1; $i <= 12; $i++)
+                        <option value="{{ $i }}"
+                            {{ request('bulan', now()->month) == $i ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
+                        </option>
+                    @endfor
+
+                </select>
+            </div>
+
+            {{-- TAHUN --}}
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                    Tahun
+                </label>
+                <select
+                    name="tahun"
+                    class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
+
+                    @for($i = 2024; $i <= 2030; $i++)
+                        <option value="{{ $i }}"
+                            {{ request('tahun', now()->year) == $i ? 'selected' : '' }}>
+                            {{ $i }}
+                        </option>
+                    @endfor
+
+                </select>
+            </div>
+
+            {{-- PEGAWAI --}}
+            <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+                    Pegawai
+                </label>
+                <select
+                    name="user_id"
+                    class="w-full rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500">
+
+                    <option value="">Semua Pegawai</option>
+
+                    @foreach($pegawaiList as $pegawai)
+                        <option value="{{ $pegawai->user_id }}"
+                            {{ request('user_id') == $pegawai->user_id ? 'selected' : '' }}>
+                            {{ $pegawai->nama }}
+                        </option>
+                    @endforeach
+
+                </select>
+            </div>
+
+            {{-- BUTTON --}}
+            <div class="flex gap-2">
+                <button
+                    type="submit"
+                    class="flex-1 inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-gradient-to-r from-[#004b8d] to-[#006fcf] text-white shadow-[0_10px_25px_rgba(79,_70,_229,_0.25)] hover:scale-[1.01] transition">
+                    Filter
+                </button>
+                        <a href="{{ route('admin.presensi.rekap') }}" class="inline-flex items-center justify-center px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-[0.18em] bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/10 transition">
                             Reset
                         </a>
-                    </div>
-                </div>
             </div>
-        </form>
+
+        </div>
+    </div>
+</form>
+
 
         <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10">
 
