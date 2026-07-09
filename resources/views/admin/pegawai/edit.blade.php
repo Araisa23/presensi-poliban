@@ -18,21 +18,25 @@
                     
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <!-- NIP -->
-                <div>
-                    <x-input-label for="nip" :value="__('NIP')" />
-
-                    <x-text-input 
-                        id="nip" 
-                        class="block mt-1 w-full" 
-                        type="text" 
-                        name="nip" 
-                        :value="old('nip', $pegawai->nip)" 
-                        required 
-                    />
-
-                    <x-input-error :messages="$errors->get('nip')" class="mt-2" />
-                </div>
+            <!-- NIP -->
+            <div>
+                <x-input-label for="nip" :value="__('NIP')" />
+                <x-text-input 
+                    id="nip" 
+                    class="block mt-1 w-full" 
+                    type="text" 
+                    name="nip" 
+                    :value="old('nip')" 
+                    required 
+                    maxlength="18"
+                    minlength="18"
+                    inputmode="numeric"
+                    pattern="\d{18}"
+                    title="NIP harus terdiri dari tepat 18 digit angka"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 18)"
+                />
+                <x-input-error :messages="$errors->get('nip')" class="mt-2" />
+            </div>
 
                 <!-- Nama -->
                 <div>

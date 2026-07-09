@@ -10,9 +10,31 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 
-class PegawaiImport implements ToCollection, WithHeadingRow
+class PegawaiImport extends DefaultValueBinder implements ToCollection, WithHeadingRow, WithCustomValueBinder
 {
+    /**
+     * Paksa semua kolom yang berpotensi berisi angka panjang
+     * (NIP) dibaca sebagai STRING, bukan numeric/scientific.
+     */
+    public function bindValue(Cell $cell, $value)
+    {
+        // Ambil nama kolom heading pada baris pertama (opsional, kalau mau spesifik per kolom)
+        // Tapi cara paling simpel & aman: kalau value berupa angka panjang, paksa jadi string.
+
+        if (is_numeric($value) && strlen((string)$value) >= 8) {
+            $cell->setValueExplicit((string)$value, DataType::TYPE_STRING);
+            return true;
+        }
+
+        // Selain itu, pakai binding default dari PhpSpreadsheet
+        return parent::bindValue($cell, $value);
+    }
+
     public function collection(Collection $rows)
     {
         $requiredHeaders = [
@@ -23,7 +45,7 @@ class PegawaiImport implements ToCollection, WithHeadingRow
         ];
 
         if ($rows->isEmpty()) {
-            
+
             throw ValidationException::withMessages([
                 'file' => 'File Excel kosong.'
             ]);
@@ -31,17 +53,17 @@ class PegawaiImport implements ToCollection, WithHeadingRow
 
         foreach ($rows as $index => $row) {
 
-        // ============================
-        // SKIP BARIS KOSONG
-        // ============================
+            // ============================
+            // SKIP BARIS KOSONG
+            // ============================
 
-        if (
-            collect($row)
-                ->filter(fn($value) => trim((string)$value) !== '')
-                ->isEmpty()
-        ) {
-            continue;
-        }
+            if (
+                collect($row)
+                    ->filter(fn($value) => trim((string)$value) !== '')
+                    ->isEmpty()
+            ) {
+                continue;
+            }
 
             // ============================
             // VALIDASI FIELD WAJIB
@@ -49,7 +71,7 @@ class PegawaiImport implements ToCollection, WithHeadingRow
 
             foreach ($requiredHeaders as $header) {
 
-                if (!isset($row[$header]) || trim($row[$header]) == '') {
+                if (!isset($row[$header]) || trim((string)$row[$header]) == '') {
 
                     throw ValidationException::withMessages([
                         'file' => "Baris ".($index+2)." : Kolom '{$header}' wajib diisi."
@@ -60,13 +82,51 @@ class PegawaiImport implements ToCollection, WithHeadingRow
             }
 
             // ============================
+            // NORMALISASI NIP (JAGA-JAGA JIKA MASIH SCIENTIFIC NOTATION)
+            // ============================
+
+            $nipRaw = trim((string)$row['nip']);
+
+            // Jika masih lolos dalam bentuk notasi ilmiah (misal: 9.970428202321E+19)
+            if (preg_match('/^\d+(\.\d+)?E\+\d+$/i', $nipRaw)) {
+
+                throw ValidationException::withMessages([
+                    'file' => "Baris ".($index+2)." : NIP '{$nipRaw}' terbaca dalam format notasi ilmiah dan datanya tidak akurat. ".
+                              "Silakan format ulang kolom NIP di Excel sebagai 'Text' sebelum mengetik ulang NIP, lalu upload kembali."
+                ]);
+
+            }
+
+            $nip = $nipRaw;
+
+            // ============================
+            // VALIDASI FORMAT NIP (HARUS 18 DIGIT ANGKA)
+            // ============================
+
+            if (!ctype_digit($nip)) {
+
+                throw ValidationException::withMessages([
+                    'file' => "Baris ".($index+2)." : NIP '{$nip}' harus berupa angka."
+                ]);
+
+            }
+
+            if (strlen($nip) !== 18) {
+
+                throw ValidationException::withMessages([
+                    'file' => "Baris ".($index+2)." : NIP '{$nip}' harus terdiri dari 18 digit angka."
+                ]);
+
+            }
+
+            // ============================
             // VALIDASI DUPLIKAT NIP
             // ============================
 
-            if (User::where('nip', trim($row['nip']))->exists()) {
+            if (User::where('nip', $nip)->exists()) {
 
                 throw ValidationException::withMessages([
-                    'file' => "NIP {$row['nip']} sudah terdaftar."
+                    'file' => "NIP {$nip} sudah terdaftar."
                 ]);
 
             }
@@ -88,7 +148,7 @@ class PegawaiImport implements ToCollection, WithHeadingRow
             if (!in_array($jk, ['L', 'P'])) {
 
                 throw ValidationException::withMessages([
-                    'file' => "Jenis Kelamin pada NIP {$row['nip']} harus L atau P."
+                    'file' => "Jenis Kelamin pada NIP {$nip} harus L atau P."
                 ]);
 
             }
@@ -116,9 +176,9 @@ class PegawaiImport implements ToCollection, WithHeadingRow
 
             $user = User::create([
 
-                'nip' => trim($row['nip']),
+                'nip' => $nip,
                 'name' => trim($row['nama']),
-                'password' => Hash::make(trim($row['nip'])),
+                'password' => Hash::make($nip),
                 'role_id' => 2,
                 'is_first_login' => true,
 
@@ -131,7 +191,7 @@ class PegawaiImport implements ToCollection, WithHeadingRow
             TenagaKependidikan::create([
 
                 'user_id' => $user->id,
-                'nip' => trim($row['nip']),
+                'nip' => $nip,
                 'nama' => trim($row['nama']),
                 'jenis_kelamin' => $jk,
                 'pangkat' => !empty($row['pangkat'])
