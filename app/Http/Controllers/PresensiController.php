@@ -385,13 +385,19 @@ public function index(Request $request)
                     $jadwal->batas_akhir_masuk
                 );
 
-
                 if ($jadwal->use_camera && !$request->foto) {
-
                     return response()->json([
                         'message' => 'Selfie wajib dilakukan sebelum presensi.'
                     ], 400);
                 }
+
+                // Verifikasi liveness (kedipan mata) untuk presensi masuk
+                if ($jadwal->use_camera && (int) $request->is_live !== 1) {
+                    return response()->json([
+                        'message' => 'Verifikasi liveness (kedipan mata) gagal. Silakan ulangi.'
+                    ], 400);
+                }
+
                 $presensi = Presensi::create([
                     'user_id'                 => $user->id,
                     'tenaga_kependidikan_id' => $pegawai->id,
@@ -450,6 +456,14 @@ public function index(Request $request)
                     'message' => 'Selfie wajib dilakukan sebelum presensi pulang.'
                 ], 400);
             }
+
+            // Verifikasi liveness (kedipan mata) untuk presensi pulang
+            if ($jadwal->use_camera && (int) $request->is_live !== 1) {
+                return response()->json([
+                    'message' => 'Verifikasi liveness (kedipan mata) gagal. Silakan ulangi.'
+                ], 400);
+            }
+
             $presensiHariIni->update([
                 'jam_pulang' => $waktuSekarang,
                 'lat'        => $request->latitude,
