@@ -17,7 +17,10 @@ class Presensi extends Model
         'jam_masuk', 
         'jam_pulang', 
         'lat', 
-        'lng'
+        'lng',
+        'gps_accuracy',
+        'is_suspicious',
+        'suspicious_reason',
     ];
 
     public function user()

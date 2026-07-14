@@ -11,12 +11,16 @@
     <div class="max-w-7xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 bg-white dark:bg-slate-900 overflow-hidden shadow-soft rounded-3xl border border-slate-100/70 dark:border-white/10 p-6 sm:p-8">
-            
+
                         @if($jadwal?->use_camera)
 
                         <div class="relative rounded-3xl overflow-hidden bg-black aspect-video flex items-center justify-center border border-slate-100/70 dark:border-white/10 shadow-soft">
                             <video id="video" autoplay playsinline class="w-full h-full object-cover transform scale-x-[-1]"></video>
                             <canvas id="canvas" class="hidden"></canvas>
+                        </div>
+
+                        <div id="liveness-status" class="mt-3 p-3 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-800 dark:text-amber-200 text-xs font-bold text-center">
+                            📷 Memuat model deteksi wajah...
                         </div>
 
                         @endif
@@ -43,6 +47,7 @@
 
                                     @if($jadwal?->use_camera)
                                         <li>- Pastikan wajah terlihat jelas.</li>
+                                        <li>- Kedipkan mata, lalu toleh ke kiri dan ke kanan.</li>
                                     @endif
 
                                     @if($jadwal?->use_location)
@@ -152,176 +157,374 @@
 
     </div>
 
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            const btnAbsen = document.getElementById('btn-absen');
-            const btnText = document.getElementById('btn-text');
-            const btnLoader = document.getElementById('btn-loader');
-            const locationInfo = document.getElementById('location-info');
-            const locationCoords = document.getElementById('location-coords');
-            const alertContainer = document.getElementById('alert-container');
-            const successModal = document.getElementById('success-modal');
-            const successModalMessage = document.getElementById('success-modal-message');
-            const successModalBtn = document.getElementById('success-modal-btn');
-            const successModalIconMasuk = document.getElementById('success-modal-icon-masuk');
-            const successModalIconPulang = document.getElementById('success-modal-icon-pulang');
+@push('scripts')
+<script type="module">
+import {
+    FaceLandmarker,
+    FilesetResolver
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/vision_bundle.mjs";
 
-            let lat = null;
-            let lon = null;
-            const locationStatusChip = document.getElementById('location-status-chip');
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const btnAbsen = document.getElementById('btn-absen');
+    const btnText = document.getElementById('btn-text');
+    const btnLoader = document.getElementById('btn-loader');
+    const locationInfo = document.getElementById('location-info');
+    const locationCoords = document.getElementById('location-coords');
+    const alertContainer = document.getElementById('alert-container');
+    const successModal = document.getElementById('success-modal');
+    const successModalMessage = document.getElementById('success-modal-message');
+    const successModalBtn = document.getElementById('success-modal-btn');
+    const successModalIconMasuk = document.getElementById('success-modal-icon-masuk');
+    const successModalIconPulang = document.getElementById('success-modal-icon-pulang');
+    const livenessStatusEl = document.getElementById('liveness-status');
 
-            // 1. Get Location
-                @if($jadwal?->use_location)
 
-                if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(
-                    (position) => {
-                        lat = position.coords.latitude;
-                        lon = position.coords.longitude;
-                        locationInfo.textContent = "Lokasi Terkunci";
-                        locationInfo.classList.add('text-green-600', 'dark:text-green-400');
-                        locationCoords.textContent = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-                        if (locationStatusChip) locationStatusChip.textContent = 'Terkunci';
-                    },
-                    (error) => {
-                        console.error('Error getting location:', error);
-                        locationInfo.textContent = "Gagal mendapatkan lokasi";
-                        locationInfo.classList.add('text-red-600', 'dark:text-red-400');
-                        if (locationStatusChip) locationStatusChip.textContent = 'Gagal';
-                        showAlert('Izin lokasi diperlukan untuk presensi.', 'error');
-                    },
-                    { enableHighAccuracy: true }
-                );
+        // ============================
+    // DEVICE ID (untuk device binding)
+    // ============================
+    function getOrCreateDeviceId() {
+        const STORAGE_KEY = 'presensi_device_id';
+        let deviceId = localStorage.getItem(STORAGE_KEY);
+        if (!deviceId) {
+            deviceId = crypto.randomUUID();
+            localStorage.setItem(STORAGE_KEY, deviceId);
+        }
+        return deviceId;
+    }
+    const deviceId = getOrCreateDeviceId();
+
+    let lat = null;
+    let lon = null;
+    let accuracy = null;
+    const locationStatusChip = document.getElementById('location-status-chip');
+
+    const useCamera = {{ $jadwal?->use_camera ? 'true' : 'false' }};
+
+    // ============================
+    // LIVENESS STATE
+    // ============================
+    let faceLandmarker = null;
+    let livenessPassed = !useCamera; // kalau kamera tidak dipakai, anggap liveness tidak perlu
+    let lastVideoTime = -1;
+
+    // State machine: 'blink' -> 'turn_left' -> 'turn_right' -> selesai
+    let livenessStep = 'blink';
+
+    // Blink detection
+    let eyeWasClosed = false;
+    let blinkCount = 0;
+    const REQUIRED_BLINKS = 1;
+    const BLINK_CLOSE_THRESHOLD = 0.5;
+
+    // Head turn detection
+    const YAW_THRESHOLD = 15; // derajat. Naikkan/turunkan jika kurang/terlalu sensitif
+    let hasReturnedToCenter = true; // mencegah 1 gerakan menoleh terhitung dobel
+
+    // 1. Get Location
+    @if($jadwal?->use_location)
+
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+            (position) => {
+                lat = position.coords.latitude;
+                lon = position.coords.longitude;
+                accuracy = position.coords.accuracy;
+                locationInfo.textContent = "Lokasi Terkunci";
+                locationInfo.classList.add('text-green-600', 'dark:text-green-400');
+                locationCoords.textContent = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+                if (locationStatusChip) locationStatusChip.textContent = 'Terkunci';
+            },
+            (error) => {
+                console.error('Error getting location:', error);
+                locationInfo.textContent = "Gagal mendapatkan lokasi";
+                locationInfo.classList.add('text-red-600', 'dark:text-red-400');
+                if (locationStatusChip) locationStatusChip.textContent = 'Gagal';
+                showAlert('Izin lokasi diperlukan untuk presensi.', 'error');
+            },
+            { enableHighAccuracy: true }
+        );
+    } else {
+        showAlert('Browser Anda tidak mendukung Geolocation.', 'error');
+    }
+
+    @endif
+
+    // 2. Access Camera
+    async function initCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "user" },
+                audio: false
+            });
+            video.srcObject = stream;
+
+            video.addEventListener('loadeddata', () => {
+                if (useCamera) initLiveness();
+            });
+
+        } catch (err) {
+            console.error("Error accessing camera: ", err);
+            showAlert('Gagal mengakses kamera. Pastikan izin diberikan.', 'error');
+            btnAbsen.disabled = true;
+        }
+    }
+
+    @if($jadwal?->use_camera)
+    initCamera();
+    updateButtonState();
+    @endif
+
+    // ============================
+    // 3. LIVENESS DETECTION (MediaPipe)
+    // ============================
+    async function initLiveness() {
+        try {
+            const vision = await FilesetResolver.forVisionTasks(
+                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+            );
+
+            faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+                    delegate: "GPU"
+                },
+                runningMode: "VIDEO",
+                numFaces: 1,
+                outputFaceBlendshapes: true,
+                outputFacialTransformationMatrixes: true
+            });
+
+            if (livenessStatusEl) {
+                livenessStatusEl.textContent = "👀 Posisikan wajah di kamera, lalu kedipkan mata";
+            }
+
+            requestAnimationFrame(detectLoop);
+
+        } catch (err) {
+            console.error('Gagal load model liveness:', err);
+            if (livenessStatusEl) {
+                livenessStatusEl.textContent = "❌ Gagal memuat model deteksi wajah.";
+                livenessStatusEl.className = "mt-3 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold text-center";
+            }
+        }
+    }
+
+    function getYawDegrees(matrix) {
+        // matrix.data: 4x4 column-major
+        const m = matrix.data;
+        const m02 = m[8];
+        const m11 = m[5], m12 = m[6];
+        const yawRad = Math.atan2(-m02, Math.sqrt(m11 * m11 + m12 * m12));
+        return yawRad * (180 / Math.PI);
+    }
+
+    function detectLoop() {
+        if (livenessPassed || !faceLandmarker) return;
+
+        if (video.currentTime !== lastVideoTime) {
+            lastVideoTime = video.currentTime;
+
+            const result = faceLandmarker.detectForVideo(video, performance.now());
+
+            if (result.faceLandmarks.length === 0) {
+                setLivenessStatus("⚠️ Wajah tidak terdeteksi, mendekatlah ke kamera", 'warn');
+            } else if (result.faceLandmarks.length > 1) {
+                setLivenessStatus("⚠️ Terdeteksi lebih dari 1 wajah", 'warn');
             } else {
-                showAlert('Browser Anda tidak mendukung Geolocation.', 'error');
-            }
 
-            @endif
-            // 2. Access Camera
-            async function initCamera() {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { facingMode: "user" }, 
-                        audio: false 
-                    }); 
-                    video.srcObject = stream;
-                } catch (err) {
-                    console.error("Error accessing camera: ", err);
-                    showAlert('Gagal mengakses kamera. Pastikan izin diberikan.', 'error');
-                    btnAbsen.disabled = true;
-                }
-            }
-            @if($jadwal?->use_camera)
-            initCamera();
-            @endif
+                // === STEP 1: KEDIP ===
+                if (livenessStep === 'blink' && result.faceBlendshapes?.length > 0) {
+                    const shapes = result.faceBlendshapes[0].categories;
+                    const blinkLeft  = shapes.find(s => s.categoryName === 'eyeBlinkLeft')?.score  ?? 0;
+                    const blinkRight = shapes.find(s => s.categoryName === 'eyeBlinkRight')?.score ?? 0;
+                    const avgBlink   = (blinkLeft + blinkRight) / 2;
+                    const isClosedNow = avgBlink > BLINK_CLOSE_THRESHOLD;
 
-            // 3. Handle Capture and Submit
-            btnAbsen.addEventListener('click', async function() {
-                @if($jadwal?->use_location)
-
-                if (!lat || !lon) {
-                    showAlert('Harap tunggu hingga koordinat lokasi terkunci.', 'warning');
-                    return;
-                }
-
-                @endif
-
-                setLoading(true);
-
-                // Capture image from video
-                let imageData = null;
-
-                @if($jadwal?->use_camera)
-
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-
-                const context = canvas.getContext('2d');
-
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                imageData = canvas.toDataURL('image/png');
-
-                @endif
-
-                try {
-                    const response = await fetch("{{ route('pegawai.presensi.store') }}", {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            latitude: lat ? lat.toString() : null,
-                            longitude: lon ? lon.toString() : null,
-                            foto: imageData,
-                        })
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        showSuccessModal(result.message, result.type);
-                    } else {
-                        showAlert(result.message || 'Terjadi kesalahan.', 'error');
+                    if (isClosedNow) {
+                        eyeWasClosed = true;
+                    } else if (eyeWasClosed && !isClosedNow) {
+                        eyeWasClosed = false;
+                        blinkCount++;
                     }
-                } catch (err) {
-                    console.error('Upload error:', err);
-                    showAlert('Gagal mengirim data ke server.', 'error');
-                } finally {
-                    setLoading(false);
+
+                    if (blinkCount < REQUIRED_BLINKS) {
+                        setLivenessStatus(`👁️ Kedipkan mata untuk verifikasi (${blinkCount}/${REQUIRED_BLINKS})`, 'info');
+                    } else {
+                        livenessStep = 'turn_left';
+                        setLivenessStatus("↩️ Sekarang, tolehkan wajah ke KIRI", 'info');
+                    }
                 }
+
+                // === STEP 2 & 3: TOLEH KIRI / KANAN ===
+                else if ((livenessStep === 'turn_left' || livenessStep === 'turn_right')
+                          && result.facialTransformationMatrixes?.length > 0) {
+
+                    const yaw = getYawDegrees(result.facialTransformationMatrixes[0]);
+
+                    if (livenessStep === 'turn_left') {
+                        if (yaw < -YAW_THRESHOLD && hasReturnedToCenter) {
+                            livenessStep = 'turn_right';
+                            hasReturnedToCenter = false;
+                            setLivenessStatus("↪️ Bagus! Sekarang tolehkan wajah ke KANAN", 'info');
+                        } else {
+                            setLivenessStatus("↩️ Tolehkan wajah ke KIRI", 'info');
+                        }
+                    } else if (livenessStep === 'turn_right') {
+                        if (!hasReturnedToCenter && Math.abs(yaw) < 5) {
+                            hasReturnedToCenter = true;
+                        }
+                        if (yaw > YAW_THRESHOLD && hasReturnedToCenter) {
+                            passLiveness();
+                        } else if (!hasReturnedToCenter) {
+                            setLivenessStatus("↪️ Kembalikan wajah ke tengah dulu, lalu toleh ke KANAN", 'info');
+                        } else {
+                            setLivenessStatus("↪️ Tolehkan wajah ke KANAN", 'info');
+                        }
+                    }
+                }
+            }
+        }
+
+        requestAnimationFrame(detectLoop);
+    }
+
+    function passLiveness() {
+        livenessPassed = true;
+        setLivenessStatus("✅ Verifikasi wajah berhasil", 'success');
+        updateButtonState();
+    }
+
+    function setLivenessStatus(text, type) {
+        if (!livenessStatusEl) return;
+        livenessStatusEl.textContent = text;
+
+        const base = "mt-3 p-3 rounded-2xl text-xs font-bold text-center border ";
+        const styles = {
+            info:    "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-800 dark:text-amber-200",
+            warn:    "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-800 dark:text-rose-200",
+            success: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-200",
+        };
+        livenessStatusEl.className = base + styles[type];
+    }
+
+    function updateButtonState() {
+        btnAbsen.disabled = !livenessPassed;
+    }
+
+    // 4. Handle Capture and Submit
+    btnAbsen.addEventListener('click', async function() {
+
+        if (useCamera && !livenessPassed) {
+            showAlert('Selesaikan verifikasi wajah (kedip, lalu toleh kiri & kanan) terlebih dahulu.', 'warning');
+            return;
+        }
+
+        @if($jadwal?->use_location)
+
+        if (!lat || !lon) {
+            showAlert('Harap tunggu hingga koordinat lokasi terkunci.', 'warning');
+            return;
+        }
+
+        @endif
+
+        setLoading(true);
+
+        // Capture image from video
+        let imageData = null;
+
+        @if($jadwal?->use_camera)
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        imageData = canvas.toDataURL('image/png');
+
+        @endif
+
+        try {
+            const response = await fetch("{{ route('pegawai.presensi.store') }}", {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                    body: JSON.stringify({
+                    latitude: lat ? lat.toString() : null,
+                    longitude: lon ? lon.toString() : null,
+                    accuracy: accuracy,
+                    foto: imageData,
+                    is_live: livenessPassed ? 1 : 0,
+                    device_id: deviceId,
+                })
             });
 
-            function showSuccessModal(message, type) {
-                successModalMessage.textContent = message;
+            const result = await response.json();
 
-                if (type === 'pulang') {
-                    successModalIconMasuk.classList.add('hidden');
-                    successModalIconPulang.classList.remove('hidden');
-                } else {
-                    successModalIconMasuk.classList.remove('hidden');
-                    successModalIconPulang.classList.add('hidden');
-                }
-
-                successModal.classList.remove('hidden');
-                successModal.classList.add('flex');
+            if (response.ok) {
+                showSuccessModal(result.message, result.type);
+            } else {
+                showAlert(result.message || 'Terjadi kesalahan.', 'error');
             }
+        } catch (err) {
+            console.error('Upload error:', err);
+            showAlert('Gagal mengirim data ke server.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    });
 
-            successModalBtn.addEventListener('click', function() {
-                window.location.reload();
-            });
+    function showSuccessModal(message, type) {
+        successModalMessage.textContent = message;
 
-            function showAlert(message, type) {
-                alertContainer.textContent = message;
-                alertContainer.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700', 'bg-yellow-100', 'text-yellow-700', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800', 'bg-amber-50', 'text-amber-800', 'ring-emerald-600/10', 'ring-rose-600/10', 'ring-amber-600/10');
-                
-                if (type === 'success') {
-                    alertContainer.classList.add('bg-emerald-50', 'text-emerald-800', 'ring-emerald-600/10');
-                } else if (type === 'warning') {
-                    alertContainer.classList.add('bg-amber-50', 'text-amber-800', 'ring-amber-600/10');
-                } else {
-                    alertContainer.classList.add('bg-rose-50', 'text-rose-800', 'ring-rose-600/10');
-                }
-            }
+        if (type === 'pulang') {
+            successModalIconMasuk.classList.add('hidden');
+            successModalIconPulang.classList.remove('hidden');
+        } else {
+            successModalIconMasuk.classList.remove('hidden');
+            successModalIconPulang.classList.add('hidden');
+        }
 
-            function setLoading(loading) {
-                if (loading) {
-                    btnText.classList.add('hidden');
-                    btnLoader.classList.remove('hidden');
-                    btnAbsen.disabled = true;
-                } else {
-                    btnText.classList.remove('hidden');
-                    btnLoader.classList.add('hidden');
-                    btnAbsen.disabled = false;
-                }
-            }
-        });
-    </script>
-    @endpush
+        successModal.classList.remove('hidden');
+        successModal.classList.add('flex');
+    }
+
+    successModalBtn.addEventListener('click', function() {
+        window.location.reload();
+    });
+
+    function showAlert(message, type) {
+        alertContainer.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700', 'bg-yellow-100', 'text-yellow-700', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800', 'bg-amber-50', 'text-amber-800', 'ring-emerald-600/10', 'ring-rose-600/10', 'ring-amber-600/10');
+        alertContainer.textContent = message;
+
+        if (type === 'success') {
+            alertContainer.classList.add('bg-emerald-50', 'text-emerald-800', 'ring-emerald-600/10');
+        } else if (type === 'warning') {
+            alertContainer.classList.add('bg-amber-50', 'text-amber-800', 'ring-amber-600/10');
+        } else {
+            alertContainer.classList.add('bg-rose-50', 'text-rose-800', 'ring-rose-600/10');
+        }
+    }
+
+    function setLoading(loading) {
+        if (loading) {
+            btnText.classList.add('hidden');
+            btnLoader.classList.remove('hidden');
+            btnAbsen.disabled = true;
+        } else {
+            btnText.classList.remove('hidden');
+            btnLoader.classList.add('hidden');
+            btnAbsen.disabled = !livenessPassed;
+        }
+    }
+});
+</script>
+@endpush
 </x-app-layout>

@@ -132,6 +132,10 @@
                                 Unit Kerja
                             </th>
 
+                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b">
+                                Device
+                            </th>
+
                             <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b text-center">
                                 Aksi
                             </th>
@@ -181,6 +185,35 @@
                                         {{ $p->unitKerja->nama_unit ?? '-' }}
 
                                     </span>
+
+                                </td>
+
+                                <!-- DEVICE -->
+                                <td class="px-6 py-5">
+
+                                    @if($p->user)
+                                        <div class="text-xs {{ $p->user->device_id ? 'text-emerald-600' : 'text-slate-400' }} font-bold mb-1">
+                                            {{ $p->user->device_id ? '✅ Terdaftar' : '⚪ Belum terdaftar' }}
+                                        </div>
+
+                                        @if($p->user->device_id && $p->user->device_registered_at)
+                                            <div class="text-[10px] text-slate-400 mb-2">
+                                                Sejak {{ $p->user->device_registered_at->format('d M Y') }}
+                                            </div>
+                                        @endif
+
+                                        @if($p->user->device_id)
+                                            <form action="{{ route('admin.users.reset-device', $p->user->id) }}" method="POST"
+                                                onsubmit="return confirm('Yakin reset device untuk {{ $p->nama }}? Pegawai perlu presensi ulang dari device baru.')">
+                                                @csrf
+                                                <button type="submit" class="text-[10px] font-bold text-rose-600 hover:underline">
+                                                    Reset Device
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @else
+                                        <span class="text-xs text-slate-300 italic">Belum ada akun</span>
+                                    @endif
 
                                 </td>
 
@@ -308,7 +341,7 @@
 
                             <tr>
 
-                                <td colspan="6"
+                                <td colspan="7"
                                     class="px-6 py-12 text-center text-slate-400 font-medium italic">
 
                                     Belum ada data tenaga kependidikan.

@@ -213,4 +213,111 @@ class PresensiService
 
         return $workingDaysArr;
     }
+
+    /**
+     * Cek apakah akurasi GPS terlalu buruk (indikasi lokasi tidak stabil/dipalsukan).
+     * Semakin kecil angka accuracy = semakin presisi (dalam meter).
+     */
+    public function isAccuracyTooLow($accuracy, $thresholdMeter = 50)
+    {
+        if ($accuracy === null) {
+            return false; // tidak ada data, jangan asumsikan curiga
+        }
+
+        return (float) $accuracy > $thresholdMeter;
+    }
+
+    /**
+     * Cek apakah koordinat presensi user beberapa hari terakhir
+     * selalu identik persis (indikasi fake GPS dengan titik statis).
+     */
+    public function isStaticCoordinateSuspicious($tenagaKependidikanId, $lat, $lon, $minSampleSamaCount = 5, $checkLastN = 10)
+    {
+        $riwayat = \App\Models\Presensi::where('tenaga_kependidikan_id', $tenagaKependidikanId)
+            ->whereNotNull('lat')
+            ->whereNotNull('lng')
+            ->orderByDesc('tanggal')
+            ->limit($checkLastN)
+            ->get(['lat', 'lng']);
+
+        if ($riwayat->count() < $minSampleSamaCount) {
+            return false; // data belum cukup untuk disimpulkan
+        }
+
+        $samaPersisCount = 0;
+
+        foreach ($riwayat as $item) {
+            $sama = abs((float) $item->lat - (float) $lat) < 0.000001
+                 && abs((float) $item->lng - (float) $lon) < 0.000001;
+
+            if ($sama) {
+                $samaPersisCount++;
+            }
+        }
+
+        return $samaPersisCount >= $minSampleSamaCount;
+    }
+
+    /**
+     * Cek lompatan lokasi yang mustahil secara fisik (kecepatan > threshold km/jam)
+     * dibanding presensi terakhir milik pegawai yang sama.
+     */
+    public function isSuspiciousJump($tenagaKependidikanId, $newLat, $newLon, $newDateTime, $maxSpeedKmh = 150)
+    {
+        $last = \App\Models\Presensi::where('tenaga_kependidikan_id', $tenagaKependidikanId)
+            ->whereNotNull('lat')
+            ->whereNotNull('lng')
+            ->orderByDesc('tanggal')
+            ->first();
+
+        if (!$last || !$last->lat || !$last->lng) {
+            return false;
+        }
+
+        $lastDateTime = Carbon::parse($last->tanggal->format('Y-m-d') . ' ' . ($last->jam_pulang ?? $last->jam_masuk));
+        $newDateTimeCarbon = Carbon::parse($newDateTime);
+
+        $detikBerlalu = abs($newDateTimeCarbon->diffInSeconds($lastDateTime));
+
+        if ($detikBerlalu <= 0) {
+            return false;
+        }
+
+        $jarakMeter = $this->calculateDistance(
+            (float) $last->lat,
+            (float) $last->lng,
+            (float) $newLat,
+            (float) $newLon
+        );
+
+        $kecepatanKmh = ($jarakMeter / $detikBerlalu) * 3.6;
+
+        return $kecepatanKmh > $maxSpeedKmh;
+    }
+
+    /**
+     * Kumpulkan semua pengecekan kecurigaan GPS jadi satu hasil ringkas.
+     * Tidak menolak presensi, hanya menandai untuk direview admin.
+     */
+    public function evaluateGpsSuspicion($tenagaKependidikanId, $lat, $lon, $accuracy, $dateTime)
+    {
+        $alasan = [];
+
+        if ($this->isAccuracyTooLow($accuracy)) {
+            $alasan[] = "Akurasi GPS buruk ({$accuracy}m)";
+        }
+
+        if ($this->isStaticCoordinateSuspicious($tenagaKependidikanId, $lat, $lon)) {
+            $alasan[] = "Koordinat identik berulang kali";
+        }
+
+        if ($this->isSuspiciousJump($tenagaKependidikanId, $lat, $lon, $dateTime)) {
+            $alasan[] = "Lompatan lokasi tidak wajar dibanding presensi sebelumnya";
+        }
+
+        return [
+            'is_suspicious' => count($alasan) > 0,
+            'reason'        => implode('; ', $alasan) ?: null,
+        ];
+    }
 }

@@ -13,6 +13,7 @@ use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\PimpinanManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\DeviceAttemptLogController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -48,7 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
 
         // IMPORT EXCEL USERS
         Route::get('users/import', [UserController::class, 'importForm'])
@@ -59,6 +60,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // USERS
         Route::resource('users', UserController::class);
+
+        // DEVICE BINDING
+        Route::post('users/{user}/reset-device', [UserController::class, 'resetDevice'])
+            ->name('users.reset-device');
+
+        Route::get('device-logs', [App\Http\Controllers\Admin\DeviceAttemptLogController::class, 'index'])
+            ->name('device-logs.index');
 
         // PEGAWAI IMPORT
         Route::post('pegawai/import', [PegawaiController::class, 'import'])
@@ -92,8 +100,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('presensi/{id}', [PresensiController::class, 'show'])
             ->name('presensi.show');
 
-    });
+        Route::get('/device-logs', [DeviceAttemptLogController::class, 'index']
+        )->name('device-logs.index');
 
+    });
     /*
     |--------------------------------------------------------------------------
     | PEGAWAI
