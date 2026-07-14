@@ -269,7 +269,7 @@ public function index(Request $request)
         return $rekap;
     }
 
-    public function store(StorePresensiRequest $request)
+public function store(StorePresensiRequest $request)
     {
         try {
 
@@ -291,6 +291,32 @@ public function index(Request $request)
 
             $tanggalHariIni = Carbon::today()->toDateString();
             $waktuSekarang  = Carbon::now()->toTimeString();
+
+            $incomingDeviceId = $request->device_id;
+
+            if (!$user->device_id) {
+                // Belum pernah presensi sama sekali di device manapun -> daftarkan device ini
+                $user->update([
+                    'device_id'             => $incomingDeviceId,
+                    'device_registered_at'  => Carbon::now(),
+                ]);
+            } elseif ($user->device_id !== $incomingDeviceId) {
+
+                // Catat percobaan yang ditolak untuk keperluan audit admin
+                \App\Models\DeviceAttemptLog::create([
+                    'user_id'               => $user->id,
+                    'attempted_device_id'   => $incomingDeviceId,
+                    'registered_device_id'  => $user->device_id,
+                    'ip_address'            => $request->ip(),
+                    'user_agent'            => $request->userAgent(),
+                    'attempted_at'          => Carbon::now(),
+                ]);
+
+                // Device tidak cocok dengan yang terdaftar -> tolak total
+                return response()->json([
+                    'message' => 'Presensi hanya bisa dilakukan dari perangkat yang sudah terdaftar. Hubungi admin jika Anda mengganti perangkat.'
+                ], 403);
+            }
 
             /*
             |--------------------------------------------------------------------------
@@ -398,13 +424,31 @@ public function index(Request $request)
                     ], 400);
                 }
 
+                /*
+                |--------------------------------------------------------------------------
+                | EVALUASI KECURIGAAN GPS (tidak menolak, hanya menandai)
+                |--------------------------------------------------------------------------
+                */
+
+                $gpsCheck = $this->presensiService->evaluateGpsSuspicion(
+                    $pegawai->id,
+                    $request->latitude,
+                    $request->longitude,
+                    $request->accuracy,
+                    Carbon::now()
+                );
+
                 $presensi = Presensi::create([
+
                     'user_id'                 => $user->id,
                     'tenaga_kependidikan_id' => $pegawai->id,
                     'tanggal'                => $tanggalHariIni,
                     'jam_masuk'              => $waktuSekarang,
                     'lat'                    => $request->latitude,
                     'lng'                    => $request->longitude,
+                    'gps_accuracy'           => $request->accuracy,
+                    'is_suspicious'          => $gpsCheck['is_suspicious'],
+                    'suspicious_reason'      => $gpsCheck['reason'],
                 ]);
 
                 /*
@@ -464,10 +508,21 @@ public function index(Request $request)
                 ], 400);
             }
 
+            $gpsCheck = $this->presensiService->evaluateGpsSuspicion(
+                $pegawai->id,
+                $request->latitude,
+                $request->longitude,
+                $request->accuracy,
+                Carbon::now()
+            );
+
             $presensiHariIni->update([
-                'jam_pulang' => $waktuSekarang,
-                'lat'        => $request->latitude,
-                'lng'        => $request->longitude,
+                'jam_pulang'        => $waktuSekarang,
+                'lat'               => $request->latitude,
+                'lng'               => $request->longitude,
+                'gps_accuracy'      => $request->accuracy,
+                'is_suspicious'     => $gpsCheck['is_suspicious'],
+                'suspicious_reason' => $gpsCheck['reason'],
             ]);
 
             /*

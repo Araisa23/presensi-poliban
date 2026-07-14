@@ -21,8 +21,15 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
-        'foto', // TAMBAHAN
+        'foto', 
+        'device_id',
+        'device_registered_at'
 
+    ];
+
+    protected $casts = [
+        'email_verified_at'    => 'datetime',
+        'device_registered_at' => 'datetime',
     ];
 
     public function role()
@@ -58,5 +65,10 @@ class User extends Authenticatable
     public function getDisplayNipAttribute()
     {
         return $this->tenagaKependidikan?->nip ?? $this->nip;
+    }
+
+    public function deviceAttemptLogs()
+    {
+        return $this->hasMany(DeviceAttemptLog::class);
     }
 }

@@ -169,4 +169,15 @@ class UserController extends Controller
             ->with('success', 'User berhasil dihapus');
     }
 
+    public function resetDevice($id)
+    {
+        $user = \App\Models\User::findOrFail($id);
+
+        $user->update([
+            'device_id' => null,
+            'device_registered_at' => null,
+        ]);
+
+        return back()->with('success', 'Device pengguna berhasil direset.');
+    }
 }

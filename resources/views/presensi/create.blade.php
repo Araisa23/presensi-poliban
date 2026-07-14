@@ -180,10 +180,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const successModalIconPulang = document.getElementById('success-modal-icon-pulang');
     const livenessStatusEl = document.getElementById('liveness-status');
 
+    // ============================
+    // DEVICE ID (untuk device binding)
+    // ============================
+    function getOrCreateDeviceId() {
+        const STORAGE_KEY = 'presensi_device_id';
+
+        let deviceId = localStorage.getItem(STORAGE_KEY);
+
+        if (!deviceId) {
+            deviceId = crypto.randomUUID();
+            localStorage.setItem(STORAGE_KEY, deviceId);
+        }
+
+        return deviceId;
+    }
+
+    const deviceId = getOrCreateDeviceId();
+
     let lat = null;
     let lon = null;
-    const locationStatusChip = document.getElementById('location-status-chip');
+    let accuracy = null;
 
+    const locationStatusChip = document.getElementById('location-status-chip');
     const useCamera = {{ $jadwal?->use_camera ? 'true' : 'false' }};
 
     // ============================
@@ -214,6 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
             (position) => {
                 lat = position.coords.latitude;
                 lon = position.coords.longitude;
+                accuracy = position.coords.accuracy;
                 locationInfo.textContent = "Lokasi Terkunci";
                 locationInfo.classList.add('text-green-600', 'dark:text-green-400');
                 locationCoords.textContent = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
@@ -439,11 +459,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Accept': 'application/json'
                 },
+
                 body: JSON.stringify({
                     latitude: lat ? lat.toString() : null,
                     longitude: lon ? lon.toString() : null,
+                    accuracy: accuracy,
                     foto: imageData,
                     is_live: livenessPassed ? 1 : 0,
+                    device_id: deviceId,
                 })
             });
 
