@@ -274,7 +274,7 @@ class PresensiService
             return false;
         }
 
-        $lastDateTime = Carbon::parse($last->tanggal->format('Y-m-d') . ' ' . ($last->jam_pulang ?? $last->jam_masuk));
+        $lastDateTime = Carbon::parse(Carbon::parse($last->tanggal)->format('Y-m-d') . ' ' . ($last->jam_pulang ?? $last->jam_masuk));
         $newDateTimeCarbon = Carbon::parse($newDateTime);
 
         $detikBerlalu = abs($newDateTimeCarbon->diffInSeconds($lastDateTime));
