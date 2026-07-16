@@ -135,36 +135,6 @@
         Data Presensi
     </a>
 
-    <a href="{{ route('admin.device-logs.index') }}"
-   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold 
-   {{ request()->routeIs('admin.device-logs.*') 
-        ? 'bg-white/15 text-white ring-1 ring-white/20' 
-        : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
-
-    <span class="w-8 h-8 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center">
-        <svg class="w-4 h-4 
-        {{ request()->routeIs('admin.device-log.*') 
-            ? 'text-white' 
-            : 'text-slate-400' }}"
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24">
-
-            <path stroke-linecap="round" 
-                  stroke-linejoin="round" 
-                  stroke-width="2"
-                  d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z"/>
-
-            <path stroke-linecap="round" 
-                  stroke-linejoin="round" 
-                  stroke-width="2"
-                  d="M5.5 20a6.5 6.5 0 0113 0"/>
-        </svg>
-    </span>
-
-    Log Device Ditolak
-</a>
-
     <a href="{{ route('admin.presensi.rekap') }}"
        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold {{ request()->routeIs('admin.presensi.rekap') ? 'bg-white/15 text-white ring-1 ring-white/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
         <span class="w-8 h-8 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center">
@@ -173,6 +143,35 @@
         Rekapitulasi Bulanan
     </a>
 
+    <a href="{{ route('admin.device-logs.index') }}"
+    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold 
+    {{ request()->routeIs('admin.device-logs.*') 
+            ? 'bg-white/15 text-white ring-1 ring-white/20' 
+            : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+
+        <span class="w-8 h-8 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center">
+            <svg class="w-4 h-4 
+            {{ request()->routeIs('admin.device-log.*') 
+                ? 'text-white' 
+                : 'text-slate-400' }}"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24">
+
+                <path stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    stroke-width="2"
+                    d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z"/>
+
+                <path stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    stroke-width="2"
+                    d="M5.5 20a6.5 6.5 0 0113 0"/>
+            </svg>
+        </span>
+
+        Log Device Ditolak
+    </a>
     @endif
 
     @if(Auth::user()->role->name == 'pegawai')
