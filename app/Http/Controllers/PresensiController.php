@@ -29,7 +29,11 @@ class PresensiController extends Controller
 
     public function create()
     {
-        $tanggalHariIni = Carbon::today()->toDateString();
+        $lokasi   = LokasiKantor::first();
+        $timezone = $lokasi->timezone ?? config('app.timezone');
+
+        $waktuSaatIni   = $this->presensiService->getCurrentDateTimeForTimezone($timezone);
+        $tanggalHariIni = $waktuSaatIni['tanggal'];
 
         // Cek apakah hari ini adalah hari kerja
         $checkWorkingDay = $this->presensiService->isWorkingDay($tanggalHariIni);
@@ -42,7 +46,7 @@ class PresensiController extends Controller
         }
 
         $namaHari = $this->presensiService
-            ->getIndonesianDayName(Carbon::today()->dayOfWeek);
+            ->getIndonesianDayName(Carbon::now($timezone)->dayOfWeek);
 
         $jadwal = JadwalKerja::get()->first(function ($item) use ($namaHari) {
 
@@ -54,38 +58,38 @@ class PresensiController extends Controller
         return view('presensi.create', compact('jadwal'));
     }
 
-public function index(Request $request)
-{
-    // Default: bulan & tahun berjalan
-    $bulan = $request->bulan ?? now()->month;
-    $tahun = $request->tahun ?? now()->year;
+    public function index(Request $request)
+    {
+        // Default: bulan & tahun berjalan
+        $bulan = $request->bulan ?? now()->month;
+        $tahun = $request->tahun ?? now()->year;
 
-    $query = Presensi::with([
-        'user.tenagaKependidikan',
-        'foto'
-    ])
-        ->whereMonth('tanggal', $bulan)
-        ->whereYear('tanggal', $tahun);
+        $query = Presensi::with([
+            'user.tenagaKependidikan',
+            'foto'
+        ])
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun);
 
-    // Filter pegawai tertentu (jika dipilih)
-    if ($request->filled('user_id')) {
-        $query->where('user_id', $request->user_id);
+        // Filter pegawai tertentu (jika dipilih)
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        $presensi = $query->latest()->paginate(10)->withQueryString();
+
+        // Untuk dropdown filter pegawai
+        $pegawaiList = TenagaKependidikan::select('user_id', 'nama')
+            ->orderBy('nama')
+            ->get();
+
+        return view('admin.presensi.index', compact(
+            'presensi',
+            'bulan',
+            'tahun',
+            'pegawaiList'
+        ));
     }
-
-    $presensi = $query->latest()->paginate(10)->withQueryString();
-
-    // Untuk dropdown filter pegawai
-    $pegawaiList = TenagaKependidikan::select('user_id', 'nama')
-        ->orderBy('nama')
-        ->get();
-
-    return view('admin.presensi.index', compact(
-        'presensi',
-        'bulan',
-        'tahun',
-        'pegawaiList'
-    ));
-}
 
     public function history()
     {
@@ -269,7 +273,7 @@ public function index(Request $request)
         return $rekap;
     }
 
-public function store(StorePresensiRequest $request)
+    public function store(StorePresensiRequest $request)
     {
         try {
 
@@ -289,8 +293,26 @@ public function store(StorePresensiRequest $request)
                 ], 400);
             }
 
-            $tanggalHariIni = Carbon::today()->toDateString();
-            $waktuSekarang  = Carbon::now()->toTimeString();
+            /*
+            |--------------------------------------------------------------------------
+            | AMBIL LOKASI DULU UNTUK TENTUKAN TIMEZONE
+            |--------------------------------------------------------------------------
+            */
+
+            $lokasi = LokasiKantor::first();
+
+            if (!$lokasi) {
+                return response()->json([
+                    'message' => 'Lokasi kantor belum diatur admin.'
+                ], 400);
+            }
+
+            $timezone = $lokasi->timezone ?? config('app.timezone');
+
+            $waktuSaatIni = $this->presensiService->getCurrentDateTimeForTimezone($timezone);
+
+            $tanggalHariIni = $waktuSaatIni['tanggal'];
+            $waktuSekarang  = $waktuSaatIni['waktu'];
 
             $incomingDeviceId = $request->device_id;
 
@@ -339,7 +361,7 @@ public function store(StorePresensiRequest $request)
             */
 
             $namaHari = $this->presensiService
-                ->getIndonesianDayName(Carbon::today()->dayOfWeek);
+                ->getIndonesianDayName(Carbon::now($timezone)->dayOfWeek);
 
             $jadwal = JadwalKerja::get()->first(function ($item) use ($namaHari) {
 
@@ -348,11 +370,9 @@ public function store(StorePresensiRequest $request)
                 return in_array($namaHari, $hariArray);
             });
 
-            $lokasi = LokasiKantor::first();
-
-            if (!$jadwal || !$lokasi) {
+            if (!$jadwal) {
                 return response()->json([
-                    'message' => 'Jadwal kerja atau lokasi kantor belum diatur admin.'
+                    'message' => 'Jadwal kerja belum diatur admin.'
                 ], 400);
             }
 
@@ -408,7 +428,8 @@ public function store(StorePresensiRequest $request)
                     $jadwal->jam_masuk,
                     $jadwal->jam_pulang,
                     $jadwal->batas_awal_masuk,
-                    $jadwal->batas_akhir_masuk
+                    $jadwal->batas_akhir_masuk,
+                    $timezone
                 );
 
                 if ($jadwal->use_camera && !$request->foto) {
@@ -435,7 +456,7 @@ public function store(StorePresensiRequest $request)
                     $request->latitude,
                     $request->longitude,
                     $request->accuracy,
-                    Carbon::now()
+                    Carbon::now($timezone)
                 );
 
                 $presensi = Presensi::create([
@@ -491,7 +512,8 @@ public function store(StorePresensiRequest $request)
                 $jadwal->jam_masuk,
                 $jadwal->jam_pulang,
                 $jadwal->batas_awal_pulang,
-                $jadwal->batas_akhir_pulang
+                $jadwal->batas_akhir_pulang,
+                $timezone
             );
 
             if ($jadwal->use_camera && !$request->foto) {
@@ -513,7 +535,7 @@ public function store(StorePresensiRequest $request)
                 $request->latitude,
                 $request->longitude,
                 $request->accuracy,
-                Carbon::now()
+                Carbon::now($timezone)
             );
 
             $presensiHariIni->update([

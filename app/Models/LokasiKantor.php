@@ -10,5 +10,5 @@ class LokasiKantor extends Model
     use HasFactory;
 
     protected $table = 'lokasi_kantors';
-    protected $fillable = ['nama_lokasi', 'latitude', 'longitude', 'radius'];
+    protected $fillable = ['nama_lokasi', 'latitude', 'longitude', 'radius', 'timezone'];
 }

@@ -27,16 +27,18 @@ class LokasiKantorController extends Controller
     {
         $request->validate([
             'nama_lokasi' => 'required|string|max:255',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'radius' => 'required|integer',
+            'latitude'    => 'required',
+            'longitude'   => 'required',
+            'radius'      => 'required|integer|min:1',
+            'timezone'    => 'required|string|in:Asia/Jakarta,Asia/Makassar,Asia/Jayapura',
         ]);
 
         LokasiKantor::create([
             'nama_lokasi' => $request->nama_lokasi,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'radius' => $request->radius,
+            'latitude'    => $request->latitude,
+            'longitude'   => $request->longitude,
+            'radius'      => $request->radius,
+            'timezone'    => $request->timezone,
         ]);
 
         return redirect()
@@ -53,21 +55,23 @@ class LokasiKantorController extends Controller
     {
         $request->validate([
             'nama_lokasi' => 'required|string|max:255',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'radius' => 'required|integer|min:1',
+            'latitude'    => 'required',
+            'longitude'   => 'required',
+            'radius'      => 'required|integer|min:1',
+            'timezone'    => 'required|string|in:Asia/Jakarta,Asia/Makassar,Asia/Jayapura',
         ]);
 
         $lokasiKantor->update([
             'nama_lokasi' => $request->nama_lokasi,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'radius' => $request->radius,
+            'latitude'    => $request->latitude,
+            'longitude'   => $request->longitude,
+            'radius'      => $request->radius,
+            'timezone'    => $request->timezone,
         ]);
 
         return redirect()
             ->route('admin.lokasi-kantor.index')
-            ->with('success', 'Radius berhasil diperbarui.');
+            ->with('success', 'Lokasi kantor berhasil diperbarui.');
     }
 
     public function destroy(LokasiKantor $lokasiKantor)

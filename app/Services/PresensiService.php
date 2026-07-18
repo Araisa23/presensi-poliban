@@ -100,7 +100,9 @@ class PresensiService
     }
 
     /**
-     * Validasi waktu presensi (Masuk / Pulang)
+     * Validasi waktu presensi (Masuk / Pulang).
+     * $timezone: IANA timezone identifier milik LokasiKantor terkait
+     * (contoh: 'Asia/Makassar', 'Asia/Jakarta', 'Asia/Jayapura').
      */
     public function validateTime(
         $type,
@@ -108,39 +110,55 @@ class PresensiService
         $jamMasuk,
         $jamPulang,
         $batasAwal  = null,
-        $batasAkhir = null
+        $batasAkhir = null,
+        $timezone   = 'Asia/Makassar'
     ) {
-        $now    = Carbon::parse($currentTime);
-        $masuk  = Carbon::parse($jamMasuk);
-        $pulang = Carbon::parse($jamPulang);
+        $now    = Carbon::parse($currentTime, $timezone);
+        $masuk  = Carbon::parse($jamMasuk, $timezone);
+        $pulang = Carbon::parse($jamPulang, $timezone);
 
         if ($type === 'masuk') {
-            $windowStart = $batasAwal  ? Carbon::parse($batasAwal)  : $masuk->copy()->subHour();
-            $windowEnd   = $batasAkhir ? Carbon::parse($batasAkhir) : $masuk->copy();
+            $windowStart = $batasAwal  ? Carbon::parse($batasAwal, $timezone)  : $masuk->copy()->subHour();
+            $windowEnd   = $batasAkhir ? Carbon::parse($batasAkhir, $timezone) : $masuk->copy();
 
             if ($now->lessThan($windowStart)) {
-                throw new Exception("Belum waktunya presensi masuk (Mulai: " . $windowStart->format('H:i') . ")");
+                throw new Exception("Belum waktunya presensi masuk (Mulai: " . $windowStart->format('H:i') . " " . $timezone . ")");
             }
 
             if ($now->greaterThan($windowEnd)) {
-                throw new Exception("Waktu presensi masuk sudah habis (Batas Akhir: " . $windowEnd->format('H:i') . ")");
+                throw new Exception("Waktu presensi masuk sudah habis (Batas Akhir: " . $windowEnd->format('H:i') . " " . $timezone . ")");
             }
 
             return;
         }
 
         if ($type === 'pulang') {
-            $windowStart = $batasAwal  ? Carbon::parse($batasAwal)  : $pulang->copy();
-            $windowEnd   = $batasAkhir ? Carbon::parse($batasAkhir) : $pulang->copy()->addHour();
+            $windowStart = $batasAwal  ? Carbon::parse($batasAwal, $timezone)  : $pulang->copy();
+            $windowEnd   = $batasAkhir ? Carbon::parse($batasAkhir, $timezone) : $pulang->copy()->addHour();
 
             if ($now->lessThan($windowStart)) {
-                throw new Exception("Belum waktunya presensi pulang (Mulai: " . $windowStart->format('H:i') . ")");
+                throw new Exception("Belum waktunya presensi pulang (Mulai: " . $windowStart->format('H:i') . " " . $timezone . ")");
             }
 
             if ($now->greaterThan($windowEnd)) {
-                throw new Exception("Batas waktu presensi pulang sudah habis (Batas Akhir: " . $windowEnd->format('H:i') . ")");
+                throw new Exception("Batas waktu presensi pulang sudah habis (Batas Akhir: " . $windowEnd->format('H:i') . " " . $timezone . ")");
             }
         }
+    }
+
+    /**
+     * Ambil tanggal & waktu sekarang berdasarkan timezone lokasi tertentu.
+     * Dipakai supaya presensi valid sesuai zona waktu setempat lokasi kantor,
+     * bukan timezone server.
+     */
+    public function getCurrentDateTimeForTimezone($timezone = 'Asia/Makassar')
+    {
+        $now = Carbon::now($timezone);
+
+        return [
+            'tanggal' => $now->toDateString(),
+            'waktu'   => $now->toTimeString(),
+        ];
     }
 
     /**

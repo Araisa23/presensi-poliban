@@ -17,10 +17,23 @@
                         <div class="relative rounded-3xl overflow-hidden bg-black aspect-video flex items-center justify-center border border-slate-100/70 dark:border-white/10 shadow-soft">
                             <video id="video" autoplay playsinline class="w-full h-full object-cover transform scale-x-[-1]"></video>
                             <canvas id="canvas" class="hidden"></canvas>
-                        </div>
 
-                        <div id="liveness-status" class="mt-3 p-3 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-800 dark:text-amber-200 text-xs font-bold text-center">
-                            📷 Memuat model deteksi wajah...
+                            <!-- Frame Wajah -->
+                            <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+
+                                <div
+                                    id="face-guide"
+                                    class="w-[55%] aspect-[3/4] rounded-[50%]
+                                        border-[4px] border-red-500
+                                        transition-all duration-300">
+                                </div>
+
+                            </div>
+
+                            <!-- Overlay pesan verifikasi, menempel di atas video (seperti verifikasi wajah m-banking) -->
+                            <div id="liveness-status" class="absolute left-3 right-3 bottom-3 p-3 rounded-2xl bg-black/60 backdrop-blur-sm border border-white/10 text-white text-xs font-bold text-center transition-colors">
+                                📷 Memuat model deteksi wajah...
+                            </div>
                         </div>
 
                         @endif
@@ -179,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const successModalIconMasuk = document.getElementById('success-modal-icon-masuk');
     const successModalIconPulang = document.getElementById('success-modal-icon-pulang');
     const livenessStatusEl = document.getElementById('liveness-status');
+    const faceGuide = document.getElementById('face-guide');
 
     // ============================
     // DEVICE ID (untuk device binding)
@@ -222,8 +236,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const BLINK_CLOSE_THRESHOLD = 0.5;
 
     // Head turn detection
-    const YAW_THRESHOLD = 15; // derajat. Naikkan/turunkan jika kurang/terlalu sensitif
+    const YAW_THRESHOLD = 20; // derajat. Naikkan/turunkan jika kurang/terlalu sensitif
     let hasReturnedToCenter = true; // mencegah 1 gerakan menoleh terhitung dobel
+
+    // ======================
+    // FACE POSITION CHECK
+    // ======================
+
+    const FACE_CENTER_THRESHOLD_X = 0.15;
+    const FACE_CENTER_THRESHOLD_Y = 0.15;
+
+    let faceCentered = false;
 
     // 1. Get Location
     @if($jadwal?->use_location)
@@ -300,17 +323,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (livenessStatusEl) {
-                livenessStatusEl.textContent = "👀 Posisikan wajah di kamera, lalu kedipkan mata";
+                setLivenessStatus("👀 Posisikan wajah di kamera, lalu kedipkan mata", 'info');
             }
 
             requestAnimationFrame(detectLoop);
 
         } catch (err) {
             console.error('Gagal load model liveness:', err);
-            if (livenessStatusEl) {
-                livenessStatusEl.textContent = "❌ Gagal memuat model deteksi wajah.";
-                livenessStatusEl.className = "mt-3 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold text-center";
-            }
+            setLivenessStatus("❌ Gagal memuat model deteksi wajah.", 'warn');
         }
     }
 
@@ -323,71 +343,192 @@ document.addEventListener('DOMContentLoaded', function() {
         return yawRad * (180 / Math.PI);
     }
 
+    // ============================
+    // MAIN DETECTION LOOP
+    // Satu-satunya tempat logika liveness dievaluasi per frame.
+    // (Sebelumnya ada 2 blok kedip/toleh yang jalan dobel di frame
+    // yang sama -> itu penyebab liveness tidak pernah stabil.)
+    // ============================
     function detectLoop() {
+
         if (livenessPassed || !faceLandmarker) return;
 
         if (video.currentTime !== lastVideoTime) {
+
             lastVideoTime = video.currentTime;
 
-            const result = faceLandmarker.detectForVideo(video, performance.now());
+            const result = faceLandmarker.detectForVideo(
+                video,
+                performance.now()
+            );
 
+            // ===========================
+            // Tidak ada wajah
+            // ===========================
             if (result.faceLandmarks.length === 0) {
-                setLivenessStatus("⚠️ Wajah tidak terdeteksi, mendekatlah ke kamera", 'warn');
-            } else if (result.faceLandmarks.length > 1) {
-                setLivenessStatus("⚠️ Terdeteksi lebih dari 1 wajah", 'warn');
-            } else {
 
-                // === STEP 1: KEDIP ===
-                if (livenessStep === 'blink' && result.faceBlendshapes?.length > 0) {
-                    const shapes = result.faceBlendshapes[0].categories;
-                    const blinkLeft  = shapes.find(s => s.categoryName === 'eyeBlinkLeft')?.score  ?? 0;
-                    const blinkRight = shapes.find(s => s.categoryName === 'eyeBlinkRight')?.score ?? 0;
-                    const avgBlink   = (blinkLeft + blinkRight) / 2;
-                    const isClosedNow = avgBlink > BLINK_CLOSE_THRESHOLD;
+                faceCentered = false;
 
-                    if (isClosedNow) {
-                        eyeWasClosed = true;
-                    } else if (eyeWasClosed && !isClosedNow) {
-                        eyeWasClosed = false;
-                        blinkCount++;
-                    }
+                faceGuide.classList.remove("border-green-500");
+                faceGuide.classList.add("border-red-500");
 
-                    if (blinkCount < REQUIRED_BLINKS) {
-                        setLivenessStatus(`👁️ Kedipkan mata untuk verifikasi (${blinkCount}/${REQUIRED_BLINKS})`, 'info');
-                    } else {
-                        livenessStep = 'turn_left';
-                        setLivenessStatus("↩️ Sekarang, tolehkan wajah ke KIRI", 'info');
-                    }
-                }
+                setLivenessStatus("⚠️ Wajah tidak terdeteksi", "warn");
 
-                // === STEP 2 & 3: TOLEH KIRI / KANAN ===
-                else if ((livenessStep === 'turn_left' || livenessStep === 'turn_right')
-                          && result.facialTransformationMatrixes?.length > 0) {
-
-                    const yaw = getYawDegrees(result.facialTransformationMatrixes[0]);
-
-                    if (livenessStep === 'turn_left') {
-                        if (yaw < -YAW_THRESHOLD && hasReturnedToCenter) {
-                            livenessStep = 'turn_right';
-                            hasReturnedToCenter = false;
-                            setLivenessStatus("↪️ Bagus! Sekarang tolehkan wajah ke KANAN", 'info');
-                        } else {
-                            setLivenessStatus("↩️ Tolehkan wajah ke KIRI", 'info');
-                        }
-                    } else if (livenessStep === 'turn_right') {
-                        if (!hasReturnedToCenter && Math.abs(yaw) < 5) {
-                            hasReturnedToCenter = true;
-                        }
-                        if (yaw > YAW_THRESHOLD && hasReturnedToCenter) {
-                            passLiveness();
-                        } else if (!hasReturnedToCenter) {
-                            setLivenessStatus("↪️ Kembalikan wajah ke tengah dulu, lalu toleh ke KANAN", 'info');
-                        } else {
-                            setLivenessStatus("↪️ Tolehkan wajah ke KANAN", 'info');
-                        }
-                    }
-                }
+                requestAnimationFrame(detectLoop);
+                return;
             }
+
+            // ===========================
+            // LEBIH DARI 1 WAJAH
+            // ===========================
+            if (result.faceLandmarks.length > 1) {
+
+                faceCentered = false;
+
+                faceGuide.classList.remove("border-green-500");
+                faceGuide.classList.add("border-red-500");
+
+                setLivenessStatus("⚠️ Hanya boleh 1 wajah", "warn");
+
+                requestAnimationFrame(detectLoop);
+                return;
+            }
+
+            // ===========================
+            // WAJAH TERDETEKSI - CEK POSISI
+            // ===========================
+            const landmarks = result.faceLandmarks[0];
+
+            let minX = 1;
+            let maxX = 0;
+            let minY = 1;
+            let maxY = 0;
+
+            landmarks.forEach(pt => {
+                minX = Math.min(minX, pt.x);
+                maxX = Math.max(maxX, pt.x);
+                minY = Math.min(minY, pt.y);
+                maxY = Math.max(maxY, pt.y);
+            });
+
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+
+            faceCentered =
+                Math.abs(centerX - 0.5) < FACE_CENTER_THRESHOLD_X &&
+                Math.abs(centerY - 0.5) < FACE_CENTER_THRESHOLD_Y;
+
+            if (!faceCentered) {
+
+                faceGuide.classList.remove("border-green-500");
+                faceGuide.classList.add("border-red-500");
+
+                setLivenessStatus("📍 Posisikan wajah tepat di tengah frame", "warn");
+
+                requestAnimationFrame(detectLoop);
+                return;
+            }
+
+            faceGuide.classList.remove("border-red-500");
+            faceGuide.classList.add("border-green-500");
+
+            // ======================================================
+            // LIVENESS (KEDIP → TOLEH KIRI → TOLEH KANAN)
+            // Hanya dievaluasi sekali per frame, di sini.
+            // ======================================================
+
+            if (livenessStep === "blink" && result.faceBlendshapes?.length > 0) {
+
+                const shapes = result.faceBlendshapes[0].categories;
+
+                const blinkLeft =
+                    shapes.find(s => s.categoryName === "eyeBlinkLeft")?.score ?? 0;
+
+                const blinkRight =
+                    shapes.find(s => s.categoryName === "eyeBlinkRight")?.score ?? 0;
+
+                const avgBlink = (blinkLeft + blinkRight) / 2;
+
+                const isClosedNow = avgBlink > BLINK_CLOSE_THRESHOLD;
+
+                if (isClosedNow) {
+
+                    eyeWasClosed = true;
+
+                } else if (eyeWasClosed) {
+
+                    eyeWasClosed = false;
+                    blinkCount++;
+
+                }
+
+                if (blinkCount < REQUIRED_BLINKS) {
+
+                    setLivenessStatus(
+                        `👁️ Kedipkan mata (${blinkCount}/${REQUIRED_BLINKS})`,
+                        "info"
+                    );
+
+                } else {
+
+                    livenessStep = "turn_left";
+
+                    setLivenessStatus("↩️ Sekarang toleh ke KIRI", "info");
+
+                }
+
+            }
+            else if (
+                (livenessStep === "turn_left" || livenessStep === "turn_right") &&
+                result.facialTransformationMatrixes?.length > 0
+            ) {
+
+                const yaw = getYawDegrees(result.facialTransformationMatrixes[0]);
+
+                if (livenessStep === "turn_left") {
+
+                    if (yaw < -YAW_THRESHOLD && hasReturnedToCenter) {
+
+                        livenessStep = "turn_right";
+                        hasReturnedToCenter = false;
+
+                        setLivenessStatus("↪️ Bagus! Sekarang toleh ke KANAN", "info");
+
+                    } else {
+
+                        setLivenessStatus("↩️ Tolehkan wajah ke KIRI", "info");
+
+                    }
+
+                }
+                else if (livenessStep === "turn_right") {
+
+                    if (!hasReturnedToCenter && Math.abs(yaw) < 5) {
+
+                        hasReturnedToCenter = true;
+
+                    }
+
+                    if (yaw > YAW_THRESHOLD && hasReturnedToCenter) {
+
+                        passLiveness();
+
+                    }
+                    else if (!hasReturnedToCenter) {
+
+                        setLivenessStatus("↪️ Kembalikan ke tengah dulu", "info");
+
+                    }
+                    else {
+
+                        setLivenessStatus("↪️ Tolehkan ke KANAN", "info");
+
+                    }
+
+                }
+
+            }
+
         }
 
         requestAnimationFrame(detectLoop);
@@ -399,17 +540,21 @@ document.addEventListener('DOMContentLoaded', function() {
         updateButtonState();
     }
 
+    // ============================
+    // Pesan verifikasi ditampilkan sebagai overlay DI DALAM area kamera
+    // (mirip verifikasi wajah m-banking: wajah di tengah oval + teks status di bawahnya)
+    // ============================
     function setLivenessStatus(text, type) {
         if (!livenessStatusEl) return;
         livenessStatusEl.textContent = text;
 
-        const base = "mt-3 p-3 rounded-2xl text-xs font-bold text-center border ";
+        const base = "absolute left-3 right-3 bottom-3 p-3 rounded-2xl text-xs font-bold text-center backdrop-blur-sm border transition-colors ";
         const styles = {
-            info:    "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-800 dark:text-amber-200",
-            warn:    "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-800 dark:text-rose-200",
-            success: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-200",
+            info:    "bg-amber-500/70 border-amber-300/40 text-white",
+            warn:    "bg-rose-500/80 border-rose-300/40 text-white",
+            success: "bg-emerald-500/80 border-emerald-300/40 text-white",
         };
-        livenessStatusEl.className = base + styles[type];
+        livenessStatusEl.className = base + (styles[type] || styles.info);
     }
 
     function updateButtonState() {
@@ -451,24 +596,24 @@ document.addEventListener('DOMContentLoaded', function() {
         @endif
 
         try {
-            const response = await fetch("{{ route('pegawai.presensi.store') }}", {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
+        const response = await fetch("{{ route('pegawai.presensi.store') }}", {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
 
-                body: JSON.stringify({
-                    latitude: lat ? lat.toString() : null,
-                    longitude: lon ? lon.toString() : null,
-                    accuracy: accuracy,
-                    foto: imageData,
-                    is_live: livenessPassed ? 1 : 0,
-                    device_id: deviceId,
-                })
-            });
+            body: JSON.stringify({
+                latitude: lat ? lat.toString() : null,
+                longitude: lon ? lon.toString() : null,
+                accuracy: accuracy,
+                foto: imageData,
+                is_live: livenessPassed ? 1 : 0,
+                device_id: deviceId,
+            })
+        });
 
             const result = await response.json();
 

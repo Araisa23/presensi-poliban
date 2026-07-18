@@ -101,6 +101,35 @@
                         <x-input-error :messages="$errors->get('radius')" class="mt-2" />
                     </div>
 
+                    {{-- Timezone --}}
+                    <div class="md:col-span-2">
+                        <x-input-label for="timezone" :value="__('Zona Waktu Lokasi')" />
+
+                        <select
+                            id="timezone"
+                            name="timezone"
+                            required
+                            class="block mt-1 w-full rounded-2xl border-slate-300 focus:border-blue-500 focus:ring-blue-500 shadow-soft"
+                        >
+                            <option value="" disabled selected>-- Pilih Zona Waktu --</option>
+                            <option value="Asia/Jakarta" {{ old('timezone') == 'Asia/Jakarta' ? 'selected' : '' }}>
+                                WIB — Asia/Jakarta (Jakarta, Sumatera, Jawa, Kalimantan Barat & Tengah)
+                            </option>
+                            <option value="Asia/Makassar" {{ old('timezone', 'Asia/Makassar') == 'Asia/Makassar' ? 'selected' : '' }}>
+                                WITA — Asia/Makassar (Kalimantan Selatan/Timur/Utara, Sulawesi, Bali, NTB, NTT)
+                            </option>
+                            <option value="Asia/Jayapura" {{ old('timezone') == 'Asia/Jayapura' ? 'selected' : '' }}>
+                                WIT — Asia/Jayapura (Maluku, Papua)
+                            </option>
+                        </select>
+
+                        <p class="mt-2 text-xs text-slate-500 font-medium">
+                            Zona waktu ini akan menjadi acuan jam presensi masuk/pulang pegawai di lokasi ini.
+                        </p>
+
+                        <x-input-error :messages="$errors->get('timezone')" class="mt-2" />
+                    </div>
+
                 </div>
 
                 {{-- INFO --}}
